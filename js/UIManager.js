@@ -167,17 +167,59 @@ export class UIManager {
     }
 
     parseMarkdown(text) {
-        return text
-            .replace(/^### (.*$)/gim, '<h3>$1</h3>')
-            .replace(/^## (.*$)/gim, '<h2>$1</h2>')
-            .replace(/^# (.*$)/gim, '<h1>$1</h1>')
-            .replace(/\*\*(.*)\*\*/gim, '<strong>$1</strong>')
-            .replace(/\*(.*)\*/gim, '<em>$1</em>')
-            .replace(/`{3}([\s\S]*?)`{3}/gim, '<pre><code>$1</code></pre>')
-            .replace(/`(.*?)`/gim, '<code>$1</code>')
-            .replace(/^\* (.*$)/gim, '<ul>\n<li>$1</li>\n</ul>')
-            .replace(/<\/ul>\n<ul>/gim, '') // Combine consecutive lists
-            .replace(/\n/g, '<br>');
+        const lines = text.split('\n');
+        let html = '';
+        let listStack = [];
+
+        const closeOpenLists = (currentLineIndent, currentLineType = null) => {
+            while (listStack.length > 0) {
+                const topOfStack = listStack[listStack.length - 1];
+                if (topOfStack.indent > currentLineIndent || (topOfStack.indent === currentLineIndent && currentLineType && topOfStack.type !== currentLineType) || !currentLineType) {
+                    html += `</${topOfStack.type}>`;
+                    listStack.pop();
+                } else {
+                    break;
+                }
+            }
+        };
+
+        for (const line of lines) {
+            let processedLine = line;
+            const currentLineIndent = line.match(/^\s*/)[0].length;
+
+            if (/^### (.*)/.test(line)) {
+                closeOpenLists(currentLineIndent);
+                html += `<h3>${processedLine.substring(4)}</h3>`;
+            } else if (/^## (.*)/.test(line)) {
+                closeOpenLists(currentLineIndent);
+                html += `<h2>${processedLine.substring(3)}</h2>`;
+            } else if (/^# (.*)/.test(line)) {
+                closeOpenLists(currentLineIndent);
+                html += `<h1>${processedLine.substring(2)}</h1>`;
+            } else if (/^---/.test(line)) {
+                closeOpenLists(currentLineIndent);
+                html += '<hr>';
+            } else if (/^(\s*)[*-]+\s+(.*)/.test(line)) {
+                const match = line.match(/^(\s*)[*-]+\s+(.*)/);
+                const itemIndent = match[1].length;
+                let itemContent = match[2].replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>').replace(/`([^`]+)`/g, '<code>$1</code>');
+                closeOpenLists(itemIndent, 'ul');
+                if (listStack.length === 0 || listStack[listStack.length - 1].indent < itemIndent || listStack[listStack.length - 1].type !== 'ul') {
+                    html += '<ul>';
+                    listStack.push({ type: 'ul', indent: itemIndent });
+                }
+                html += `<li>${itemContent}</li>`;
+            } else if (line.trim() === '') {
+                closeOpenLists(currentLineIndent);
+                html += '<br>';
+            } else {
+                closeOpenLists(currentLineIndent);
+                processedLine = processedLine.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>').replace(/`([^`]+)`/g, '<code>$1</code>');
+                html += `<p>${processedLine}</p>`;
+            }
+        }
+        closeOpenLists(0);
+        return html;
     }
 
     performReadmeSearch() {
