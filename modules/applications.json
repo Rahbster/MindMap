@@ -1,0 +1,34 @@
+{
+  "id": "applications",
+  "name": "AI Applications",
+  "nodes": {
+    "root": {
+      "id": "root",
+      "title": "AI Applications",
+      "content": "<h2>Applications of AI</h2><p>Artificial Intelligence is transforming numerous industries by enabling new capabilities and efficiencies.</p>",
+      "children": ["healthcare", "finance", "transportation"],
+      "quiz": []
+    },
+    "healthcare": {
+      "id": "healthcare",
+      "title": "Healthcare",
+      "content": "<h3>AI in Healthcare</h3><p>AI is used for diagnostic imaging analysis (like X-rays and MRIs), personalized treatment plans, drug discovery, and robotic surgery.</p>",
+      "children": [],
+      "quiz": []
+    },
+    "finance": {
+      "id": "finance",
+      "title": "Finance",
+      "content": "<h3>AI in Finance</h3><p>In finance, AI powers algorithmic trading, fraud detection systems, credit scoring, and personalized financial advice through robo-advisors.</p>",
+      "children": [],
+      "quiz": []
+    },
+    "transportation": {
+      "id": "transportation",
+      "title": "Transportation",
+      "content": "<h3>AI in Transportation</h3><p>The most well-known application is in self-driving cars. AI is also used for traffic prediction, route optimization, and managing logistics for shipping and delivery.</p>",
+      "children": [],
+      "quiz": []
+    }
+  }
+}

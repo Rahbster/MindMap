@@ -1,0 +1,27 @@
+{
+  "id": "learning-paradigms",
+  "name": "Learning Paradigms",
+  "nodes": {
+    "root": {
+      "id": "root",
+      "title": "Learning Paradigms",
+      "content": "<h2>AI Learning Paradigms</h2><p>These are the fundamental approaches and methodologies used to enable machines to learn from data.</p>",
+      "children": ["machine-learning", "deep-learning"],
+      "quiz": []
+    },
+    "machine-learning": {
+      "id": "machine-learning",
+      "title": "Machine Learning",
+      "content": "<h3>Machine Learning</h3><p>The foundational field of AI focused on algorithms that allow computers to learn from and make predictions on data. Click to zoom in.</p>",
+      "children": [],
+      "subModule": "modules/ml.json"
+    },
+    "deep-learning": {
+      "id": "deep-learning",
+      "title": "Deep Learning",
+      "content": "<h3>Deep Learning</h3><p>A powerful subfield of Machine Learning that uses multi-layered neural networks to learn from vast amounts of data. Click to zoom in.</p>",
+      "children": [],
+      "subModule": "modules/deep-learning.json"
+    }
+  }
+}

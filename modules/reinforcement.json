@@ -1,0 +1,12 @@
+{
+  "id": "reinforcement",
+  "name": "Reinforcement Learning",
+  "nodes": {
+    "root": {
+      "id": "root",
+      "title": "Reinforcement Learning",
+      "content": "<h3>Reinforcement Learning</h3><p>An agent learns to make decisions by taking actions in an environment to maximize a cumulative reward. It learns from trial and error. This is the basis for teaching AI to play games like Chess or Go, as well as for robotics control.</p>",
+      "children": []
+    }
+  }
+}

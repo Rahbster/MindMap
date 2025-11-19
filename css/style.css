@@ -1,0 +1,473 @@
+/* Define a global variable for dynamic font sizing */
+:root {
+    --dynamic-font-size: 24px; /* Default font size */
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: #f4f6f8;
+    color: #333;
+    line-height: 1.6;
+}
+
+header {
+    background-color: #2c3e50;
+    color: #ecf0f1;
+    z-index: 999; /* Ensure header is below overlay */
+    padding: 1rem;
+    text-align: center;
+}
+
+.hamburger-icon {
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0 1rem;
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+}
+.header-content {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start; /* Align items to the start */
+    position: relative;
+    gap: 1rem;
+}
+
+#breadcrumb-nav {
+    flex-grow: 1;
+    font-size: 1rem;
+    margin-left: 4rem; /* Make space for hamburger */
+}
+
+.breadcrumb-link {
+    color: #bdc3c7;
+    text-decoration: none;
+}
+
+.breadcrumb-link:hover {
+    text-decoration: underline;
+}
+
+.breadcrumb-separator {
+    margin: 0 0.5rem;
+    color: white;
+}
+
+/* Sidenav Menu */
+.sidenav {
+    height: 100%;
+    width: 0;
+    position: fixed;
+    z-index: 1001;
+    top: 0;
+    left: 0;
+    background-color: #2c3e50;
+    overflow-x: hidden;
+    transition: 0.3s;
+    padding-top: 60px;
+    box-shadow: 3px 0 6px rgba(0,0,0,0.2);
+}
+
+.sidenav a, .sidenav button {
+    padding: 8px 8px 8px 32px;
+    text-decoration: none;
+    font-size: 1.1rem;
+    color: #bdc3c7;
+    display: block;
+    transition: 0.2s;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+}
+
+.sidenav a:hover, .sidenav button:hover {
+    color: #ffffff;
+}
+
+.sidenav .close-btn {
+    position: absolute;
+    top: 0;
+    right: 25px;
+    font-size: 36px;
+    margin-left: 50px;
+}
+
+.sidenav .search-container {
+    padding: 0 32px;
+    margin-bottom: 1rem;
+}
+
+.sidenav #node-search-input {
+    width: 100%;
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid #7f8c8d;
+    background-color: #34495e;
+    color: white;
+}
+
+#search-results-container {
+    max-height: 25vh;
+    overflow-y: auto;
+}
+
+.search-result-item {
+    padding: 8px 32px;
+    cursor: pointer;
+    border-bottom: 1px solid #34495e;
+    color: #bdc3c7;
+}
+
+.search-result-item:hover {
+    background-color: #34495e;
+    color: white;
+}
+
+.sidenav h2 {
+    padding: 0 32px;
+    color: #ecf0f1;
+}
+
+.sidenav hr {
+    margin: 1rem 32px;
+    border-color: #34495e;
+}
+
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    z-index: 1000;
+    transition: opacity 0.3s;
+}
+
+.menu-btn {
+    background-color: #3498db !important;
+    color: white !important;
+    margin: 1rem 32px;
+    width: calc(100% - 64px);
+}
+
+.menu-btn.destructive {
+    background-color: #e74c3c !important;
+    color: white !important;
+}
+
+.font-controls {
+    position: absolute;
+    right: 1rem;
+    display: flex;
+    gap: 0.5rem;
+}
+
+.font-controls button {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    line-height: 1;
+}
+.container {
+    display: flex;
+    padding: 1rem;
+    gap: 1rem;
+    height: calc(100vh - 70px); /* Full height minus header */
+}
+
+.mindmap-container, .content-container {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    padding: 1.5rem;
+    overflow-y: auto;
+}
+
+.mindmap-container {
+    position: relative; /* Needed for absolute positioning of child elements */
+    flex: 2; /* Make mindmap container wider */
+}
+
+.content-container {
+    flex: 3; /* Adjust content container to fill remaining space */
+}
+
+.content-title-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 1rem;
+}
+.content-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.icon-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.2rem;
+    color: #7f8c8d;
+    padding: 5px;
+    line-height: 1;
+    border-radius: 4px;
+}
+
+.icon-button.destructive:hover {
+    background-color: #f8d7da;
+    color: #c0392b;
+}
+h1, h2 {
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+    color: #34495e;
+}
+
+/* Mind Map SVG Styles */
+#mindmap-svg-container {
+    width: 100%;
+    height: 90%;
+}
+
+.node-circle {
+    cursor: pointer;
+    fill: #3498db;
+    stroke: #2980b9;
+    stroke-width: calc(var(--dynamic-font-size) / 8); /* Make stroke proportional */
+    transition: fill 0.2s;
+}
+
+.node-circle:hover {
+    fill: #5dade2;
+}
+
+.node-circle.active {
+    animation: pulse-glow 1.5s infinite;
+}
+
+@keyframes pulse-glow {
+    0% {
+        filter: drop-shadow(0 0 3px #e67e22);
+    }
+    50% {
+        filter: drop-shadow(0 0 12px #e67e22);
+    }
+    100% {
+        filter: drop-shadow(0 0 3px #e67e22);
+    }
+}
+
+.node-text {
+    font-size: calc(var(--dynamic-font-size) * 0.75); /* Make node text proportional */
+    pointer-events: none;
+    fill: #fff;
+    text-anchor: middle;
+    /* dominant-baseline is handled by tspan dy */
+}
+
+.link-line {
+    stroke: #95a5a6;
+    stroke-width: calc(var(--dynamic-font-size) / 8); /* Make stroke proportional */
+}
+
+/* Add a glow to nodes that link to a sub-module */
+.has-submodule {
+    filter: drop-shadow(0 0 5px #3498db);
+}
+
+/* Add a shadow to child nodes */
+.is-child-node {
+    filter: drop-shadow(3px 3px 3px rgba(0, 0, 0, 0.4));
+}
+
+/* Content and Quiz Styles */
+#content-display h1, #content-display h2 {
+    font-size: 1.75rem;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 0.5rem;
+}
+
+.hidden {
+    display: none !important;
+}
+
+#quiz-container {
+    font-size: var(--dynamic-font-size);
+    margin-top: 2rem;
+    border-top: 2px solid #eee;
+    padding-top: 1.5rem;
+}
+
+.quiz-option {
+    display: block;
+    width: 100%;
+    padding: 0.75rem;
+    margin: 0.5rem 0;
+    text-align: left;
+    background-color: #ecf0f1;
+    border: 1px solid #bdc3c7;
+    font-size: inherit; /* Ensure options scale with the container font size */
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.quiz-option:hover:not(:disabled) {
+    background-color: #dfe6e9;
+}
+
+.quiz-option.correct {
+    background-color: #2ecc71;
+    color: white;
+    border-color: #27ae60;
+}
+
+.quiz-option.incorrect {
+    background-color: #e74c3c;
+    color: white;
+    border-color: #c0392b;
+}
+
+#quiz-feedback {
+    margin-top: 1rem;
+    font-weight: bold;
+}
+
+/* Node Editor Modal */
+.modal {
+    position: fixed;
+    z-index: 1002;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background-color: #fff;
+    padding: 2rem;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 700px;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.modal-input {
+    width: 100%;
+    padding: 0.5rem;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+#node-content-editor {
+    height: 200px;
+    border: 1px solid #ccc;
+}
+
+.modal-buttons {
+    margin-top: 1rem;
+    display: flex;
+    gap: 1rem;
+}
+
+#content-display {
+    /* Set font size via CSS variable for global control */
+    font-size: var(--dynamic-font-size);
+}
+
+.map-controls {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    z-index: 10; /* Ensure it's above the SVG content */
+    display: flex;
+    gap: 0.5rem;
+}
+
+.icon-button:hover {
+    background-color: #f0f0f0;
+}
+
+.header-content h1 {
+    margin-left: 4rem; /* Make space for hamburger */
+    color: #ecf0f1; /* Make header title text light for better contrast */
+}
+
+/* ReadMe Modal Styles */
+.readme-content {
+    width: 90%;
+    max-width: 900px;
+    height: 80vh;
+    padding: 0;
+}
+
+.readme-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--divider-color);
+    background-color: #f8f9fa;
+}
+
+.readme-header h2 {
+    margin: 0;
+}
+
+.readme-search-container {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+#readme-search-input {
+    padding: 5px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+}
+
+#readme-search-count {
+    font-size: 0.9rem;
+    color: #7f8c8d;
+}
+
+#close-readme-btn {
+    font-size: 2rem;
+}
+
+#readme-display {
+    padding: 1.5rem;
+    overflow-y: auto;
+    height: calc(100% - 70px); /* Adjust based on header height */
+}
+
+#readme-display mark {
+    background-color: #f1c40f;
+    padding: 2px;
+    border-radius: 3px;
+}

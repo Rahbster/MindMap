@@ -1,0 +1,34 @@
+{
+  "id": "deep-learning",
+  "name": "Deep Learning",
+  "nodes": {
+    "root": {
+      "id": "root",
+      "title": "Deep Learning",
+      "content": "<h2>Deep Learning</h2><p>A subfield of machine learning based on artificial neural networks with many layers (deep neural networks). It has led to breakthroughs in many areas.</p>",
+      "children": ["ann", "cnn", "rnn"],
+      "quiz": []
+    },
+    "ann": {
+      "id": "ann",
+      "title": "Neural Networks",
+      "content": "<h3>Artificial Neural Networks (ANNs)</h3><p>Computing systems inspired by the biological neural networks that constitute animal brains. They consist of interconnected nodes (neurons) that process information.</p>",
+      "children": [],
+      "quiz": []
+    },
+    "cnn": {
+      "id": "cnn",
+      "title": "Convolutional Neural Networks",
+      "content": "<h3>CNNs</h3><p>A class of deep neural networks, most commonly applied to analyzing visual imagery. They are used in image and video recognition, image classification, and medical image analysis.</p>",
+      "children": [],
+      "quiz": []
+    },
+    "rnn": {
+      "id": "rnn",
+      "title": "Recurrent Neural Networks",
+      "content": "<h3>RNNs</h3><p>A class of artificial neural networks where connections between nodes form a directed graph along a temporal sequence. This allows them to exhibit temporal dynamic behavior, making them ideal for sequential data like text or time series.</p>",
+      "children": [],
+      "quiz": []
+    }
+  }
+}

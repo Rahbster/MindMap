@@ -1,0 +1,34 @@
+{
+  "id": "ethics",
+  "name": "AI Ethics",
+  "nodes": {
+    "root": {
+      "id": "root",
+      "title": "AI Ethics",
+      "content": "<h2>Ethical Considerations in AI</h2><p>As AI becomes more powerful, it's crucial to consider the ethical implications of its development and deployment.</p>",
+      "children": ["bias", "privacy", "autonomy"],
+      "quiz": []
+    },
+    "bias": {
+      "id": "bias",
+      "title": "Bias and Fairness",
+      "content": "<h3>Bias and Fairness</h3><p>AI models trained on biased data can perpetuate and even amplify existing societal biases, leading to unfair outcomes in areas like hiring, loan applications, and criminal justice.</p>",
+      "children": [],
+      "quiz": []
+    },
+    "privacy": {
+      "id": "privacy",
+      "title": "Privacy",
+      "content": "<h3>Privacy Concerns</h3><p>AI systems often require vast amounts of data to function, raising significant concerns about data privacy, surveillance, and how personal information is collected, used, and protected.</p>",
+      "children": [],
+      "quiz": []
+    },
+    "autonomy": {
+      "id": "autonomy",
+      "title": "Autonomous Systems",
+      "content": "<h3>Autonomous Systems</h3><p>The development of autonomous systems, such as self-driving cars and autonomous weapons, raises complex ethical questions about accountability, control, and decision-making in critical situations.</p>",
+      "children": [],
+      "quiz": []
+    }
+  }
+}

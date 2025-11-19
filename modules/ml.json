@@ -1,0 +1,41 @@
+{
+  "id": "ml",
+  "name": "Machine Learning",
+  "nodes": {
+    "root": {
+      "id": "root",
+      "title": "Machine Learning",
+      "content": "<h2>Machine Learning</h2><p>A subset of AI that gives computers the ability to learn without being explicitly programmed. It focuses on the development of algorithms that can access data and use it to learn for themselves.</p>",
+      "children": ["supervised", "unsupervised", "reinforcement"],
+      "quiz": [
+        {
+          "question": "What is the primary goal of Machine Learning?",
+          "options": ["To create perfect programs", "To allow systems to learn from data", "To replace human jobs"],
+          "answer": "To allow systems to learn from data"
+        }
+      ]
+    },
+    "supervised": {
+      "id": "supervised",
+      "title": "Supervised Learning",
+      "content": "<h3>Supervised Learning</h3><p>The model is trained on a labeled dataset. Click to zoom in for more details on types like Classification and Regression.</p>",
+      "children": [],
+      "quiz": [],
+      "subModule": "modules/supervised.json"
+    },
+    "unsupervised": {
+      "id": "unsupervised",
+      "title": "Unsupervised Learning",
+      "content": "<h3>Unsupervised Learning</h3><p>The model works with unlabeled data to find hidden patterns. Click to zoom in.</p>",
+      "children": [],
+      "subModule": "modules/unsupervised.json"
+    },
+    "reinforcement": {
+      "id": "reinforcement",
+      "title": "Reinforcement Learning",
+      "content": "<h3>Reinforcement Learning</h3><p>An agent learns to make decisions by taking actions in an environment to maximize a reward. Click to zoom in.</p>",
+      "children": [],
+      "subModule": "modules/reinforcement.json"
+    }
+  }
+}

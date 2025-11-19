@@ -1,0 +1,25 @@
+{
+  "id": "unsupervised",
+  "name": "Unsupervised Learning",
+  "nodes": {
+    "root": {
+      "id": "root",
+      "title": "Unsupervised Learning",
+      "content": "<h3>Unsupervised Learning</h3><p>The model works with unlabeled data and tries to find patterns and relationships within it without prior knowledge of the output.</p>",
+      "children": ["clustering", "dimensionality-reduction"],
+      "quiz": []
+    },
+    "clustering": {
+      "id": "clustering",
+      "title": "Clustering",
+      "content": "<h4>Clustering</h4><p>The task of grouping a set of objects in such a way that objects in the same group (or cluster) are more similar to each other than to those in other groups. Used in market segmentation and anomaly detection.</p>",
+      "children": []
+    },
+    "dimensionality-reduction": {
+      "id": "dimensionality-reduction",
+      "title": "Dimensionality Reduction",
+      "content": "<h4>Dimensionality Reduction</h4><p>The process of reducing the number of random variables under consideration by obtaining a set of principal variables. It is used to simplify data for easier processing and visualization.</p>",
+      "children": []
+    }
+  }
+}

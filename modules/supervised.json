@@ -1,0 +1,33 @@
+{
+  "id": "supervised",
+  "name": "Supervised Learning",
+  "nodes": {
+    "root": {
+      "id": "root",
+      "title": "Supervised Learning",
+      "content": "<h3>Supervised Learning</h3><p>The model is trained on a labeled dataset, meaning each data point is tagged with the correct output. The goal is to learn a mapping function that can predict the output for new, unseen data.</p>",
+      "children": ["classification", "regression"],
+      "quiz": [
+        {
+          "question": "What is a key characteristic of Supervised Learning?",
+          "options": ["It uses unlabeled data", "It learns from rewards and punishments", "It requires a labeled dataset"],
+          "answer": "It requires a labeled dataset"
+        }
+      ]
+    },
+    "classification": {
+      "id": "classification",
+      "title": "Classification",
+      "content": "<h4>Classification</h4><p>A supervised learning task where the output variable is a category, such as 'spam' or 'not spam'. The goal is to predict the class label of a given input data.</p>",
+      "children": [],
+      "quiz": []
+    },
+    "regression": {
+      "id": "regression",
+      "title": "Regression",
+      "content": "<h4>Regression</h4><p>A supervised learning task where the output variable is a continuous value, such as the price of a house or the temperature. The goal is to predict a real-valued output.</p>",
+      "children": [],
+      "quiz": []
+    }
+  }
+}

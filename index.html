@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#3498db" />
+    <title>MindMap Knowledge System</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" href="icons/icon-192x192.png">
+    <!-- Quill Rich Text Editor -->
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+</head>
+<body>
+    <div id="sidenav" class="sidenav">
+        <a href="javascript:void(0)" class="close-btn" id="close-menu-btn">&times;</a>
+        <h2>Search Nodes</h2>
+        <div class="search-container">
+            <input type="search" id="node-search-input" placeholder="Search in current module...">
+        </div>
+        <div id="search-results-container">
+            <!-- Search results will appear here -->
+        </div>
+        <hr>
+        <h2>Load Module</h2>
+        <div id="module-loader">
+            <!-- Module links will be populated here -->
+        </div>
+        <hr>
+        <button id="load-module-btn" class="menu-btn">Load from File</button>
+        <hr>
+        <button id="show-readme-btn" class="menu-btn">Help / About</button>
+    </div>
+
+    <div id="main-content">
+        <header>
+            <div class="header-content">
+                <span class="hamburger-icon" id="open-menu-btn">&#9776;</span>
+                <h1>MindMap: <span id="module-title"></span></h1>
+                <nav id="breadcrumb-nav"></nav>
+                <div class="font-controls">
+                    <button id="decrease-font-btn" class="icon-button" title="Decrease font size">A-</button>
+                    <button id="increase-font-btn" class="icon-button" title="Increase font size">A+</button>
+                </div>
+            </div>
+        </header>
+
+        <main class="container">
+            <div class="mindmap-container">
+                <div class="map-controls">
+                    <button id="save-module-btn" class="icon-button hidden" title="Save to File"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg></button>
+                    <button id="auto-organize-btn" class="icon-button" title="Auto Organize"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg></button>
+                </div>
+                <h2>Knowledge Map</h2>
+                <div id="mindmap-svg-container">
+                    <!-- SVG Mind Map will be rendered here -->
+                </div>
+            </div>
+
+            <div class="content-container">
+                <div id="content-display">
+                    <!-- Content of the selected node will appear here -->
+                    <p>Select a node from the map to view its content.</p>
+                </div>
+
+                <div id="quiz-container" class="hidden">
+                    <h2>Mini-Quiz</h2>
+                    <div id="quiz-question"></div>
+                    <div id="quiz-options"></div>
+                    <div id="quiz-feedback"></div>
+                    <button id="next-question-btn" class="hidden">Next Question</button>
+                </div>
+            </div>
+        </main>
+
+        <!-- Node Editor Modal -->
+        <div id="node-editor-modal" class="modal hidden">
+            <div class="modal-content">
+                <h2>Edit Node</h2>
+                <label for="node-title-input">Title</label>
+                <input type="text" id="node-title-input" class="modal-input">
+                <label for="node-content-editor">Content</label>
+                <div id="node-content-editor"></div>
+                <div class="modal-buttons">
+                    <button id="save-node-btn">Save</button>
+                    <button id="cancel-node-edit-btn">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ReadMe Modal -->
+    <div id="readme-modal" class="modal hidden">
+        <div class="modal-content readme-content">
+            <div class="readme-header">
+                <h2>About This Application</h2>
+                <div class="readme-search-container">
+                    <input type="search" id="readme-search-input" placeholder="Search help...">
+                    <span id="readme-search-count"></span>
+                </div>
+                <button id="close-readme-btn" class="icon-button">&times;</button>
+            </div>
+            <div id="readme-display">
+                <!-- Rendered README.md will go here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js');
+            });
+        }
+    </script>
+    <!-- Quill Rich Text Editor -->
+    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+    <script src="js/quiz.js"></script>
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>
