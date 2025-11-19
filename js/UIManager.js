@@ -145,9 +145,16 @@ export class UIManager {
     }
 
     async openReadmeModal() {
-        if (this.readmeDisplay.innerHTML === '') {
+        this.readmeModal.classList.remove('hidden');
+        this.closeMenu();
+
+        // Only fetch and parse the content once.
+        if (this.originalReadmeHTML === '') {
+            this.readmeDisplay.innerHTML = '<p>Loading...</p>';
             try {
                 const response = await fetch('README.md');
+                if (!response.ok) throw new Error('README.md file not found.');
+
                 const markdown = await response.text();
                 this.originalReadmeHTML = this.parseMarkdown(markdown);
                 this.readmeDisplay.innerHTML = this.originalReadmeHTML;
@@ -156,8 +163,6 @@ export class UIManager {
                 console.error('Error fetching README:', error);
             }
         }
-        this.readmeModal.classList.remove('hidden');
-        this.closeMenu();
     }
 
     closeReadmeModal() {
@@ -166,8 +171,8 @@ export class UIManager {
         this.performReadmeSearch(); // Clear highlights
     }
 
-    parseMarkdown(text) {
-        const lines = text.split('\n');
+    parseMarkdown(markdown) {
+        const lines = markdown.split('\n');
         let html = '';
         let listStack = [];
 
@@ -190,6 +195,12 @@ export class UIManager {
             if (/^### (.*)/.test(line)) {
                 closeOpenLists(currentLineIndent);
                 html += `<h3>${processedLine.substring(4)}</h3>`;
+            } else if (/^##### (.*)/.test(line)) {
+                closeOpenLists(currentLineIndent);
+                html += `<h5>${processedLine.substring(6)}</h5>`;
+            } else if (/^#### (.*)/.test(line)) {
+                closeOpenLists(currentLineIndent);
+                html += `<h4>${processedLine.substring(5)}</h4>`;
             } else if (/^## (.*)/.test(line)) {
                 closeOpenLists(currentLineIndent);
                 html += `<h2>${processedLine.substring(3)}</h2>`;
@@ -202,11 +213,24 @@ export class UIManager {
             } else if (/^(\s*)[*-]+\s+(.*)/.test(line)) {
                 const match = line.match(/^(\s*)[*-]+\s+(.*)/);
                 const itemIndent = match[1].length;
-                let itemContent = match[2].replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>').replace(/`([^`]+)`/g, '<code>$1</code>');
+                let itemContent = match[2];
+                // Apply inline formatting *after* identifying the list item content
+                itemContent = itemContent.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>').replace(/`([^`]+)`/g, '<code>$1</code>');
                 closeOpenLists(itemIndent, 'ul');
                 if (listStack.length === 0 || listStack[listStack.length - 1].indent < itemIndent || listStack[listStack.length - 1].type !== 'ul') {
                     html += '<ul>';
                     listStack.push({ type: 'ul', indent: itemIndent });
+                }
+                html += `<li>${itemContent}</li>`;
+            } else if (/^(\s*)(\d+\.)\s+(.*)/.test(line)) {
+                const match = line.match(/^(\s*)(\d+\.)\s+(.*)/);
+                const itemIndent = match[1].length;
+                let itemContent = match[3];
+                itemContent = itemContent.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>').replace(/`([^`]+)`/g, '<code>$1</code>');
+                closeOpenLists(itemIndent, 'ol');
+                if (listStack.length === 0 || listStack[listStack.length - 1].indent < itemIndent || listStack[listStack.length - 1].type !== 'ol') {
+                    html += '<ol>';
+                    listStack.push({ type: 'ol', indent: itemIndent });
                 }
                 html += `<li>${itemContent}</li>`;
             } else if (line.trim() === '') {
@@ -214,6 +238,7 @@ export class UIManager {
                 html += '<br>';
             } else {
                 closeOpenLists(currentLineIndent);
+                // Apply inline formatting for paragraphs
                 processedLine = processedLine.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>').replace(/`([^`]+)`/g, '<code>$1</code>');
                 html += `<p>${processedLine}</p>`;
             }
@@ -223,36 +248,24 @@ export class UIManager {
     }
 
     performReadmeSearch() {
-        const term = this.readmeSearchInput.value;
+        const searchTerm = this.readmeSearchInput.value.trim();
         this.readmeDisplay.innerHTML = this.originalReadmeHTML; // Reset content
 
-        if (!term || term.length < 2) {
+        if (searchTerm === '') {
             this.readmeSearchCount.textContent = '';
             return;
         }
 
-        const regex = new RegExp(term, 'gi');
-        let count = 0;
-
-        const walker = document.createTreeWalker(this.readmeDisplay, NodeFilter.SHOW_TEXT, null, false);
-        let node;
-        const nodesToReplace = [];
-        while (node = walker.nextNode()) {
-            if (node.textContent.match(regex)) {
-                const newHTML = node.textContent.replace(regex, (match) => {
-                    count++;
-                    return `<mark>${match}</mark>`;
-                });
-                nodesToReplace.push({ node, newHTML });
-            }
-        }
-        nodesToReplace.forEach(({ node, newHTML }) => {
-            const span = document.createElement('span');
-            span.innerHTML = newHTML;
-            node.parentNode.replaceChild(span, node);
+        const regex = new RegExp(searchTerm, 'gi');
+        let matches = 0;
+        const newHTML = this.originalReadmeHTML.replace(regex, (match) => {
+            matches++;
+            return `<mark>${match}</mark>`;
         });
-
-        this.readmeSearchCount.textContent = `${count} matches`;
+        this.readmeDisplay.innerHTML = newHTML;
+        this.readmeSearchCount.textContent = `${matches} found`;
+        const firstMark = this.readmeDisplay.querySelector('mark');
+        if (firstMark) firstMark.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
 
     applySavedFontSize() {
