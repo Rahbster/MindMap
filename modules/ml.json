@@ -5,12 +5,12 @@
     "root": {
       "id": "root",
       "title": "Machine Learning",
-      "content": "<h2>Machine Learning</h2><p>A subset of AI that gives computers the ability to learn without being explicitly programmed. It focuses on the development of algorithms that can access data and use it to learn for themselves.</p>",
-      "children": ["supervised", "unsupervised", "reinforcement"],
+      "content": "<h2>Machine Learning (ML)</h2><p>A subset of AI that gives computers the ability to learn without being explicitly programmed. It focuses on the development of algorithms that can access data and use it to learn for themselves. Deep Learning is a popular and powerful subfield of ML.</p>",
+      "children": ["supervised", "unsupervised", "reinforcement", "deep-learning"],
       "quiz": [
         {
           "question": "What is the primary goal of Machine Learning?",
-          "options": ["To create perfect programs", "To allow systems to learn from data", "To replace human jobs"],
+          "options": ["To create perfect programs", "To replace human jobs"],
           "answer": "To allow systems to learn from data"
         }
       ]
@@ -36,6 +36,13 @@
       "content": "<h3>Reinforcement Learning</h3><p>An agent learns to make decisions by taking actions in an environment to maximize a reward. Click to zoom in.</p>",
       "children": [],
       "subModule": "modules/reinforcement.json"
+    },
+    "deep-learning": {
+      "id": "deep-learning",
+      "title": "Deep Learning",
+      "content": "<h3>Deep Learning</h3><p>A subfield of ML based on artificial neural networks with many layers. Click to explore.</p>",
+      "children": [],
+      "subModule": "modules/deep-learning.json"
     }
   }
 }

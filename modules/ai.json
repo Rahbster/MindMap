@@ -1,40 +1,58 @@
 {
   "id": "ai",
   "name": "Artificial Intelligence",
+  "isTopLevel": true,
   "nodes": {
     "root": {
       "id": "root",
       "title": "Artificial Intelligence",
-      "content": "<h1>Artificial Intelligence</h1><p>AI is a broad area of computer science that makes machines seem like they have human intelligence.</p>",
-      "children": ["learning-paradigms", "applications", "ethics"],
+      "content": "<h2>Artificial Intelligence (AI)</h2><p>The theory and development of computer systems able to perform tasks that normally require human intelligence, such as visual perception, speech recognition, decision-making, and translation between languages.</p>",
+      "children": ["history", "ml", "applications", "ethics", "paradigms"],
       "quiz": [
         {
-          "question": "What does AI stand for?",
-          "options": ["Automated Information", "Artificial Intelligence", "Advanced Integration"],
-          "answer": "Artificial Intelligence"
+          "question": "What is the core concept of Artificial Intelligence?",
+          "options": [
+            "Creating robots that can perform any physical task",
+            "Building faster computers"
+          ],
+          "answer": "Simulating human intelligence in machines"
         }
       ]
     },
-    "learning-paradigms": {
-      "id": "learning-paradigms",
-      "title": "Learning Paradigms",
-      "content": "<h2>Learning Paradigms</h2><p>The fundamental approaches and methodologies used to enable machines to learn from data. Click to zoom in.</p>",
+    "history": {
+      "id": "history",
+      "title": "History of AI",
+      "content": "<h3>History of AI</h3><p>Explore the key milestones, pioneers, and events that have shaped the field of Artificial Intelligence from its inception to the present day. Click to learn more.</p>",
       "children": [],
-      "subModule": "modules/learning-paradigms.json"
+      "subModule": "modules/history-of-ai.json"
+    },
+    "ml": {
+      "id": "ml",
+      "title": "Machine Learning",
+      "content": "<h3>Machine Learning</h3><p>A subset of AI that gives computers the ability to learn without being explicitly programmed. Click to explore this topic.</p>",
+      "children": [],
+      "subModule": "modules/ml.json"
     },
     "applications": {
       "id": "applications",
-      "title": "Applications",
-      "content": "<h2>AI Applications</h2><p>Where and how AI is used in the real world, from healthcare to finance. Click to zoom in.</p>",
+      "title": "AI Applications",
+      "content": "<h3>AI Applications</h3><p>Where is AI used today? From healthcare to finance, AI is transforming industries. Click to see examples.</p>",
       "children": [],
       "subModule": "modules/applications.json"
     },
     "ethics": {
       "id": "ethics",
       "title": "AI Ethics",
-      "content": "<h2>AI Ethics</h2><p>The critical study of the moral and social impact of artificial intelligence. Click to zoom in.</p>",
+      "content": "<h3>AI Ethics</h3><p>The ethical considerations surrounding the development and deployment of AI are crucial. Click to learn more about bias, privacy, and autonomy.</p>",
       "children": [],
       "subModule": "modules/ethics.json"
+    },
+    "paradigms": {
+      "id": "paradigms",
+      "title": "Learning Paradigms",
+      "content": "<h3>Learning Paradigms</h3><p>Beyond the main types of ML, there are other important learning strategies and concepts. Click to explore.</p>",
+      "children": [],
+      "subModule": "modules/learning-paradigms.json"
     }
   }
 }

@@ -1,49 +1,60 @@
 import { MindMapRenderer } from './MindMapRenderer.js';
 import { MindMapInteraction } from './MindMapInteraction.js';
+import { QuizManager } from './QuizManager.js';
 import { UIManager } from './UIManager.js';
 import { NodeManager } from './NodeManager.js';
+import { StateManager } from './StateManager.js';
+import { ModuleLoader } from './ModuleLoader.js';
+import { SearchHandler } from './SearchHandler.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     class MindMapApp {
         constructor() {
-            this.state = {
-                mindMapData: null,
-                moduleStack: [],
-                activeNodeId: null,
-                positions: {},
-                pan: { x: 0, y: 0 },
-                zoom: 1,
-            };
+            this.stateManager = new StateManager();
+            this.state = this.stateManager.getState();
 
             this.availableModules = [
-                { name: 'Artificial Intelligence', path: 'modules/ai.json' },
+                { name: 'Artificial Intelligence', path: 'modules/ai.json' }, // Main entry point
+                // ... other modules
                 { name: 'Machine Learning', path: 'modules/ml.json' },
                 { name: 'Deep Learning', path: 'modules/deep-learning.json' },
-                { name: 'Supervised Learning', path: 'modules/supervised.json' },
-                { name: 'Unsupervised Learning', path: 'modules/unsupervised.json' },
-                { name: 'Reinforcement Learning', path: 'modules/reinforcement.json' },
-                { name: 'Learning Paradigms', path: 'modules/learning-paradigms.json' },
+                { name: 'Natural Language Processing', path: 'modules/nlp.json' },
+                { name: 'History of AI', path: 'modules/history-of-ai.json' },
+                { name: 'Computer Vision', path: 'modules/computer-vision.json' },
+                { name: 'Generative AI', path: 'modules/generative-ai.json' },
                 { name: 'AI Applications', path: 'modules/applications.json' },
                 { name: 'AI Ethics', path: 'modules/ethics.json' }
             ];
 
             this.mindmapContainer = document.getElementById('mindmap-svg-container');
             this.quizManager = new QuizManager(this.state);
-
-            this.renderer = new MindMapRenderer(this.mindmapContainer);
+            this.renderer = new MindMapRenderer(this.mindmapContainer, this.state);
             
             this.interaction = new MindMapInteraction(this.mindmapContainer, this.state, {
                 onPanZoom: () => this.renderer.applyTransform(this.state.pan, this.state.zoom),
-                onNodeDrag: (nodeId, position) => this.handleNodeDrag(nodeId, position),
+                onNodeDrag: (nodeId, position) => {
+                    this.renderer.runLayoutAnimation(false); // Stop auto-layout on manual drag
+                    this.handleNodeDrag(nodeId, position);
+                },
                 onNodeSelect: (nodeId) => this.selectNode(nodeId),
-                onDragEnd: () => this.saveModuleToStorage(),
+                onDragEnd: () => this.stateManager.saveModuleToStorage(),
+            });
+
+            this.moduleLoader = new ModuleLoader(this.stateManager, {
+                onModuleLoaded: () => {
+                    this.quizManager.setMindMapData(this.state.mindMapData);
+                    this.renderMindMap();
+                    this.uiManager.updateOnModuleLoad();
+                    this.setActiveNode('root');
+                },
+                onMenuClose: () => this.uiManager.closeMenu(),
             });
 
             this.nodeManager = new NodeManager(this.state, {
                 onDataUpdate: (resetView = false) => {
-                    this.saveModuleToStorage();
+                    this.stateManager.saveModuleToStorage();
                     if (resetView) {
-                        this.state.activeNodeId = null;
+                        this.stateManager.setActiveNode(null);
                         document.getElementById('content-display').innerHTML = `<p>Select a node from the map to view its content.</p>`;
                         document.getElementById('quiz-container').classList.add('hidden');
                     }
@@ -52,11 +63,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
 
+            this.searchHandler = new SearchHandler(this.stateManager, {
+                onSearchResults: (results) => this.uiManager.renderSearchResults(results),
+                onGoToNode: (nodeId) => {
+                    this.renderer.applyTransform(this.state.pan, this.state.zoom);
+                    this.selectNode(nodeId);
+                    this.uiManager.closeMenu();
+                },
+                getContainerWidth: () => this.mindmapContainer.clientWidth,
+                getContainerHeight: () => this.mindmapContainer.clientHeight,
+            });
+
             this.uiManager = new UIManager(this.state, {
-                onModuleSelect: (path) => this.loadModuleAndResetStack(path),
-                onBreadcrumbClick: (index) => this.navigateToStackIndex(index),
-                onSearch: (term) => this.performSearch(term),
-                onSearchResultClick: (nodeId) => this.goToNode(nodeId),
+                onModuleSelect: (path) => this.moduleLoader.loadModuleAndResetStack(path),
+                onBreadcrumbClick: (index) => this.moduleLoader.navigateToStackIndex(index),
+                onSearch: (term) => this.searchHandler.performSearch(term),
+                onSearchResultClick: (nodeId) => this.searchHandler.goToNode(nodeId),
                 onStartQuiz: (nodeId) => this.quizManager.startQuizForNode(nodeId),
                 getActionButton: (type) => {
                     const button = document.createElement('button');
@@ -80,54 +102,28 @@ document.addEventListener('DOMContentLoaded', () => {
                 onFontSizeChange: () => {
                     if (this.state.mindMapData && this.state.mindMapData.positions) {
                         delete this.state.mindMapData.positions;
-                        this.saveModuleToStorage();
+                        this.stateManager.saveModuleToStorage();
                     }
                     this.renderMindMap();
                 },
-                onSaveModule: () => this.saveModuleToFile(),
-                onLoadModuleFromFile: () => this.loadModuleFromFile(),
+                onSaveModule: () => this.moduleLoader.saveModuleToFile(),
+                onLoadModuleFromFile: () => this.moduleLoader.loadModuleFromFile(),
                 onAutoOrganize: () => this.autoOrganize(),
             });
+            this.uiManager.callbacks.onStopAutoOrganize = () => this.stopAutoOrganize();
+            this.renderer.callbacks = { onLayoutEnd: () => {
+                this.stateManager.saveModuleToStorage();
+                this.uiManager.stopOrganizeIndicator();
+            }};
 
             this.uiManager.populateModuleLoader(this.availableModules);
-            this.loadModule('modules/ai.json');
-        }
-
-        async loadModule(moduleSource) {
-            try {
-                let newModuleData;
-                if (typeof moduleSource === 'string') {
-                    const moduleId = moduleSource.split('/').pop().replace('.json', '');
-                    const savedModule = this.getModuleFromStorage(moduleId);
-                    newModuleData = savedModule || await (await fetch(moduleSource)).json();
-                } else {
-                    newModuleData = moduleSource;
-                }
-
-                if (this.state.mindMapData && typeof moduleSource === 'string') {
-                    this.state.moduleStack.push(this.state.mindMapData);
-                }
-
-                this.state.mindMapData = newModuleData;
-                this.quizManager.setMindMapData(this.state.mindMapData);
-                this.renderMindMap();
-                this.uiManager.updateOnModuleLoad();
-                this.setActiveNode('root');
-            } catch (error) {
-                console.error('Failed to load module:', error);
-            }
-        }
-
-        loadModuleAndResetStack(modulePath) {
-            this.state.moduleStack.length = 0;
-            this.loadModule(modulePath);
-            this.uiManager.closeMenu();
+            this.moduleLoader.loadModule('modules/ai.json');
         }
 
         renderMindMap() {
             if (!this.state.mindMapData) return;
 
-            const baseFontSize = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--dynamic-font-size'));
+            const baseFontSize = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--mindmap-font-size'));
             this.state.positions = this.state.mindMapData.positions || {};
 
             const { pan, zoom } = this.renderer.render(
@@ -143,7 +139,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         setActiveNode(nodeId) {
-            this.state.activeNodeId = nodeId;
+            this.stateManager.setActiveNode(nodeId);
             document.querySelectorAll('.node-circle').forEach(c => c.classList.remove('active'));
             const group = this.mindmapContainer.querySelector(`g[data-node-id="${nodeId}"]`);
             if (group) {
@@ -155,17 +151,10 @@ document.addEventListener('DOMContentLoaded', () => {
         selectNode(nodeId) {
             const node = this.state.mindMapData.nodes[nodeId];
             if (node.subModule) {
-                this.loadModule(node.subModule);
+                this.moduleLoader.loadModule(node.subModule);
             } else {
                 this.setActiveNode(nodeId);
             }
-        }
-
-        navigateToStackIndex(index) {
-            const modulesToPop = this.state.moduleStack.length - (index + 1);
-            for (let i = 0; i < modulesToPop; i++) this.state.moduleStack.pop();
-            const targetModule = this.state.moduleStack.pop();
-            this.loadModule(targetModule);
         }
 
         handleNodeDrag(nodeId, position) {
@@ -179,120 +168,15 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        saveModuleToStorage() {
-            if (!this.state.mindMapData || !this.state.mindMapData.id) return;
-            localStorage.setItem(`mindmap-module-${this.state.mindMapData.id}`, JSON.stringify(this.state.mindMapData));
-        }
-
-        getModuleFromStorage(moduleId) {
-            const savedData = localStorage.getItem(`mindmap-module-${moduleId}`);
-            return savedData ? JSON.parse(savedData) : null;
-        }
-
         autoOrganize() {
-            if (this.state.mindMapData && this.state.mindMapData.positions) {
-                delete this.state.mindMapData.positions;
-                this.saveModuleToStorage();
-            }
-            this.renderMindMap();
+            // This will either start a new animation or boost the existing one.
+            this.renderer.runLayoutAnimation(true, this.state.positions);
         }
 
-        saveModuleToFile() {
-            if (!this.state.mindMapData) return;
-            const dataStr = JSON.stringify(this.state.mindMapData, null, 2);
-            const blob = new Blob([dataStr], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `${this.state.mindMapData.id || 'custom-module'}.json`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            this.uiManager.closeMenu();
-        }
-
-        loadModuleFromFile() {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = '.json,application/json';
-            input.onchange = (e) => {
-                const file = e.target.files[0];
-                if (!file) return;
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    try {
-                        const newModule = JSON.parse(event.target.result);
-                        this.state.moduleStack.length = 0; // Reset stack for file load
-                        this.loadModule(newModule);
-                    } catch (error) {
-                        alert('Error: Could not parse the JSON file.');
-                    }
-                };
-                reader.readAsText(file);
-            };
-            input.click();
-            this.uiManager.closeMenu();
-        }
-
-        performSearch(term) {
-            if (!term || term.length < 2) {
-                this.renderSearchResults([]);
-                return;
-            }
-            const searchTerm = term.toLowerCase();
-            const results = [];
-            Object.values(this.state.mindMapData.nodes).forEach(node => {
-                const title = node.title.toLowerCase();
-                const content = node.content.replace(/<[^>]*>/g, ' ').toLowerCase();
-                let matchIndex = -1;
-                let foundIn = '';
-                if (title.includes(searchTerm)) {
-                    matchIndex = title.indexOf(searchTerm);
-                    foundIn = 'title';
-                } else if (content.includes(searchTerm)) {
-                    matchIndex = content.indexOf(searchTerm);
-                    foundIn = 'content';
-                }
-                if (matchIndex > -1) {
-                    const sourceText = foundIn === 'title' ? node.title : node.content.replace(/<[^>]*>/g, ' ');
-                    const snippetStart = Math.max(0, matchIndex - 30);
-                    const snippetEnd = Math.min(sourceText.length, matchIndex + term.length + 30);
-                    let snippet = sourceText.substring(snippetStart, snippetEnd);
-                    if (snippetStart > 0) snippet = '...' + snippet;
-                    if (snippetEnd < sourceText.length) snippet = snippet + '...';
-                    results.push({ nodeId: node.id, title: node.title, snippet: snippet });
-                }
-            });
-            this.renderSearchResults(results);
-        }
-
-        renderSearchResults(results) {
-            const container = document.getElementById('search-results-container');
-            const input = document.getElementById('node-search-input');
-            if (results.length === 0) {
-                container.innerHTML = '';
-                return;
-            }
-            container.innerHTML = results.map(result => `
-                <div class="search-result-item" data-node-id="${result.nodeId}">
-                    <h4>${result.title}</h4>
-                    <p>${result.snippet.replace(new RegExp(input.value, 'gi'), '<strong>$&</strong>')}</p>
-                </div>
-            `).join('');
-        }
-
-        goToNode(nodeId) {
-            const nodePosition = this.state.positions[nodeId];
-            if (!nodePosition) return;
-
-            this.state.zoom = 1;
-            this.state.pan.x = (this.mindmapContainer.clientWidth / 2) - (nodePosition.x * this.state.zoom);
-            this.state.pan.y = (this.mindmapContainer.clientHeight / 2) - (nodePosition.y * this.state.zoom);
-            this.renderer.applyTransform(this.state.pan, this.state.zoom);
-
-            this.selectNode(nodeId);
-            this.uiManager.closeMenu();
+        stopAutoOrganize() {
+            this.renderer.runLayoutAnimation(false); // Stop the animation
+            this.uiManager.stopOrganizeIndicator(); // Stop the blinking
+            this.stateManager.saveModuleToStorage(); // Save the final positions
         }
     }
 

@@ -5,20 +5,51 @@
     "root": {
       "id": "root",
       "title": "Unsupervised Learning",
-      "content": "<h3>Unsupervised Learning</h3><p>The model works with unlabeled data and tries to find patterns and relationships within it without prior knowledge of the output.</p>",
-      "children": ["clustering", "dimensionality-reduction"],
-      "quiz": []
+      "content": "<h3>Unsupervised Learning</h3><p>The model works with unlabeled data and tries to find patterns and relationships within it without prior knowledge of the output. The goal is to discover the underlying structure of the data.</p>",
+      "children": ["clustering", "dimensionality-reduction", "association"],
+      "quiz": [
+        {
+          "question": "What is the defining characteristic of the data used in unsupervised learning?",
+          "options": ["It is labeled", "It is numerical"],
+          "answer": "It is unlabeled"
+        }
+      ]
     },
     "clustering": {
       "id": "clustering",
       "title": "Clustering",
       "content": "<h4>Clustering</h4><p>The task of grouping a set of objects in such a way that objects in the same group (or cluster) are more similar to each other than to those in other groups. Used in market segmentation and anomaly detection.</p>",
-      "children": []
+      "children": ["kmeans"]
     },
     "dimensionality-reduction": {
       "id": "dimensionality-reduction",
       "title": "Dimensionality Reduction",
       "content": "<h4>Dimensionality Reduction</h4><p>The process of reducing the number of random variables under consideration by obtaining a set of principal variables. It is used to simplify data for easier processing and visualization.</p>",
+      "children": ["pca"]
+    },
+    "association": {
+      "id": "association",
+      "title": "Association Rule Learning",
+      "content": "<h4>Association Rule Learning</h4><p>A rule-based method for discovering interesting relations between variables in large datasets. A famous example is 'market basket analysis', which finds relationships between items bought together in a store (e.g., 'customers who buy diapers also tend to buy beer').</p>",
+      "children": [],
+      "quiz": [
+        {
+          "question": "Market basket analysis is a classic example of which unsupervised learning technique?",
+          "options": ["Clustering", "Dimensionality Reduction"],
+          "answer": "Association Rule Learning"
+        }
+      ]
+    },
+    "kmeans": {
+      "id": "kmeans",
+      "title": "K-Means Clustering",
+      "content": "<h5>K-Means Clustering</h5><p>A popular algorithm that aims to partition 'n' observations into 'k' clusters in which each observation belongs to the cluster with the nearest mean (cluster centroid).</p>",
+      "children": []
+    },
+    "pca": {
+      "id": "pca",
+      "title": "Principal Component Analysis (PCA)",
+      "content": "<h5>Principal Component Analysis (PCA)</h5><p>A widely used technique for dimensionality reduction. It works by transforming the data into a new coordinate system such that the greatest variance by some projection of the data comes to lie on the first coordinate (called the first principal component), the second greatest variance on the second coordinate, and so on.</p>",
       "children": []
     }
   }

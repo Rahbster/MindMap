@@ -1,0 +1,54 @@
+{
+  "id": "computer-vision",
+  "name": "Computer Vision",
+  "isTopLevel": false,
+  "nodes": {
+    "root": {
+      "id": "root",
+      "title": "Computer Vision (CV)",
+      "content": "<h2>Computer Vision (CV)</h2><p>An interdisciplinary scientific field that deals with how computers can gain high-level understanding from digital images or videos. From the perspective of engineering, it seeks to understand and automate tasks that the human visual system can do.</p>",
+      "children": ["image-classification", "object-detection", "image-segmentation", "facial-recognition"],
+      "quiz": [
+        {
+          "question": "What is the main goal of Computer Vision?",
+          "options": [
+            "To create better digital cameras.",
+            "To store images more efficiently."
+          ],
+          "answer": "To enable computers to understand and interpret visual information."
+        }
+      ]
+    },
+    "image-classification": {
+      "id": "image-classification",
+      "title": "Image Classification",
+      "content": "<h3>Image Classification</h3><p>The task of assigning a label or class to an entire image. For example, an algorithm might look at a picture and predict whether it contains a 'cat' or a 'dog'.</p>",
+      "children": [],
+      "quiz": [
+        {
+          "question": "An AI that tells you an image is a 'sunset' is performing which task?",
+          "options": ["Object Detection", "Image Segmentation"],
+          "answer": "Image Classification"
+        }
+      ]
+    },
+    "object-detection": {
+      "id": "object-detection",
+      "title": "Object Detection",
+      "content": "<h3>Object Detection</h3><p>This task goes beyond classification to locate and identify multiple objects within an image, typically by drawing bounding boxes around them and assigning a class to each box. It answers both 'what' is in the image and 'where' it is.</p>",
+      "children": []
+    },
+    "image-segmentation": {
+      "id": "image-segmentation",
+      "title": "Image Segmentation",
+      "content": "<h3>Image Segmentation</h3><p>A more granular task where the goal is to classify each individual pixel in an image. This allows for precisely outlining objects. It is heavily used in medical imaging to identify tumors and in self-driving cars to identify the exact shape of the road.</p>",
+      "children": []
+    },
+    "facial-recognition": {
+      "id": "facial-recognition",
+      "title": "Facial Recognition",
+      "content": "<h3>Facial Recognition</h3><p>A specific application of computer vision capable of identifying or verifying a person from a digital image or a video frame. It is widely used in security systems and for unlocking smartphones.</p>",
+      "children": []
+    }
+  }
+}

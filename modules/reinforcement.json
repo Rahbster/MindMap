@@ -5,7 +5,39 @@
     "root": {
       "id": "root",
       "title": "Reinforcement Learning",
-      "content": "<h3>Reinforcement Learning</h3><p>An agent learns to make decisions by taking actions in an environment to maximize a cumulative reward. It learns from trial and error. This is the basis for teaching AI to play games like Chess or Go, as well as for robotics control.</p>",
+      "content": "<h3>Reinforcement Learning (RL)</h3><p>An area of machine learning concerned with how intelligent agents ought to take actions in an environment in order to maximize the notion of cumulative reward. It is a process of learning through trial and error.</p>",
+      "children": ["agent", "reward-signal", "exploration-exploitation"],
+      "quiz": [
+        {
+          "question": "What is the main goal of an agent in Reinforcement Learning?",
+          "options": ["To explore the environment randomly", "To follow a pre-programmed path"],
+          "answer": "To maximize its cumulative reward"
+        }
+      ]
+    },
+    "agent": {
+      "id": "agent",
+      "title": "Agent & Environment",
+      "content": "<h4>Agent & Environment</h4><p>The <strong>agent</strong> is the learner or decision-maker. The <strong>environment</strong> is everything the agent interacts with, comprising everything outside the agent.</p>",
+      "children": []
+    },
+    "reward-signal": {
+      "id": "reward-signal",
+      "title": "Reward Signal",
+      "content": "<h4>Reward Signal</h4><p>A key component of RL, the reward signal is a numerical value that the environment sends to the agent. The agent's sole objective is to maximize the total reward it receives over the long run.</p>",
+      "children": [],
+      "quiz": [
+        {
+          "question": "In a chess-playing RL agent, what would be a good example of a final reward signal?",
+          "options": ["A reward for every piece captured", "A reward for controlling the center of the board"],
+          "answer": "+1 for winning, -1 for losing"
+        }
+      ]
+    },
+    "exploration-exploitation": {
+      "id": "exploration-exploitation",
+      "title": "Exploration vs. Exploitation",
+      "content": "<h4>Exploration vs. Exploitation Trade-off</h4><p>A fundamental dilemma in RL. The agent must balance between <strong>exploiting</strong> what it already knows to get rewards, and <strong>exploring</strong> new actions to potentially discover even better rewards.</p>",
       "children": []
     }
   }

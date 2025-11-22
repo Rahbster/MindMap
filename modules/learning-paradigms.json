@@ -1,27 +1,45 @@
 {
   "id": "learning-paradigms",
   "name": "Learning Paradigms",
+  "isTopLevel": false,
   "nodes": {
     "root": {
       "id": "root",
-      "title": "Learning Paradigms",
-      "content": "<h2>AI Learning Paradigms</h2><p>These are the fundamental approaches and methodologies used to enable machines to learn from data.</p>",
-      "children": ["machine-learning", "deep-learning"],
-      "quiz": []
+      "title": "Other Learning Paradigms",
+      "content": "<h2>Other Learning Paradigms</h2><p>Beyond supervised, unsupervised, and reinforcement learning, other paradigms have emerged to tackle different types of problems.</p>",
+      "children": ["semi-supervised", "self-supervised", "transfer-learning"],
+      "quiz": [
+        {
+          "question": "Which learning paradigm is most useful when you have a large amount of data, but only a small portion of it is labeled?",
+          "options": ["Self-Supervised Learning", "Transfer Learning"],
+          "answer": "Semi-Supervised Learning"
+        }
+      ]
     },
-    "machine-learning": {
-      "id": "machine-learning",
-      "title": "Machine Learning",
-      "content": "<h3>Machine Learning</h3><p>The foundational field of AI focused on algorithms that allow computers to learn from and make predictions on data. Click to zoom in.</p>",
-      "children": [],
-      "subModule": "modules/ml.json"
+    "semi-supervised": {
+      "id": "semi-supervised",
+      "title": "Semi-Supervised Learning",
+      "content": "<h3>Semi-Supervised Learning</h3><p>This approach is a middle ground between supervised and unsupervised learning, using a small amount of labeled data and a large amount of unlabeled data for training. It's useful when labeling data is expensive.</p>",
+      "children": []
     },
-    "deep-learning": {
-      "id": "deep-learning",
-      "title": "Deep Learning",
-      "content": "<h3>Deep Learning</h3><p>A powerful subfield of Machine Learning that uses multi-layered neural networks to learn from vast amounts of data. Click to zoom in.</p>",
+    "self-supervised": {
+      "id": "self-supervised",
+      "title": "Self-Supervised Learning",
+      "content": "<h3>Self-Supervised Learning</h3><p>A type of unsupervised learning where the data provides the supervision. The model learns to predict a part of its input from other parts of its input. This is foundational to large language models (LLMs).</p>",
+      "children": []
+    },
+    "transfer-learning": {
+      "id": "transfer-learning",
+      "title": "Transfer Learning",
+      "content": "<h3>Transfer Learning</h3><p>A powerful technique where a model developed for a task is reused as the starting point for a model on a second task. It's very popular in deep learning, as it can reduce the need for massive datasets.</p>",
       "children": [],
-      "subModule": "modules/deep-learning.json"
+      "quiz": [
+        {
+          "question": "What is the main benefit of Transfer Learning?",
+          "options": ["It creates the most accurate models from scratch.", "It only works for image recognition."],
+          "answer": "It allows a model to be trained on a new task with less data."
+        }
+      ]
     }
   }
 }

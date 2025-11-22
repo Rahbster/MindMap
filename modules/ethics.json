@@ -1,34 +1,67 @@
 {
   "id": "ethics",
   "name": "AI Ethics",
+  "isTopLevel": false,
   "nodes": {
     "root": {
       "id": "root",
       "title": "AI Ethics",
-      "content": "<h2>Ethical Considerations in AI</h2><p>As AI becomes more powerful, it's crucial to consider the ethical implications of its development and deployment.</p>",
-      "children": ["bias", "privacy", "autonomy"],
-      "quiz": []
+      "content": "<h2>Ethical Considerations in AI</h2><p>As AI becomes more powerful and integrated into society, it's crucial to consider the ethical implications of its development and deployment to ensure it benefits humanity.</p>",
+      "children": ["bias", "privacy", "autonomy", "accountability", "job-displacement"],
+      "quiz": [
+        {
+          "question": "Why is AI ethics a growing concern?",
+          "options": [
+            "Because AI systems are expensive to build.",
+            "Because AI can't solve complex problems."
+          ],
+          "answer": "Because AI is becoming more powerful and autonomous."
+        }
+      ]
     },
     "bias": {
       "id": "bias",
       "title": "Bias and Fairness",
       "content": "<h3>Bias and Fairness</h3><p>AI models trained on biased data can perpetuate and even amplify existing societal biases, leading to unfair outcomes in areas like hiring, loan applications, and criminal justice.</p>",
       "children": [],
-      "quiz": []
+      "quiz": [
+        {
+          "question": "If an AI hiring tool is trained only on historical data from a company that mostly hired men, what is a likely outcome?",
+          "options": ["It will be perfectly fair.", "It will only hire women to correct the imbalance."],
+          "answer": "It will likely show a bias against female candidates."
+        }
+      ]
     },
     "privacy": {
       "id": "privacy",
       "title": "Privacy",
       "content": "<h3>Privacy Concerns</h3><p>AI systems often require vast amounts of data to function, raising significant concerns about data privacy, surveillance, and how personal information is collected, used, and protected.</p>",
-      "children": [],
-      "quiz": []
+      "children": []
     },
     "autonomy": {
       "id": "autonomy",
       "title": "Autonomous Systems",
       "content": "<h3>Autonomous Systems</h3><p>The development of autonomous systems, such as self-driving cars and autonomous weapons, raises complex ethical questions about accountability, control, and decision-making in critical situations.</p>",
       "children": [],
-      "quiz": []
+      "quiz": [
+        {
+          "question": "The ethical dilemma of a self-driving car having to choose between two unavoidable harmful outcomes is a modern version of what famous thought experiment?",
+          "options": ["The Prisoner's Dilemma", "Schrödinger's Cat"],
+          "answer": "The Trolley Problem"
+        }
+      ]
+    },
+    "accountability": {
+      "id": "accountability",
+      "title": "Accountability",
+      "content": "<h3>Accountability & Explainability</h3><p>Who is responsible when an AI system makes a mistake? The user, the developer, or the owner? This is a complex legal and ethical question. 'Explainable AI' (XAI) is a related field that aims to make 'black box' models more transparent and understandable.</p>",
+      "children": []
+    },
+    "job-displacement": {
+      "id": "job-displacement",
+      "title": "Job Displacement",
+      "content": "<h3>Job Displacement</h3><p>The potential for AI to automate tasks currently performed by humans raises concerns about widespread job loss and the need for societal adaptation, including reskilling and education.</p>",
+      "children": []
     }
   }
 }

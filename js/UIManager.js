@@ -1,3 +1,37 @@
+/**
+ * Unregisters service workers, clears caches, and optionally clears all local storage.
+ * @param {boolean} clearAllStorage - If true, localStorage and sessionStorage will be cleared.
+ */
+async function resetApplication(clearAllStorage) {
+    try {
+        if ('serviceWorker' in navigator) {
+            console.log('Unregistering service workers...');
+            const registrations = await navigator.serviceWorker.getRegistrations();
+            for (const registration of registrations) {
+                await registration.unregister();
+            }
+            console.log('Service workers unregistered.');
+        }
+        if ('caches' in window) {
+            console.log('Clearing caches...');
+            const keys = await caches.keys();
+            await Promise.all(keys.map(key => caches.delete(key)));
+            console.log('Caches cleared.');
+        }
+        if (clearAllStorage) {
+            console.log('Clearing local and session storage...');
+            localStorage.clear();
+            sessionStorage.clear();
+            console.log('Storage cleared.');
+        }
+        console.log('Reset complete. Reloading page.');
+        window.location.reload();
+    } catch (error) {
+        console.error('Error during application reset:', error);
+        alert('An error occurred during the reset process. Please check the console for details.');
+    }
+}
+
 export class UIManager {
     constructor(appState, callbacks) {
         this.state = appState;
@@ -13,6 +47,7 @@ export class UIManager {
         this.nodeSearchInput = document.getElementById('node-search-input');
         this.searchResultsContainer = document.getElementById('search-results-container');
         this.saveModuleBtn = document.getElementById('save-module-btn');
+        this.autoOrganizeBtn = document.getElementById('auto-organize-btn');
 
         // ReadMe Modal Elements
         this.readmeModal = document.getElementById('readme-modal');
@@ -21,13 +56,21 @@ export class UIManager {
         this.readmeSearchCount = document.getElementById('readme-search-count');
         this.originalReadmeHTML = '';
 
+        // Reset Modal Elements
+        this.resetModal = document.getElementById('reset-modal');
+
+
         this.FONT_SIZE_KEY = 'mindmap-font-size';
+        this.MAP_FONT_SIZE_KEY = 'mindmap-map-font-size';
+        this.THEME_KEY = 'mindmap-theme';
+
         // Define bounds for font size
         this.MIN_FONT_SIZE = 16;
         this.MAX_FONT_SIZE = 32;
 
         this.initListeners();
         this.applySavedFontSize();
+        this.applySavedTheme();
     }
 
     initListeners() {
@@ -38,8 +81,8 @@ export class UIManager {
                 this.closeMenu();
             }
         });
-        document.getElementById('increase-font-btn').addEventListener('click', () => this.changeFontSize(1));
-        document.getElementById('decrease-font-btn').addEventListener('click', () => this.changeFontSize(-1));
+        // Event delegation for dynamically added font buttons
+        this.initFontControlListeners();
         this.nodeSearchInput.addEventListener('input', (e) => this.callbacks.onSearch(e.target.value));
         this.searchResultsContainer.addEventListener('click', (e) => {
             const resultItem = e.target.closest('.search-result-item');
@@ -49,11 +92,72 @@ export class UIManager {
         });
         this.saveModuleBtn.addEventListener('click', () => this.callbacks.onSaveModule());
         document.getElementById('load-module-btn').addEventListener('click', () => this.callbacks.onLoadModuleFromFile());
-        document.getElementById('auto-organize-btn').addEventListener('click', () => this.callbacks.onAutoOrganize());
+        
+        // Change Auto-Organize to press-and-hold
+        this.autoOrganizeBtn.addEventListener('mousedown', () => {
+            this.startOrganizeIndicator();
+            this.callbacks.onAutoOrganize();
+        });
+        this.autoOrganizeBtn.addEventListener('mouseup', () => this.callbacks.onStopAutoOrganize());
+        this.autoOrganizeBtn.addEventListener('mouseleave', () => this.callbacks.onStopAutoOrganize());
+
         document.getElementById('show-readme-btn').addEventListener('click', () => this.openReadmeModal());
         document.getElementById('close-readme-btn').addEventListener('click', () => this.closeReadmeModal());
         this.readmeSearchInput.addEventListener('input', () => this.performReadmeSearch());
+        
+        // Theme switcher
+        document.getElementById('theme-switch').addEventListener('change', (e) => {
+            this.setTheme(e.target.checked ? 'dark' : 'light');
+        });
 
+        // Reset Modal Listeners
+        document.getElementById('open-reset-modal-btn').addEventListener('click', () => {
+            this.resetModal.classList.remove('hidden');
+            this.resetModal.style.display = 'flex'; // Use flex for centering
+        });
+        document.getElementById('reset-cancel-btn').addEventListener('click', () => {
+            this.resetModal.classList.add('hidden');
+        });
+        document.getElementById('reset-preserve-btn').addEventListener('click', () => {
+            // Save the current module path to restore it after reload
+            const currentModule = this.state.moduleStack[this.state.moduleStack.length - 1];
+            if (currentModule) {
+                sessionStorage.setItem('mindmap-last-module', currentModule.path);
+            }
+            // false = don't clear all storage (localStorage, etc.)
+            resetApplication(false);
+        });
+        document.getElementById('reset-full-btn').addEventListener('click', () => {
+            resetApplication(true); // true = clear all storage
+        });
+        this.resetModal.addEventListener('click', (event) => {
+            if (event.target === this.resetModal) {
+                this.resetModal.classList.add('hidden');
+            }
+        });
+    }
+
+    initFontControlListeners() {
+        // Use event delegation on the body for all font controls to avoid conflicts.
+        document.body.addEventListener('click', (event) => {
+            const button = event.target.closest('button');
+            if (!button) return;
+
+            switch (button.id) {
+                case 'decrease-font-btn':
+                    this.changeFontSize(-1);
+                    break;
+                case 'increase-font-btn':
+                    this.changeFontSize(1);
+                    break;
+                case 'decrease-map-font-btn':
+                    this.changeMapFontSize(-1);
+                    break;
+                case 'increase-map-font-btn':
+                    this.changeMapFontSize(1);
+                    break;
+            }
+        });
     }
 
     openMenu() {
@@ -66,23 +170,64 @@ export class UIManager {
         this.mainContent.classList.remove('main-content-shifted');
     }
 
+    startOrganizeIndicator() {
+        this.autoOrganizeBtn.classList.add('organizing');
+    }
+
+    stopOrganizeIndicator() {
+        this.autoOrganizeBtn.classList.remove('organizing');
+    }
+
     updateOnModuleLoad() {
         this.moduleTitleEl.textContent = this.state.mindMapData.name;
+        this.updateActiveModuleInLoader();
         this.renderBreadcrumbs();
         this.saveModuleBtn.classList.remove('hidden');
     }
 
-    populateModuleLoader(availableModules) {
+    async populateModuleLoader(availableModules) {
         this.moduleLoaderEl.innerHTML = '';
-        availableModules.forEach(module => {
+
+        // 1. Fetch the content of all available modules to check the 'isTopLevel' flag.
+        const moduleContents = await Promise.all(
+            availableModules.map(m => fetch(m.path).then(res => res.json()).catch(() => null))
+        );
+
+        // 2. Filter modules where isTopLevel is explicitly true.
+        const topLevelModules = availableModules.filter((module, index) => {
+            const content = moduleContents[index];
+            return content && content.isTopLevel === true;
+        });
+
+        // 3. Sort the list alphabetically by name.
+        topLevelModules.sort((a, b) => a.name.localeCompare(b.name));
+
+        // 4. Render the filtered and sorted list.
+        topLevelModules.forEach(module => {
             const link = document.createElement('a');
             link.href = '#';
             link.textContent = module.name;
+            link.dataset.path = module.path; // Add data attribute for easy selection
             link.onclick = (e) => {
                 e.preventDefault();
                 this.callbacks.onModuleSelect(module.path);
             };
             this.moduleLoaderEl.appendChild(link);
+        });
+        this.updateActiveModuleInLoader();
+    }
+
+    updateActiveModuleInLoader() {
+        const currentModule = this.state.moduleStack[this.state.moduleStack.length - 1];
+        if (!currentModule) return;
+
+        const links = this.moduleLoaderEl.querySelectorAll('a');
+        links.forEach(link => {
+            if (link.dataset.path === currentModule.path) {
+                link.classList.add('active-module');
+            } else {
+                link.classList.remove('active-module');
+            }
         });
     }
 
@@ -110,18 +255,31 @@ export class UIManager {
 
     displayNodeContent(nodeId) {
         const node = this.state.mindMapData.nodes[nodeId];
-        this.contentDisplayEl.innerHTML = node.content;
+        const titleWrapper = this.contentDisplayEl.parentElement.querySelector('.content-title-wrapper');
+        
+        // Clear previous dynamic content
+        titleWrapper.querySelector('h2')?.remove(); // Keep this
+        const actionsWrapper = titleWrapper.querySelector('.title-actions-wrapper');
+        // Always clear old action buttons regardless of the node.
+        if (actionsWrapper) actionsWrapper.querySelector('.content-actions')?.remove();
 
-        const heading = this.contentDisplayEl.querySelector('h1, h2, h3, h4, h5, h6');
-        if (heading) {
-            const wrapper = document.createElement('div');
-            wrapper.className = 'content-title-wrapper';
-            const actions = document.createElement('div');
-            actions.className = 'content-actions';
-            actions.append(this.callbacks.getActionButton('add'), this.callbacks.getActionButton('edit'), this.callbacks.getActionButton('remove'));
-            heading.parentNode.insertBefore(wrapper, heading);
-            wrapper.append(heading, actions);
-        }
+        // Create and add the title
+        const title = document.createElement('h2');
+        title.textContent = node.title;
+        titleWrapper.prepend(title);
+
+        // Create the container for the action buttons.
+        const actions = document.createElement('div');
+        actions.className = 'content-actions';
+
+        // Add and Edit are always available.
+        actions.append(this.callbacks.getActionButton('add'), this.callbacks.getActionButton('edit'));
+
+        // Only add the Remove button if it's not the root of a top-level module.
+        if (!(node.id === 'root' && this.state.mindMapData.isTopLevel)) actions.appendChild(this.callbacks.getActionButton('remove'));
+
+        // Append the newly created buttons to the wrapper.
+        if (actionsWrapper) actionsWrapper.appendChild(actions);
 
         if (node.quiz && node.quiz.length > 0) {
             this.quizContainer.classList.remove('hidden');
@@ -129,6 +287,9 @@ export class UIManager {
         } else {
             this.quizContainer.classList.add('hidden');
         }
+
+        // Display the main content
+        this.contentDisplayEl.innerHTML = node.content;
     }
 
     changeFontSize(amount) {
@@ -142,6 +303,18 @@ export class UIManager {
         document.documentElement.style.setProperty('--dynamic-font-size', `${newSize}px`);
         localStorage.setItem(this.FONT_SIZE_KEY, newSize);
         this.callbacks.onFontSizeChange();
+    }
+
+    changeMapFontSize(amount) {
+        const rootStyle = getComputedStyle(document.documentElement);
+        const currentSize = parseFloat(rootStyle.getPropertyValue('--mindmap-font-size')) || 24;
+        let newSize = currentSize + amount;
+
+        // Enforce the min and max font size
+        newSize = Math.max(this.MIN_FONT_SIZE, Math.min(newSize, this.MAX_FONT_SIZE));
+
+        document.documentElement.style.setProperty('--mindmap-font-size', `${newSize}px`);
+        localStorage.setItem(this.MAP_FONT_SIZE_KEY, newSize);
     }
 
     async openReadmeModal() {
@@ -269,8 +442,27 @@ export class UIManager {
     }
 
     applySavedFontSize() {
-        const savedSize = localStorage.getItem(this.FONT_SIZE_KEY);
-        const defaultSize = '16px';
-        document.documentElement.style.setProperty('--dynamic-font-size', savedSize ? `${savedSize}px` : defaultSize);
+        const savedContentSize = localStorage.getItem(this.FONT_SIZE_KEY);
+        const savedMapSize = localStorage.getItem(this.MAP_FONT_SIZE_KEY);
+        const defaultContentSize = '16px';
+        const defaultMapSize = '24px';
+        document.documentElement.style.setProperty('--dynamic-font-size', savedContentSize ? `${savedContentSize}px` : defaultContentSize);
+        document.documentElement.style.setProperty('--mindmap-font-size', savedMapSize ? `${savedMapSize}px` : defaultMapSize);
+    }
+
+    applySavedTheme() {
+        const savedTheme = localStorage.getItem(this.THEME_KEY) || 'light';
+        this.setTheme(savedTheme);
+    }
+
+    setTheme(theme) {
+        if (theme === 'dark') {
+            document.body.classList.add('dark-mode');
+            document.getElementById('theme-switch').checked = true;
+        } else {
+            document.body.classList.remove('dark-mode');
+            document.getElementById('theme-switch').checked = false;
+        }
+        localStorage.setItem(this.THEME_KEY, theme);
     }
 }

@@ -1,0 +1,55 @@
+{
+  "id": "generative-ai",
+  "name": "Generative AI",
+  "isTopLevel": false,
+  "nodes": {
+    "root": {
+      "id": "root",
+      "title": "Generative AI",
+      "content": "<h2>Generative AI</h2><p>A class of artificial intelligence models that can generate new, original content, such as text, images, music, and code, based on the patterns and structures learned from existing data.</p>",
+      "children": ["gans", "llms", "diffusion-models"],
+      "quiz": [
+        {
+          "question": "What is the primary function of Generative AI?",
+          "options": [
+            "To classify existing data",
+            "To analyze data for patterns"
+          ],
+          "answer": "To create new content"
+        }
+      ]
+    },
+    "gans": {
+      "id": "gans",
+      "title": "Generative Adversarial Networks (GANs)",
+      "content": "<h3>Generative Adversarial Networks (GANs)</h3><p>A framework where two neural networks, a <strong>Generator</strong> and a <strong>Discriminator</strong>, compete with each other. The Generator creates fake data, and the Discriminator tries to distinguish it from real data. This process helps the Generator become incredibly good at creating realistic content, especially images.</p>",
+      "children": []
+    },
+    "llms": {
+      "id": "llms",
+      "title": "Large Language Models (LLMs)",
+      "content": "<h3>Large Language Models (LLMs)</h3><p>Massive deep learning models, often based on the Transformer architecture, trained on vast amounts of text data. They excel at understanding and generating human-like text for tasks like summarization, translation, and conversation. Examples include GPT-4 and LaMDA.</p>",
+      "children": [],
+      "quiz": [
+        {
+          "question": "ChatGPT is a well-known example of what type of Generative AI?",
+          "options": ["Diffusion Model", "A basic GAN"],
+          "answer": "Large Language Model (LLM)"
+        }
+      ]
+    },
+    "diffusion-models": {
+      "id": "diffusion-models",
+      "title": "Diffusion Models",
+      "content": "<h3>Diffusion Models</h3><p>A newer type of generative model that has become state-of-the-art for image generation. They work by progressively adding noise to an image and then learning how to reverse the process. By starting with pure noise, they can generate highly detailed and coherent images from text prompts. Used by systems like DALL-E 2 and Stable Diffusion.</p>",
+      "children": [],
+      "quiz": [
+        {
+          "question": "Text-to-image systems like Stable Diffusion and DALL-E 2 are primarily based on what type of model?",
+          "options": ["Recurrent Neural Networks", "Expert Systems"],
+          "answer": "Diffusion Models"
+        }
+      ]
+    }
+  }
+}

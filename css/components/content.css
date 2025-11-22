@@ -1,0 +1,70 @@
+.content-container {
+    position: relative; /* Establish positioning context for children */
+    flex: 3; /* Adjust content container to fill remaining space */
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    padding: 1.5rem;
+    overflow-y: auto;
+}
+
+.font-controls {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.content-title-wrapper {
+    display: flex;
+    justify-content: space-between; /* This is the key fix */
+    align-items: center;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 1rem;
+}
+
+.title-actions-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.content-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.icon-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.2rem;
+    color: #7f8c8d;
+    padding: 5px;
+    line-height: 1;
+    border-radius: 4px;
+}
+
+.icon-button:hover {
+    background-color: #f0f0f0;
+}
+
+.icon-button.destructive:hover {
+    background-color: #f8d7da;
+    color: #c0392b;
+}
+
+h1, h2 {
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+    color: #34495e;
+}
+
+#content-display h1, #content-display h2 {
+    font-size: 1.75rem;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 0.5rem;
+}
+
+#content-display {
+    /* Set font size via CSS variable for global control */
+    font-size: var(--dynamic-font-size);
+}

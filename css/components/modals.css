@@ -1,0 +1,187 @@
+/* Node Editor Modal */
+.modal {
+    position: fixed;
+    z-index: 1002;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background-color: #fff;
+    padding: 2rem;
+    border-radius: 8px;
+    width: 95%;
+    max-width: 850px;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.modal-input {
+    width: 100%;
+    padding: 0.5rem;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+#node-content-editor {
+    height: 200px;
+    border: 1px solid #ccc;
+}
+
+.modal-content hr {
+    border: none;
+    border-top: 1px solid #eee;
+    margin: 1rem 0;
+}
+
+/* Quiz Editor Styles */
+#quiz-editor-container {
+    max-height: 200px;
+    overflow-y: auto;
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.quiz-question-editor {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.quiz-option-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.quiz-option-item input {
+    flex-grow: 1;
+}
+
+.remove-quiz-option-btn, .remove-quiz-question-btn {
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+.quiz-question-editor button, .modal-buttons button, #add-quiz-question-btn {
+    padding: 8px 16px;
+    border-radius: 5px;
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+.modal-buttons {
+    margin-top: 1rem;
+    display: flex;
+    gap: 1rem;
+}
+
+/* ReadMe Modal Styles */
+.readme-content {
+    width: 90%;
+    max-width: 900px;
+    height: 80vh;
+    padding: 0;
+}
+
+.readme-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #eee;
+    background-color: #f8f9fa;
+}
+
+.readme-header h2 {
+    margin: 0;
+}
+
+.readme-search-container {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+#readme-search-input {
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+#readme-search-count {
+    font-size: 0.9rem;
+    color: #7f8c8d;
+}
+
+#close-readme-btn {
+    font-size: 2rem;
+}
+
+#readme-display {
+    padding: 1.5rem;
+    overflow-y: auto;
+    height: calc(100% - 70px); /* Adjust based on header height */
+}
+
+#readme-display mark {
+    background-color: #f1c40f;
+    padding: 2px;
+    border-radius: 3px;
+}
+
+/* Reset Modal Styles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-actions {
+    margin-top: 25px;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.modal-actions button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    transition: background-color 0.2s;
+}
+
+.button-primary { background-color: #007bff; color: white; }
+.button-primary:hover { background-color: #0056b3; }
+
+.button-danger { background-color: #dc3545; color: white; }
+.button-danger:hover { background-color: #c82333; }
+
+.button-secondary { background-color: #6c757d; color: white; }
+.button-secondary:hover { background-color: #5a6268; }

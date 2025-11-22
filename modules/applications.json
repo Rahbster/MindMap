@@ -1,34 +1,70 @@
 {
   "id": "applications",
   "name": "AI Applications",
+  "isTopLevel": false,
   "nodes": {
     "root": {
       "id": "root",
       "title": "AI Applications",
-      "content": "<h2>Applications of AI</h2><p>Artificial Intelligence is transforming numerous industries by enabling new capabilities and efficiencies.</p>",
-      "children": ["healthcare", "finance", "transportation"],
-      "quiz": []
+      "content": "<h2>Real-World AI Applications</h2><p>Artificial Intelligence is not just a theoretical concept; it's actively used in many fields to solve complex problems and create new possibilities.</p>",
+      "children": ["healthcare", "finance", "entertainment", "autonomous-vehicles", "nlp", "computer-vision", "generative-ai"],
+      "quiz": [
+        {
+          "question": "Which of these is NOT a common application of AI?",
+          "options": ["Medical diagnosis", "Stock market prediction"],
+          "answer": "Manual data entry"
+        },
+        {
+          "question": "Recommendation engines, like those on Netflix or Spotify, are a common application of AI in which sector?",
+          "options": ["Healthcare", "Finance"],
+          "answer": "Entertainment"
+        }
+      ]
     },
     "healthcare": {
       "id": "healthcare",
       "title": "Healthcare",
-      "content": "<h3>AI in Healthcare</h3><p>AI is used for diagnostic imaging analysis (like X-rays and MRIs), personalized treatment plans, drug discovery, and robotic surgery.</p>",
-      "children": [],
-      "quiz": []
+      "content": "<h3>AI in Healthcare</h3><p>AI helps in diagnosing diseases earlier and more accurately (e.g., analyzing medical images), discovering new drugs, and personalizing treatment plans for patients.</p>",
+      "children": []
     },
     "finance": {
       "id": "finance",
       "title": "Finance",
-      "content": "<h3>AI in Finance</h3><p>In finance, AI powers algorithmic trading, fraud detection systems, credit scoring, and personalized financial advice through robo-advisors.</p>",
-      "children": [],
-      "quiz": []
+      "content": "<h3>AI in Finance</h3><p>In the financial sector, AI is used for algorithmic trading, fraud detection, credit scoring, and providing personalized financial advice through robo-advisors.</p>",
+      "children": []
     },
-    "transportation": {
-      "id": "transportation",
-      "title": "Transportation",
-      "content": "<h3>AI in Transportation</h3><p>The most well-known application is in self-driving cars. AI is also used for traffic prediction, route optimization, and managing logistics for shipping and delivery.</p>",
+    "entertainment": {
+      "id": "entertainment",
+      "title": "Entertainment",
+      "content": "<h3>AI in Entertainment</h3><p>Recommendation engines on platforms like Netflix and Spotify are powered by AI. It's also used in video games for creating intelligent non-player characters (NPCs) and for special effects in movies.</p>",
+      "children": []
+    },
+    "autonomous-vehicles": {
+      "id": "autonomous-vehicles",
+      "title": "Autonomous Vehicles",
+      "content": "<h3>Autonomous Vehicles</h3><p>Self-driving cars use a combination of AI techniques, including computer vision to perceive the environment, sensor fusion to understand it, and reinforcement learning to make driving decisions.</p>",
+      "children": []
+    },
+    "nlp": {
+      "id": "nlp",
+      "title": "Natural Language Processing",
+      "content": "<h3>Natural Language Processing (NLP)</h3><p>Enabling computers to understand and generate human language. Click to explore applications like translation and sentiment analysis.</p>",
       "children": [],
-      "quiz": []
+      "subModule": "modules/nlp.json"
+    },
+    "computer-vision": {
+      "id": "computer-vision",
+      "title": "Computer Vision",
+      "content": "<h3>Computer Vision</h3><p>Teaching computers to 'see' and interpret the visual world. Click to explore tasks like image classification and object detection.</p>",
+      "children": [],
+      "subModule": "modules/computer-vision.json"
+    },
+    "generative-ai": {
+      "id": "generative-ai",
+      "title": "Generative AI",
+      "content": "<h3>Generative AI</h3><p>A class of AI that can create new and original content, such as images, text, and music. Click to explore models like LLMs and Diffusion Models.</p>",
+      "children": [],
+      "subModule": "modules/generative-ai.json"
     }
   }
 }

@@ -1,0 +1,64 @@
+{
+  "id": "history-of-ai",
+  "name": "History of AI",
+  "isTopLevel": false,
+  "nodes": {
+    "root": {
+      "id": "root",
+      "title": "History of AI",
+      "content": "<h2>The History of Artificial Intelligence</h2><p>The journey of AI is marked by ambitious goals, significant breakthroughs, and periods of disillusionment. This timeline covers the major milestones and pioneers who shaped the field.</p>",
+      "children": ["foundations", "birth-of-ai", "golden-years", "ai-winter", "expert-systems", "deep-learning-era"],
+      "quiz": []
+    },
+    "foundations": {
+      "id": "foundations",
+      "title": "Early Foundations (1943-1955)",
+      "content": "<h3>Early Foundations</h3><p>The groundwork for AI was laid by pioneers like <strong>Alan Turing</strong>, who proposed the 'Turing Test' to measure a machine's intelligence, and McCulloch & Pitts, who created the first mathematical model of a neuron.</p>",
+      "children": [],
+      "quiz": [
+        {
+          "question": "What test was proposed by Alan Turing to determine if a machine can exhibit intelligent behavior indistinguishable from that of a human?",
+          "options": ["The AI Test", "The Cognition Test"],
+          "answer": "The Turing Test"
+        }
+      ]
+    },
+    "birth-of-ai": {
+      "id": "birth-of-ai",
+      "title": "The Birth of AI (1956)",
+      "content": "<h3>The Dartmouth Workshop</h3><p>The term 'Artificial Intelligence' was coined by <strong>John McCarthy</strong> at the Dartmouth Summer Research Project on Artificial Intelligence. This event is widely considered the birthplace of AI as a field.</p>",
+      "children": []
+    },
+    "golden-years": {
+      "id": "golden-years",
+      "title": "The Golden Years (1956-1974)",
+      "content": "<h3>The Golden Years</h3><p>A period of great enthusiasm and funding. Early programs demonstrated that computers could solve algebra word problems, prove theorems in logic, and speak English. The LISP programming language was invented.</p>",
+      "children": []
+    },
+    "ai-winter": {
+      "id": "ai-winter",
+      "title": "The First AI Winter (1974-1980)",
+      "content": "<h3>The First AI Winter</h3><p>Progress stalled as the initial excitement led to overblown promises. The difficulty of real-world problems was underestimated, leading to major cuts in funding and a period of reduced interest.</p>",
+      "children": [],
+      "quiz": [
+        {
+          "question": "What was the 'AI Winter'?",
+          "options": ["A conference held in a cold climate.", "A breakthrough in cooling supercomputers."],
+          "answer": "A period of reduced funding and interest in AI research."
+        }
+      ]
+    },
+    "expert-systems": {
+      "id": "expert-systems",
+      "title": "Boom of Expert Systems (1980s)",
+      "content": "<h3>The Rise of Expert Systems</h3><p>AI saw a resurgence with the commercial success of 'expert systems' – programs that emulated the decision-making ability of a human expert in a specific domain. This led to a new wave of investment.</p>",
+      "children": []
+    },
+    "deep-learning-era": {
+      "id": "deep-learning-era",
+      "title": "The Deep Learning Era (2010s-Present)",
+      "content": "<h3>The Deep Learning Revolution</h3><p>Fueled by massive datasets (like ImageNet), powerful GPUs, and algorithmic breakthroughs, Deep Learning has led to astonishing progress. Pioneers like <strong>Geoffrey Hinton, Yann LeCun, and Yoshua Bengio</strong> (the 'Godfathers of AI') won the Turing Award for their work on neural networks.</p>",
+      "children": []
+    }
+  }
+}

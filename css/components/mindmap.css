@@ -1,0 +1,95 @@
+.map-controls {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    z-index: 10; /* Ensure it's above the SVG content */
+    display: flex;
+    gap: 0.5rem;
+}
+
+.map-controls .icon-button.organizing {
+    animation: pulse-organize-btn 1.5s infinite;
+}
+
+@keyframes pulse-organize-btn {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(52, 152, 219, 0.7);
+    }
+    50% {
+        box-shadow: 0 0 10px 5px rgba(52, 152, 219, 0);
+    }
+}
+
+.mindmap-container {
+    position: relative; /* Needed for absolute positioning of child elements */
+    flex: 2; /* Make mindmap container wider */
+    background-color: #fff; /* Match content container */
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    padding: 1.5rem;
+    overflow-y: auto;
+}
+
+/* Mind Map SVG Styles */
+#mindmap-svg-container {
+    width: 100%;
+    height: 100%;
+    background-color: #0D1117; /* Apply space background here */
+    border-radius: 4px; /* Add a slight rounding to the SVG area */
+}
+
+.mindmap-bg-star {
+    fill: #a9cbe3; /* A soft blue-white for the stars */
+    pointer-events: none; /* Ensure stars don't interfere with pan/zoom */
+}
+
+.node-circle {
+    cursor: pointer;
+    fill: #3498db;
+    stroke: #2980b9;
+    stroke-width: calc(var(--mindmap-font-size) / 8); /* Make stroke proportional */
+    transition: fill 0.2s;
+}
+
+.node-circle:hover {
+    fill: #5dade2;
+}
+
+.node-circle.active {
+    animation: pulse-glow 1.5s infinite;
+}
+
+@keyframes pulse-glow {
+    0% {
+        filter: drop-shadow(0 0 3px #e67e22);
+    }
+    50% {
+        filter: drop-shadow(0 0 12px #e67e22);
+    }
+    100% {
+        filter: drop-shadow(0 0 3px #e67e22);
+    }
+}
+
+.node-text {
+    font-size: calc(var(--mindmap-font-size) * 0.75); /* Make node text proportional */
+    pointer-events: none;
+    fill: #fff;
+    text-anchor: middle;
+    /* dominant-baseline is handled by tspan dy */
+}
+
+.link-line {
+    stroke: #95a5a6;
+    stroke-width: calc(var(--mindmap-font-size) / 8); /* Make stroke proportional */
+}
+
+/* Add a glow to nodes that link to a sub-module */
+.has-submodule {
+    filter: drop-shadow(0 0 5px #3498db);
+}
+
+/* Add a shadow to child nodes */
+.is-child-node {
+    filter: drop-shadow(3px 3px 3px rgba(0, 0, 0, 0.4));
+}

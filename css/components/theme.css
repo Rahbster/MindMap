@@ -1,0 +1,111 @@
+/* --- Dark Mode Theme --- */
+body.dark-mode {
+    background-color: #22272e;
+    color: #cdd9e5;
+}
+
+body.dark-mode header {
+    background-color: #1c2128;
+}
+
+body.dark-mode .sidenav {
+    background-color: #1c2128;
+    box-shadow: 3px 0 6px rgba(0,0,0,0.4);
+}
+
+body.dark-mode .sidenav a, body.dark-mode .sidenav button, body.dark-mode .theme-label {
+    color: #9a9a9a;
+}
+body.dark-mode .sidenav a:hover, body.dark-mode .sidenav button:hover {
+    color: #e0e0e0;
+}
+body.dark-mode .sidenav h2 {
+    color: #e0e0e0;
+}
+body.dark-mode .sidenav hr {
+    border-color: #333942;
+}
+
+body.dark-mode .mindmap-container, body.dark-mode .content-container {
+    background-color: #2d333b;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+}
+
+body.dark-mode #mindmap-svg-container {
+    background-color: #0D1117; /* Keep space background in dark mode */
+}
+
+body.dark-mode .mindmap-bg-star {
+    fill: #cdd9e5; /* Brighter stars for dark mode */
+}
+
+body.dark-mode h1, body.dark-mode h2 {
+    color: #e0e0e0;
+}
+
+body.dark-mode .modal-content {
+    background-color: #2d333b;
+    color: #cdd9e5;
+}
+
+body.dark-mode .modal-content h2 {
+    color: #e0e0e0;
+}
+
+/* --- Dark theme for Quill editor (adapted from GoldFin) --- */
+
+/* Toolbar background and border */
+body.dark-mode .ql-toolbar.ql-snow {
+    background-color: #1c2128; /* Darker toolbar background */
+    border-color: #444c56;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+}
+
+/* Editor container background and border */
+body.dark-mode .ql-container.ql-snow {
+    background-color: #22272e; /* Dark editor background */
+    border-color: #444c56;
+}
+
+/* Editor text color and placeholder */
+body.dark-mode .ql-editor {
+    color: #cdd9e5; /* Default text color */
+}
+body.dark-mode .ql-editor.ql-blank::before {
+    color: rgba(205, 217, 229, 0.5); /* Dimmer placeholder text */
+}
+
+/* Toolbar icons and pickers */
+body.dark-mode .ql-snow .ql-stroke { stroke: #cdd9e5; }
+body.dark-mode .ql-snow .ql-fill { fill: #cdd9e5; }
+body.dark-mode .ql-snow .ql-picker-label { color: #cdd9e5; }
+
+body.dark-mode .ql-snow .ql-picker-options {
+    background-color: #2d333b;
+    border-color: #444c56;
+}
+
+body.dark-mode .modal-content hr {
+    border-top-color: #444c56;
+}
+
+body.dark-mode #quiz-editor-container, body.dark-mode .quiz-question-editor {
+    border-color: #444c56;
+}
+
+
+body.dark-mode .modal-input, body.dark-mode #node-search-input {
+    background-color: #22272e;
+    border-color: #444c56;
+    color: #cdd9e5;
+}
+
+body.dark-mode .readme-header {
+    background-color: #1c2128;
+    border-bottom-color: #444c56;
+}
+
+body.dark-mode .icon-button:hover {
+    background-color: #3a414c;
+}

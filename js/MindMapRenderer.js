@@ -1,7 +1,11 @@
 export class MindMapRenderer {
-    constructor(container) {
+    constructor(container, state) {
         this.container = container;
+        this.layoutAnimationId = null;
+        this.state = state;
         this.svg = null;
+        this.temperature = 0;
+        this.starLayers = [];
         this.viewportG = null;
     }
 
@@ -17,57 +21,170 @@ export class MindMapRenderer {
         this.container.innerHTML = '';
         this.container.appendChild(this.svg);
 
+        // --- Starfield Background (inspired by TeamSudoku) ---
+        const starGroups = [
+            { id: 'star-layer-far', factor: 0.1, count: 150, minSize: 0.5, maxSize: 1.2 },
+            { id: 'star-layer-mid', factor: 0.3, count: 80, minSize: 0.8, maxSize: 1.8 },
+            { id: 'star-layer-near', factor: 0.6, count: 40, minSize: 1.2, maxSize: 2.5 }
+        ];
+
+        const createStars = (count, minSize, maxSize, group) => {
+            const areaSize = 3000; // A large area for stars to exist in
+            for (let i = 0; i < count; i++) {
+                const star = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                star.setAttribute('class', 'mindmap-bg-star');
+                star.setAttribute('cx', Math.random() * areaSize - areaSize / 2);
+                star.setAttribute('cy', Math.random() * areaSize - areaSize / 2);
+                star.setAttribute('r', (Math.random() * (maxSize - minSize) + minSize).toFixed(2));
+                star.style.opacity = (Math.random() * 0.7 + 0.1).toFixed(2);
+                group.appendChild(star);
+            }
+        };
+
+        this.starLayers = starGroups.map(config => {
+            const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+            group.id = config.id;
+            this.svg.appendChild(group);
+            createStars(config.count, config.minSize, config.maxSize, group);
+            return { group, factor: config.factor };
+        });
+
         this.viewportG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
         this.svg.appendChild(this.viewportG);
 
         const rootNode = mindMapData.nodes.root;
         if (!rootNode) return;
 
-        // Layout Algorithm
-        this.calculateLayout(mindMapData, positions, nodeSpacing);
+        // Determine if we need to run the layout animation.
+        const needsLayout = Object.keys(positions).length === 0;
 
-        // Draw elements
+        // Initialize positions if they don't exist, giving them a random starting point.
+        Object.values(mindMapData.nodes).forEach(node => {
+            if (!positions[node.id]) {
+                positions[node.id] = { x: Math.random() * this.container.clientWidth, y: Math.random() * this.container.clientHeight };
+            }
+        });
+
+        // Always draw the elements first.
         this.drawLines(mindMapData, positions);
         this.drawNodes(mindMapData, positions, nodeRadius, textLineHeight, nodeMouseDownCallback);
 
-        // Return calculated pan and zoom for fitting
-        return this.calculateZoomToFit(positions, nodeRadius);
+        // Always return the current pan/zoom. The layout is now only triggered manually.
+        return { pan: this.state.pan, zoom: this.state.zoom };
     }
 
-    calculateLayout(mindMapData, positions, nodeSpacing) {
-        const rootNode = mindMapData.nodes.root;
-        const nodeModifiers = {};
+    runLayoutAnimation(start = true, initialPositions = null) {
+        if (!start) {
+            if (this.layoutAnimationId) cancelAnimationFrame(this.layoutAnimationId);
+            this.layoutAnimationId = null;
+            return;
+        }
 
-        const firstPass = (nodeId) => {
-            const node = mindMapData.nodes[nodeId];
-            const children = node.children || [];
-            nodeModifiers[nodeId] = { x: 0, mod: 0 };
-            if (children.length === 0) return;
-            children.forEach(childId => firstPass(childId));
+        // If an animation is already running, just boost the temperature.
+        if (this.layoutAnimationId) {
+            this.temperature = Math.min(200, this.temperature + 100); // Add energy, with a cap.
+            console.log(`[Renderer] Auto-organize boosted. New temperature: ${this.temperature.toFixed(2)}`);
+            return;
+        }
 
-            let totalChildWidth = 0;
-            children.forEach(childId => totalChildWidth += nodeModifiers[childId].x);
+        const nodes = Object.values(this.state.mindMapData.nodes);
+        const positions = this.state.positions; // Use the main state positions object
+        const { clientWidth: width, clientHeight: height } = this.container;
 
-            let x = -totalChildWidth / 2;
-            children.forEach(childId => {
-                nodeModifiers[childId].x += x;
-                x += nodeModifiers[childId].x + nodeSpacing;
-            });
-        };
-
-        const secondPass = (nodeId, level, xOffset) => {
-            const node = mindMapData.nodes[nodeId];
-            const children = node.children || [];
-            const x = (nodeModifiers[nodeId]?.x || 0) + xOffset;
-            const y = level * nodeSpacing;
-            if (!positions[nodeId]) {
-                positions[nodeId] = { x, y };
+        // Initialize physics properties for all nodes.
+        // If initialPositions are provided (from Auto-Organize), use them.
+        // Otherwise, use the existing state positions or randomize.
+        nodes.forEach(node => {
+            if (initialPositions && initialPositions[node.id]) {
+                positions[node.id] = { ...initialPositions[node.id] };
             }
-            children.forEach(childId => secondPass(childId, level + 1, x));
-        };
+            node._ui = { vx: 0, vy: 0, fx: 0, fy: 0 }; // Physics properties
+        });
 
-        firstPass(rootNode.id);
-        secondPass(rootNode.id, 1, 0);
+        const K_REPEL = 180000; // Increased repulsion for better spacing
+        const K_ATTRACT = 0.03;
+        const IDEAL_LENGTH = 250; // Increased ideal spring length
+        const GRAVITY = 0.05;
+        this.temperature = 100.0;
+        const COOLING_RATE = 0.99;
+
+        const step = () => {
+            // 1. Calculate Forces
+            for (const node of nodes) {
+                node._ui.fx = 0;
+                node._ui.fy = 0;
+
+                // Gravity towards center
+                node._ui.fx += (width / 2 - positions[node.id].x) * GRAVITY;
+                node._ui.fy += (height / 2 - positions[node.id].y) * GRAVITY;
+
+                // Repulsion from other nodes
+                for (const otherNode of nodes) {
+                    if (node === otherNode) continue;
+                    const dx = positions[node.id].x - positions[otherNode.id].x;
+                    const dy = positions[node.id].y - positions[otherNode.id].y;
+                    const distance = Math.sqrt(dx * dx + dy * dy) || 1;
+                    const repulsion = K_REPEL / (distance * distance);
+                    node._ui.fx += (dx / distance) * repulsion;
+                    node._ui.fy += (dy / distance) * repulsion;
+                }
+
+                // Attraction to connected nodes
+                (node.children || []).forEach(childId => {
+                    const targetNode = this.state.mindMapData.nodes[childId];
+                    if (!targetNode || !positions[targetNode.id]) return;
+                    const dx = positions[targetNode.id].x - positions[node.id].x;
+                    const dy = positions[targetNode.id].y - positions[node.id].y;
+                    const distance = Math.sqrt(dx * dx + dy * dy) || 1;
+                    const attraction = K_ATTRACT * (distance - IDEAL_LENGTH);
+                    const fx = (dx / distance) * attraction;
+                    const fy = (dy / distance) * attraction;
+                    node._ui.fx += fx;
+                    node._ui.fy += fy;
+
+                    // Add a tangential force to encourage circular arrangement
+                    const tangentialForce = 0.5;
+                    // The tangential vector is (-dy, dx)
+                    const tx = -dy / distance;
+                    const ty = dx / distance;
+                    node._ui.fx += tx * tangentialForce;
+                    node._ui.fy += ty * tangentialForce;
+
+                    targetNode._ui.fx -= fx;
+                    targetNode._ui.fy -= fy;
+                });
+            }
+
+            // 2. Apply Forces and Update Positions
+            for (const node of nodes) {
+                node._ui.vx = (node._ui.vx + node._ui.fx * 0.01) * 0.9; // Damping
+                node._ui.vy = (node._ui.vy + node._ui.fy * 0.01) * 0.9;
+
+                const speed = Math.sqrt(node._ui.vx * node._ui.vx + node._ui.vy * node._ui.vy);
+
+                if (speed > this.temperature) {
+                    node._ui.vx = (node._ui.vx / speed) * this.temperature;
+                    node._ui.vy = (node._ui.vy / speed) * this.temperature;
+                }
+
+                positions[node.id].x += node._ui.vx;
+                positions[node.id].y += node._ui.vy;
+                this.updateNodeAndLines(node.id, positions[node.id]);
+            }
+
+            this.temperature *= COOLING_RATE;
+
+            if (this.temperature > 0.1) {
+                this.layoutAnimationId = requestAnimationFrame(step);
+            } else {
+                console.log('--- Auto Organize Complete: Final Node Positions ---');
+                console.log(JSON.stringify(positions, null, 2));
+                console.log('----------------------------------------------------');
+                this.state.mindMapData.positions = positions;
+                this.callbacks.onLayoutEnd();
+            }
+        };
+        step();
     }
 
     drawLines(mindMapData, positions) {
@@ -146,9 +263,23 @@ export class MindMapRenderer {
         return { pan, zoom };
     }
 
+    updateNodeAndLines(nodeId, position) {
+        const group = this.container.querySelector(`g[data-node-id="${nodeId}"]`);
+        if (group) {
+            group.setAttribute('transform', `translate(${position.x}, ${position.y})`);
+            this.updateConnectingLines(nodeId, position);
+        }
+    }
+
     applyTransform(pan, zoom) {
         if (this.viewportG) {
             this.viewportG.setAttribute('transform', `translate(${pan.x}, ${pan.y}) scale(${zoom})`);
+
+            // Apply parallax effect to star layers
+            this.starLayers.forEach(layer => {
+                const transform = `translate(${pan.x * layer.factor}, ${pan.y * layer.factor})`;
+                layer.group.setAttribute('transform', transform);
+            });
         }
     }
 

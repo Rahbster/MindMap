@@ -1,0 +1,53 @@
+{
+  "id": "nlp",
+  "name": "Natural Language Processing",
+  "nodes": {
+    "root": {
+      "id": "root",
+      "title": "Natural Language Processing (NLP)",
+      "content": "<h2>Natural Language Processing (NLP)</h2><p>A field of AI that focuses on enabling computers to understand, interpret, and generate human language. It's the power behind virtual assistants, translation apps, and more.</p>",
+      "children": ["sentiment-analysis", "machine-translation", "chatbots", "ner"],
+      "quiz": [
+        {
+          "question": "What is the primary goal of Natural Language Processing?",
+          "options": [
+            "To make computers type faster.",
+            "To create new languages for computers."
+          ],
+          "answer": "To enable computers to process and understand human language."
+        }
+      ]
+    },
+    "sentiment-analysis": {
+      "id": "sentiment-analysis",
+      "title": "Sentiment Analysis",
+      "content": "<h3>Sentiment Analysis</h3><p>The process of computationally identifying and categorizing opinions expressed in a piece of text, especially in order to determine whether the writer's attitude towards a particular topic is positive, negative, or neutral. Often used on social media and in product reviews.</p>",
+      "children": [],
+      "quiz": [
+        {
+          "question": "A company analyzing customer tweets to gauge reaction to a new product is an example of:",
+          "options": ["Machine Translation", "Named Entity Recognition"],
+          "answer": "Sentiment Analysis"
+        }
+      ]
+    },
+    "machine-translation": {
+      "id": "machine-translation",
+      "title": "Machine Translation",
+      "content": "<h3>Machine Translation</h3><p>The task of automatically translating text or speech from one language to another. Modern systems like Google Translate use deep learning models (Transformers) to achieve high accuracy.</p>",
+      "children": []
+    },
+    "chatbots": {
+      "id": "chatbots",
+      "title": "Chatbots & Dialogue Systems",
+      "content": "<h3>Chatbots & Dialogue Systems</h3><p>These are computer programs designed to simulate human conversation through text or voice commands. They range from simple, rule-based bots to sophisticated virtual assistants like Siri and Alexa, and large language models like ChatGPT.</p>",
+      "children": []
+    },
+    "ner": {
+      "id": "ner",
+      "title": "Named Entity Recognition (NER)",
+      "content": "<h3>Named Entity Recognition (NER)</h3><p>A task that involves identifying and classifying named entities in text into pre-defined categories such as the names of persons, organizations, locations, medical codes, time expressions, quantities, monetary values, percentages, etc.</p>",
+      "children": []
+    }
+  }
+}

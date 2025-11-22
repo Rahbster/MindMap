@@ -1,0 +1,78 @@
+.quiz-button, .quiz-option {
+    background-color: var(--primary-color);
+    color: var(--text-color);
+    border: none;
+    padding: 0.6em 1.2em;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-size: inherit; /* Use the inherited font size */
+    font-weight: 600;
+    margin-top: 1em;
+    transition: background-color 0.2s ease, transform 0.1s ease, border-color 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid transparent;
+    width: 100%;
+    text-align: left;
+}
+
+.quiz-button {
+    color: #ffffff;
+    text-align: center;
+}
+
+.quiz-option {
+    background-color: var(--background-color);
+}
+
+.quiz-button:hover, .quiz-option:hover:not(:disabled) {
+    background-color: var(--primary-color-darker);
+    border-color: var(--primary-color);
+    color: #ffffff;
+}
+
+.quiz-button:active {
+    transform: translateY(1px);
+}
+
+/* Styles moved from style.css */
+#quiz-container {
+    font-size: var(--dynamic-font-size);
+    margin-top: 2rem;
+    border-top: 2px solid #eee;
+    padding-top: 1.5rem;
+}
+
+#quiz-container {
+    background-color: var(--background-color-light);
+    border-top: 1px solid var(--border-color);
+    padding: 1rem;
+}
+
+#score {
+    font-weight: bold;
+    margin-bottom: 1em;
+    color: var(--text-color-secondary);
+}
+
+#quiz-options ul {
+    list-style: none; /* Removes bullet points */
+    padding: 0;
+    margin: 0;
+}
+
+.correct-answer button {
+    border-color: var(--success-color) !important;
+    background-color: #27ae6020 !important;
+}
+
+.quiz-option.correct {
+    background-color: #2ecc71 !important;
+    color: white !important;
+    border-color: #27ae60 !important;
+}
+
+.quiz-option.incorrect {
+    background-color: #e74c3c !important;
+    color: white !important;
+    border-color: #c0392b !important;
+}

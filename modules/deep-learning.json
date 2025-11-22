@@ -1,34 +1,87 @@
 {
   "id": "deep-learning",
   "name": "Deep Learning",
+  "isTopLevel": false,
   "nodes": {
     "root": {
       "id": "root",
       "title": "Deep Learning",
-      "content": "<h2>Deep Learning</h2><p>A subfield of machine learning based on artificial neural networks with many layers (deep neural networks). It has led to breakthroughs in many areas.</p>",
-      "children": ["ann", "cnn", "rnn"],
-      "quiz": []
+      "content": "<h2>Deep Learning</h2><p>A subfield of machine learning based on artificial neural networks with many layers (deep neural networks). It has led to breakthroughs in areas like computer vision and natural language processing.</p>",
+      "children": ["neural-networks", "layers", "activation-functions", "cnn", "rnn", "transformers"],
+      "quiz": [
+        {
+          "question": "What is the key characteristic of a 'deep' neural network?",
+          "options": [
+            "It learns very quickly",
+            "It uses a special type of data"
+          ],
+          "answer": "It has many layers"
+        }
+      ]
     },
-    "ann": {
-      "id": "ann",
-      "title": "Neural Networks",
-      "content": "<h3>Artificial Neural Networks (ANNs)</h3><p>Computing systems inspired by the biological neural networks that constitute animal brains. They consist of interconnected nodes (neurons) that process information.</p>",
+    "neural-networks": {
+      "id": "neural-networks",
+      "title": "Artificial Neural Networks (ANNs)",
+      "content": "<h3>Artificial Neural Networks</h3><p>Computing systems inspired by the biological neural networks that constitute animal brains. They consist of interconnected nodes (neurons) that process and transmit signals.</p>",
+      "children": []
+    },
+    "layers": {
+      "id": "layers",
+      "title": "Layers",
+      "content": "<h3>Layers in a Neural Network</h3><p>A typical ANN has an <strong>Input Layer</strong> (receives data), one or more <strong>Hidden Layers</strong> (perform computations), and an <strong>Output Layer</strong> (produces the result). Deep learning models have multiple hidden layers.</p>",
+      "children": []
+    },
+    "activation-functions": {
+      "id": "activation-functions",
+      "title": "Activation Functions",
+      "content": "<h3>Activation Functions</h3><p>A function applied to the output of a neuron that determines if it should be activated ('fire'). They introduce non-linearity into the network, allowing it to learn complex patterns. Common examples include ReLU, Sigmoid, and Tanh.</p>",
       "children": [],
-      "quiz": []
+      "quiz": [
+        {
+          "question": "What is the purpose of an activation function?",
+          "options": ["To speed up training", "To normalize the input data"],
+          "answer": "To introduce non-linearity"
+        }
+      ]
     },
     "cnn": {
       "id": "cnn",
-      "title": "Convolutional Neural Networks",
-      "content": "<h3>CNNs</h3><p>A class of deep neural networks, most commonly applied to analyzing visual imagery. They are used in image and video recognition, image classification, and medical image analysis.</p>",
+      "title": "Convolutional Neural Networks (CNNs)",
+      "content": "<h3>Convolutional Neural Networks (CNNs)</h3><p>A class of neural networks most commonly applied to analyze visual imagery. They use a special kind of layer called a convolutional layer that allows them to detect patterns like edges, textures, and shapes. They are the backbone of most computer vision systems.</p>",
       "children": [],
-      "quiz": []
+      "quiz": [
+        {
+          "question": "CNNs are particularly effective for which type of data?",
+          "options": ["Tabular data", "Time-series data"],
+          "answer": "Image data"
+        }
+      ]
     },
     "rnn": {
       "id": "rnn",
-      "title": "Recurrent Neural Networks",
-      "content": "<h3>RNNs</h3><p>A class of artificial neural networks where connections between nodes form a directed graph along a temporal sequence. This allows them to exhibit temporal dynamic behavior, making them ideal for sequential data like text or time series.</p>",
+      "title": "Recurrent Neural Networks (RNNs)",
+      "content": "<h3>Recurrent Neural Networks (RNNs)</h3><p>A type of neural network well-suited for sequential data, like text or time series. They have 'memory' because their connections form a directed cycle, allowing information to persist. Variants like LSTM (Long Short-Term Memory) and GRU were developed to handle long-term dependencies more effectively.</p>",
       "children": [],
-      "quiz": []
+      "quiz": [
+        {
+          "question": "What unique feature of RNNs makes them suitable for sequential data?",
+          "options": ["Their ability to process images", "They have fewer layers"],
+          "answer": "Their internal memory or feedback loops"
+        }
+      ]
+    },
+    "transformers": {
+      "id": "transformers",
+      "title": "Transformers",
+      "content": "<h3>Transformer Architecture</h3><p>A revolutionary neural network architecture introduced in 2017 that relies on a 'self-attention' mechanism. It processes entire sequences of data at once, making it highly parallelizable and effective. It has become the foundation for most state-of-the-art Large Language Models (LLMs) like GPT.</p>",
+      "children": [],
+      "quiz": [
+        {
+          "question": "What is the key mechanism behind the Transformer architecture?",
+          "options": ["Convolutional layers", "Recurrent connections"],
+          "answer": "Self-attention"
+        }
+      ]
     }
   }
 }
