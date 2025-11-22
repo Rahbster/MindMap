@@ -59,13 +59,12 @@ MindMap/
 ├── manifest.json         # PWA manifest
 └── sw.js                 # Service Worker for offline caching
 ```
-The application is built around a central `MindMapApp` class in `main.js` that initializes and coordinates several manager classes, each with a specific responsibility. This promotes a modular and maintainable codebase.
 
 ## 🚀 How to Run Locally
 
 1.  Ensure all the project files are in a single directory.
 2.  Due to the use of ES6 Modules and the Service Worker, you must run the project from a local web server.
-3.  A simple way to do this is to use a tool like the **Live Server** extension for Visual Studio Code or run `python -m http.server` from the project's root directory.
+3.  A simple way to do this is to use a tool like the **Live Server** extension for Visual Studio Code.
     *   Install the extension.
     *   Right-click on `index.html` and select "Open with Live Server".
 4.  The application will open in your default web browser.
@@ -87,8 +86,18 @@ The application is built around a central `MindMapApp` class in `main.js` that i
     *   Select a node, then click the trash icon (🗑️) to remove it.
     *   Click and drag any node to a new position.
 *   **Organize & Save**:
-    *   **Press and hold** the "Auto Organize" button (grid icon) to run the physics-based layout animation. Release to stop and save the new positions.
+    *   Click the "Arrange" button (grid icon) in the map panel to reset all nodes to their default positions.
     *   Click the "Save" button (download icon) to save the current module, including all your edits and custom positions, to a `.json` file.
 
+### 🤖 Development with AI Assistance
 
-*This project was developed with the assistance of Gemini Code Assist.*
+This project was developed with significant assistance from **Gemini Code Assist**. The AI was instrumental in various stages of the development lifecycle, acting as a pair programmer for tasks including:
+
+*   **Rapid Prototyping & Feature Implementation**: Implementing complex features like the physics-based layout engine, the global search functionality, and the parallax background.
+*   **Debugging & Root Cause Analysis**: Identifying the source of complex bugs, from UI layout issues to race conditions and state management flaws in the navigation logic.
+*   **Architectural Refactoring**: Restructuring the application from a single large class into a more modular, maintainable architecture with distinct manager classes (`StateManager`, `ModuleLoader`, etc.).
+*   **Code Review & Optimization**: Reviewing existing code for correctness, suggesting improvements, and optimizing algorithms (like the layout and search functions).
+*   **Content Generation**: Populating the knowledge base by creating and expanding the content within the `.json` module files.
+*   **Documentation**: Generating and updating this `README.md` file to reflect the project's current state.
+
+For developers looking to accelerate their workflow, integrating an AI assistant like Gemini can be a powerful tool for brainstorming, implementation, and debugging.

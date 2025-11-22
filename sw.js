@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mindmap-pwa-cache-v3';
+const CACHE_NAME = 'mindmap-pwa-cache-v6';
 const urlsToCache = [
     './',
     './index.html',
@@ -20,6 +20,7 @@ const urlsToCache = [
     './js/ModuleLoader.js',
     './js/SearchHandler.js',
     './js/editor.js',
+    './README.md',
     // Top-Level Modules
     './modules/ai.json',
     './modules/web-development.json',
@@ -53,7 +54,14 @@ self.addEventListener('install', (event) => {
         caches.open(CACHE_NAME)
             .then((cache) => {
                 console.log('[Service Worker] Caching all: app shell and content');
-                return cache.addAll(urlsToCache);
+                // Use custom fetch to bypass browser HTTP cache.
+                const cachePromises = urlsToCache.map((url) => {
+                    return fetch(url, { cache: 'reload' }).then((response) => {
+                        if (!response.ok) throw new Error(`Request for ${url} failed with status ${response.status}`);
+                        return cache.put(url, response);
+                    });
+                });
+                return Promise.all(cachePromises);
             })
     );
 });
