@@ -1,0 +1,44 @@
+{
+  "id": "css",
+  "name": "CSS Concepts",
+  "isTopLevel": false,
+  "nodes": {
+    "root": {
+      "id": "root",
+      "title": "CSS Concepts",
+      "content": "<h2>CSS Concepts</h2><p>Cascading Style Sheets (CSS) is used to style and lay out web pages. Mastering its core concepts is key to creating beautiful and responsive designs.</p>",
+      "children": ["selectors", "box-model", "flexbox-grid", "responsive-design"]
+    },
+    "selectors": {
+      "id": "selectors",
+      "title": "Selectors",
+      "content": "<h3>Selectors</h3><p>Selectors are patterns used to select the HTML element(s) you want to style. You can select elements by their tag name (e.g., <strong>p</strong>), class (e.g., <strong>.my-class</strong>), or ID (e.g., <strong>#my-id</strong>).</p>",
+      "children": []
+    },
+    "box-model": {
+      "id": "box-model",
+      "title": "The Box Model",
+      "content": "<h3>The Box Model</h3><p>Every HTML element can be considered a box. The CSS box model describes how this box is composed of: the content area, padding, border, and margin. Understanding this is fundamental to controlling layout and spacing.</p>",
+      "children": []
+    },
+    "flexbox-grid": {
+      "id": "flexbox-grid",
+      "title": "Flexbox & Grid",
+      "content": "<h3>Flexbox & Grid</h3><p>Modern CSS layout systems that replaced older, more difficult methods. <strong>Flexbox</strong> is designed for one-dimensional layouts (a row or a column). <strong>Grid</strong> is designed for two-dimensional layouts (rows and columns). Most modern layouts use a combination of both.</p>",
+      "children": [],
+      "quiz": [
+        {
+          "question": "Which CSS layout model is best suited for arranging items in a single row with complex alignment?",
+          "options": ["Grid", "Table"],
+          "answer": "Flexbox"
+        }
+      ]
+    },
+    "responsive-design": {
+      "id": "responsive-design",
+      "title": "Responsive Design",
+      "content": "<h3>Responsive Design</h3><p>The practice of ensuring that web content looks good on all devices (desktops, tablets, and phones). This is primarily achieved using <strong>Media Queries</strong>, which apply different CSS rules based on the screen size or device characteristics.</p>",
+      "children": []
+    }
+  }
+}

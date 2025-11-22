@@ -24,19 +24,36 @@
     "healthcare": {
       "id": "healthcare",
       "title": "Healthcare",
-      "content": "<h3>AI in Healthcare</h3><p>AI helps in diagnosing diseases earlier and more accurately (e.g., analyzing medical images), discovering new drugs, and personalizing treatment plans for patients.</p>",
-      "children": []
+      "content": "<h3>AI in Healthcare</h3><p>AI helps in diagnosing diseases earlier and more accurately (e.g., analyzing MRI scans for tumors), discovering new drugs by simulating molecular interactions, and personalizing treatment plans for patients based on their genetic makeup and lifestyle.</p>",
+      "children": [],
+      "quiz": [
+        {
+          "question": "Which of these is a key use of AI in medical imaging?",
+          "options": [
+            "Scheduling appointments.",
+            "Billing patients."
+          ],
+          "answer": "Detecting anomalies like tumors in scans."
+        }
+      ]
     },
     "finance": {
       "id": "finance",
       "title": "Finance",
-      "content": "<h3>AI in Finance</h3><p>In the financial sector, AI is used for algorithmic trading, fraud detection, credit scoring, and providing personalized financial advice through robo-advisors.</p>",
-      "children": []
+      "content": "<h3>AI in Finance</h3><p>In the financial sector, AI is used for high-frequency algorithmic trading, real-time fraud detection on credit card transactions, credit scoring for loan applications, and providing personalized financial advice through robo-advisors.</p>",
+      "children": [],
+      "quiz": [
+        {
+          "question": "When your bank sends you a text alert about a suspicious transaction, what technology is likely being used?",
+          "options": ["Manual review by a human", "A simple calculator"],
+          "answer": "AI-powered fraud detection"
+        }
+      ]
     },
     "entertainment": {
       "id": "entertainment",
       "title": "Entertainment",
-      "content": "<h3>AI in Entertainment</h3><p>Recommendation engines on platforms like Netflix and Spotify are powered by AI. It's also used in video games for creating intelligent non-player characters (NPCs) and for special effects in movies.</p>",
+      "content": "<h3>AI in Entertainment</h3><p>Recommendation engines on platforms like Netflix and Spotify are powered by AI. It's also used in video games for creating intelligent non-player characters (NPCs) and for procedural content generation. In film, AI assists with special effects, color grading, and even script analysis.</p>",
       "children": []
     },
     "autonomous-vehicles": {
@@ -50,21 +67,21 @@
       "title": "Natural Language Processing",
       "content": "<h3>Natural Language Processing (NLP)</h3><p>Enabling computers to understand and generate human language. Click to explore applications like translation and sentiment analysis.</p>",
       "children": [],
-      "subModule": "modules/nlp.json"
+      "subModule": "modules/ai/applications/nlp.json"
     },
     "computer-vision": {
       "id": "computer-vision",
       "title": "Computer Vision",
       "content": "<h3>Computer Vision</h3><p>Teaching computers to 'see' and interpret the visual world. Click to explore tasks like image classification and object detection.</p>",
       "children": [],
-      "subModule": "modules/computer-vision.json"
+      "subModule": "modules/ai/applications/computer-vision.json"
     },
     "generative-ai": {
       "id": "generative-ai",
       "title": "Generative AI",
       "content": "<h3>Generative AI</h3><p>A class of AI that can create new and original content, such as images, text, and music. Click to explore models like LLMs and Diffusion Models.</p>",
       "children": [],
-      "subModule": "modules/generative-ai.json"
+      "subModule": "modules/ai/applications/generative-ai.json"
     }
   }
 }

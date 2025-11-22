@@ -7,7 +7,7 @@
       "id": "root",
       "title": "Artificial Intelligence",
       "content": "<h2>Artificial Intelligence (AI)</h2><p>The theory and development of computer systems able to perform tasks that normally require human intelligence, such as visual perception, speech recognition, decision-making, and translation between languages.</p>",
-      "children": ["history", "ml", "applications", "ethics", "paradigms"],
+      "children": ["history", "ml", "applications", "ethics", "paradigms", "programming"],
       "quiz": [
         {
           "question": "What is the core concept of Artificial Intelligence?",
@@ -24,28 +24,28 @@
       "title": "History of AI",
       "content": "<h3>History of AI</h3><p>Explore the key milestones, pioneers, and events that have shaped the field of Artificial Intelligence from its inception to the present day. Click to learn more.</p>",
       "children": [],
-      "subModule": "modules/history-of-ai.json"
+      "subModule": "modules/ai/history-of-ai.json"
     },
     "ml": {
       "id": "ml",
       "title": "Machine Learning",
       "content": "<h3>Machine Learning</h3><p>A subset of AI that gives computers the ability to learn without being explicitly programmed. Click to explore this topic.</p>",
       "children": [],
-      "subModule": "modules/ml.json"
+      "subModule": "modules/ai/ml.json"
     },
     "applications": {
       "id": "applications",
       "title": "AI Applications",
       "content": "<h3>AI Applications</h3><p>Where is AI used today? From healthcare to finance, AI is transforming industries. Click to see examples.</p>",
       "children": [],
-      "subModule": "modules/applications.json"
+      "subModule": "modules/ai/applications.json"
     },
     "ethics": {
       "id": "ethics",
       "title": "AI Ethics",
       "content": "<h3>AI Ethics</h3><p>The ethical considerations surrounding the development and deployment of AI are crucial. Click to learn more about bias, privacy, and autonomy.</p>",
       "children": [],
-      "subModule": "modules/ethics.json"
+      "subModule": "modules/ai/ethics.json"
     },
     "paradigms": {
       "id": "paradigms",
@@ -53,6 +53,13 @@
       "content": "<h3>Learning Paradigms</h3><p>Beyond the main types of ML, there are other important learning strategies and concepts. Click to explore.</p>",
       "children": [],
       "subModule": "modules/learning-paradigms.json"
+    },
+    "programming": {
+      "id": "programming",
+      "title": "Programming with AI",
+      "content": "<h3>Programming with AI</h3><p>Explore the languages, frameworks, and tools used to build AI applications and leverage AI for developer productivity. Click to learn more.</p>",
+      "children": [],
+      "subModule": "modules/ai/programming-with-ai.json"
     }
   }
 }

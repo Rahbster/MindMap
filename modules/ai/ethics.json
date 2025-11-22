@@ -22,7 +22,7 @@
     "bias": {
       "id": "bias",
       "title": "Bias and Fairness",
-      "content": "<h3>Bias and Fairness</h3><p>AI models trained on biased data can perpetuate and even amplify existing societal biases, leading to unfair outcomes in areas like hiring, loan applications, and criminal justice.</p>",
+      "content": "<h3>Bias and Fairness</h3><p>AI models trained on biased data can perpetuate and even amplify existing societal biases. For example, if historical hiring data shows a company predominantly hired men, an AI trained on this data might unfairly penalize female candidates. Ensuring fairness requires careful data selection, algorithm design, and ongoing audits.</p>",
       "children": [],
       "quiz": [
         {
@@ -35,8 +35,18 @@
     "privacy": {
       "id": "privacy",
       "title": "Privacy",
-      "content": "<h3>Privacy Concerns</h3><p>AI systems often require vast amounts of data to function, raising significant concerns about data privacy, surveillance, and how personal information is collected, used, and protected.</p>",
-      "children": []
+      "content": "<h3>Privacy Concerns</h3><p>AI systems often require vast amounts of data to function, raising significant concerns about data privacy, surveillance, and how personal information is collected, used, and protected. Regulations like GDPR in Europe and techniques like federated learning and differential privacy aim to address these concerns.</p>",
+      "children": [],
+      "quiz": [
+        {
+          "question": "What is a primary concern related to the data needs of many AI systems?",
+          "options": [
+            "The data is too expensive.",
+            "The data takes up too much storage space."
+          ],
+          "answer": "The potential violation of user privacy."
+        }
+      ]
     },
     "autonomy": {
       "id": "autonomy",
@@ -54,13 +64,23 @@
     "accountability": {
       "id": "accountability",
       "title": "Accountability",
-      "content": "<h3>Accountability & Explainability</h3><p>Who is responsible when an AI system makes a mistake? The user, the developer, or the owner? This is a complex legal and ethical question. 'Explainable AI' (XAI) is a related field that aims to make 'black box' models more transparent and understandable.</p>",
-      "children": []
+      "content": "<h3>Accountability & Explainability</h3><p>Who is responsible when an AI system makes a mistake? The user, the developer, or the owner? This is a complex legal and ethical question. The field of 'Explainable AI' (XAI) aims to make 'black box' models more transparent, so their decisions can be understood, questioned, and audited by humans.</p>",
+      "children": [],
+      "quiz": [
+        {
+          "question": "What is the goal of Explainable AI (XAI)?",
+          "options": [
+            "To make AI that can explain jokes.",
+            "To make AI systems faster."
+          ],
+          "answer": "To make AI decisions understandable to humans."
+        }
+      ]
     },
     "job-displacement": {
       "id": "job-displacement",
       "title": "Job Displacement",
-      "content": "<h3>Job Displacement</h3><p>The potential for AI to automate tasks currently performed by humans raises concerns about widespread job loss and the need for societal adaptation, including reskilling and education.</p>",
+      "content": "<h3>Job Displacement</h3><p>The potential for AI to automate tasks currently performed by humans raises concerns about widespread job loss and the need for societal adaptation. This includes discussions around reskilling the workforce, reforming education, and exploring concepts like Universal Basic Income (UBI).</p>",
       "children": []
     }
   }

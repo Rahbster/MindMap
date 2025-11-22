@@ -35,6 +35,7 @@ header {
 
 .header-content h1 {
     margin-left: 4rem; /* Make space for hamburger */
+    margin-bottom: 0; /* Remove default margin to fix alignment and height issues */
     color: #ecf0f1; /* Make header title text light for better contrast */
 }
 

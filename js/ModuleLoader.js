@@ -1,11 +1,12 @@
 export class ModuleLoader {
-    constructor(stateManager, callbacks) {
+    constructor(stateManager, availableModules, callbacks) {
         this.stateManager = stateManager;
         this.state = stateManager.getState();
+        this.availableModules = availableModules;
         this.callbacks = callbacks;
     }
 
-    async loadModule(moduleSource) {
+    async loadModule(moduleSource, onComplete) {
         try {
             let newModuleData;
             if (typeof moduleSource === 'string') {
@@ -16,28 +17,29 @@ export class ModuleLoader {
                 newModuleData = moduleSource;
             }
 
-            if (this.state.mindMapData && typeof moduleSource === 'string') {
-                this.state.moduleStack.push(this.state.mindMapData);
-            }
-
             this.state.mindMapData = newModuleData;
+            this.state.mindMapData.path = typeof moduleSource === 'string' ? moduleSource : null;
             this.callbacks.onModuleLoaded();
+            if (onComplete) onComplete(); // Execute the callback after loading is done.
         } catch (error) {
             console.error('Failed to load module:', error);
         }
     }
 
-    loadModuleAndResetStack(modulePath) {
+    loadModuleAndResetStack(modulePath, onComplete) {
         this.state.moduleStack.length = 0;
-        this.loadModule(modulePath);
+        this.loadModule(modulePath, onComplete);
         this.callbacks.onMenuClose();
     }
 
     navigateToStackIndex(index) {
-        const modulesToPop = this.state.moduleStack.length - (index + 1);
-        for (let i = 0; i < modulesToPop; i++) this.state.moduleStack.pop();
-        const targetModule = this.state.moduleStack.pop();
-        this.loadModule(targetModule);
+        // Get the module data for the breadcrumb link that was clicked.
+        const targetModule = this.state.moduleStack[index];
+        // Truncate the stack to the level of the clicked breadcrumb.
+        this.state.moduleStack = this.state.moduleStack.slice(0, index);
+
+        // Reload the target module. The stack is now in the correct state.
+        this.loadModule(targetModule.path || targetModule);
     }
 
     saveModuleToFile() {

@@ -58,12 +58,9 @@ export class MindMapRenderer {
         // Determine if we need to run the layout animation.
         const needsLayout = Object.keys(positions).length === 0;
 
-        // Initialize positions if they don't exist, giving them a random starting point.
-        Object.values(mindMapData.nodes).forEach(node => {
-            if (!positions[node.id]) {
-                positions[node.id] = { x: Math.random() * this.container.clientWidth, y: Math.random() * this.container.clientHeight };
-            }
-        });
+        if (needsLayout) {
+            this.calculateInitialLayout(mindMapData, positions);
+        }
 
         // Always draw the elements first.
         this.drawLines(mindMapData, positions);
@@ -71,6 +68,39 @@ export class MindMapRenderer {
 
         // Always return the current pan/zoom. The layout is now only triggered manually.
         return { pan: this.state.pan, zoom: this.state.zoom };
+    }
+
+    calculateInitialLayout(mindMapData, positions) {
+        const nodes = mindMapData.nodes;
+        const rootId = 'root';
+        const baseFontSize = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--mindmap-font-size'));
+        const centerX = this.container.clientWidth / 2;
+        const centerY = this.container.clientHeight / 2;
+
+        const placeChildren = (parentId, parentX, parentY, level) => {
+            const parentNode = nodes[parentId];
+            if (!parentNode || !parentNode.children) return;
+
+            const children = parentNode.children.filter(id => nodes[id]);
+            const numChildren = children.length;
+            if (numChildren === 0) return;
+
+            const radius = 250 * Math.pow(level, 0.7); // Use a base radius that matches the physics simulation's IDEAL_LENGTH.
+            const angleIncrement = (2 * Math.PI) / numChildren;
+
+            children.forEach((childId, index) => {
+                if (!positions[childId]) { // Avoid replacing already placed nodes
+                    const angle = index * angleIncrement;
+                    const childX = parentX + radius * Math.cos(angle);
+                    const childY = parentY + radius * Math.sin(angle);
+                    positions[childId] = { x: childX, y: childY };
+                    placeChildren(childId, childX, childY, level + 1);
+                }
+            });
+        };
+
+        positions[rootId] = { x: centerX, y: centerY };
+        placeChildren(rootId, centerX, centerY, 1);
     }
 
     runLayoutAnimation(start = true, initialPositions = null) {
@@ -95,8 +125,11 @@ export class MindMapRenderer {
         // If initialPositions are provided (from Auto-Organize), use them.
         // Otherwise, use the existing state positions or randomize.
         nodes.forEach(node => {
-            if (initialPositions && initialPositions[node.id]) {
+            if (initialPositions?.[node.id]) {
                 positions[node.id] = { ...initialPositions[node.id] };
+            } else if (!positions[node.id]) {
+                // If a node has no position at all, give it a random starting point.
+                positions[node.id] = { x: Math.random() * width, y: Math.random() * height };
             }
             node._ui = { vx: 0, vy: 0, fx: 0, fy: 0 }; // Physics properties
         });

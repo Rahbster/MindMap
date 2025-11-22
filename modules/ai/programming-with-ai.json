@@ -1,0 +1,62 @@
+{
+  "id": "programming-with-ai",
+  "name": "Programming with AI",
+  "isTopLevel": false,
+  "nodes": {
+    "root": {
+      "id": "root",
+      "title": "Programming with AI",
+      "content": "<h2>Programming Languages & AI</h2><p>While AI concepts can be implemented in many languages, a few have emerged as industry standards due to their powerful libraries, frameworks, and community support. This section also explores how AI is changing the act of programming itself.</p>",
+      "children": ["python", "csharp-dotnet", "javascript-web", "dev-productivity", "pos-use-cases"]
+    },
+    "python": {
+      "id": "python",
+      "title": "Python: The Lingua Franca",
+      "content": "<h3>Python</h3><p>Python is the dominant language for AI and Machine Learning. Its simple syntax, combined with an extensive ecosystem of powerful libraries, makes it the go-to choice for researchers and developers. Key libraries include:</p><ul><li><strong>TensorFlow & PyTorch:</strong> For building and training deep learning models.</li><li><strong>Scikit-learn:</strong> For traditional machine learning algorithms.</li><li><strong>Pandas & NumPy:</strong> For data manipulation and numerical operations.</li></ul>",
+      "children": []
+    },
+    "csharp-dotnet": {
+      "id": "csharp-dotnet",
+      "title": "C# and .NET",
+      "content": "<h3>C# and .NET in AI</h3><p>For C# developers, the .NET ecosystem provides powerful tools to integrate AI into existing applications without leaving the environment. Key technologies include:</p><ul><li><strong>ML.NET:</strong> An open-source framework for building custom machine learning models in C#.</li><li><strong>ONNX Runtime:</strong> Allows you to run pre-trained models (often created in Python) efficiently within your .NET application.</li><li><strong>Azure AI Services:</strong> Easily integrate powerful, pre-built AI capabilities (like vision, speech, and language understanding) into your app via REST APIs.</li></ul>",
+      "children": [],
+      "quiz": [
+        {
+          "question": "What Microsoft framework allows you to run pre-trained AI models in a C# application?",
+          "options": ["Entity Framework", ".NET Core"],
+          "answer": "ONNX Runtime"
+        }
+      ]
+    },
+    "javascript-web": {
+      "id": "javascript-web",
+      "title": "JavaScript & Web Tech",
+      "content": "<h3>JavaScript & Web Technologies</h3><p>AI is increasingly moving to the browser and the front-end. HTML and CSS are used to build the user interface, while JavaScript is used for interactivity and AI logic:</p><ul><li><strong>TensorFlow.js:</strong> Run machine learning models directly in the browser, enabling interactive AI experiences with low latency and enhanced privacy.</li><li><strong>AI Service APIs:</strong> The most common approach is to call APIs from services like OpenAI (ChatGPT), Google AI, or Azure AI from your JavaScript front-end to add intelligent features.</li></ul>",
+      "children": []
+    },
+    "dev-productivity": {
+      "id": "dev-productivity",
+      "title": "AI for Developer Productivity",
+      "content": "<h3>AI for Developer Productivity</h3><p>AI is not just something we build; it's also a tool that helps us build better and faster. AI-powered assistants are integrated directly into code editors to provide:</p><ul><li><strong>Code Completion:</strong> Suggesting single lines or entire blocks of code as you type.</li><li><strong>Code Generation:</strong> Writing functions or classes based on a natural language comment.</li><li><strong>Debugging & Explanation:</strong> Helping to find bugs, explain complex code snippets, and suggest refactorings.</li></ul><p>Popular tools include <strong>GitHub Copilot</strong> and <strong>Amazon CodeWhisperer</strong>.</p>",
+      "children": []
+    },
+    "pos-use-cases": {
+      "id": "pos-use-cases",
+      "title": "Use Cases for POS Systems",
+      "content": "<h3>AI Use Cases for Point-of-Sale</h3><p>AI can revolutionize POS systems by improving efficiency, accuracy, and the customer experience. Click to explore specific examples.</p>",
+      "children": ["voice-ordering", "order-validation"]
+    },
+    "voice-ordering": {
+      "id": "voice-ordering",
+      "title": "Voice Ordering",
+      "content": "<h4>AI-Powered Voice Ordering</h4><p>This allows staff or customers to place orders by speaking naturally. The implementation involves a pipeline:</p><ol><li><strong>Speech-to-Text (STT):</strong> An AI service converts the spoken audio into a raw text transcript.</li><li><strong>Natural Language Understanding (NLU):</strong> A model (often a Large Language Model) processes the text to extract structured information, such as item names, quantities, and special requests (e.g., 'a large coke, two cheeseburgers, no pickles').</li><li><strong>System Integration:</strong> The structured data is then entered into the POS system's order grid.</li></ol>",
+      "children": []
+    },
+    "order-validation": {
+      "id": "order-validation",
+      "title": "AI Order Validation",
+      "content": "<h4>AI-Powered Order Validation</h4><p>An AI model can act as a 'second pair of eyes' for staff entering orders, reducing errors and increasing sales. It can be trained to:</p><ul><li><strong>Detect Common Mistakes:</strong> Flag orders that seem unusual or are commonly entered incorrectly (e.g., a meal combo missing its drink).</li><li><strong>Suggest Upsells:</strong> Recommend add-ons or combos based on the items already in the order ('Would you like to make that a meal?').</li><li><strong>Fraud Detection:</strong> Analyze ordering patterns to flag potentially fraudulent activity in real-time.</li></ul>",
+      "children": []
+    }
+  }
+}

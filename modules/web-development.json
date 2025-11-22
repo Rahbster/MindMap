@@ -1,0 +1,46 @@
+{
+  "id": "web-development",
+  "name": "Modern Web Development",
+  "isTopLevel": true,
+  "nodes": {
+    "root": {
+      "id": "root",
+      "title": "Modern Web Development",
+      "content": "<h2>Modern Web Development</h2><p>The foundation of creating websites and web applications. It revolves around three core technologies: HTML for structure, CSS for styling, and JavaScript for interactivity and logic.</p>",
+      "children": ["html", "css", "javascript", "frameworks", "web-ai"]
+    },
+    "html": {
+      "id": "html",
+      "title": "HTML: The Structure",
+      "content": "<h3>HTML (HyperText Markup Language)</h3><p>HTML is the standard markup language for documents designed to be displayed in a web browser. It provides the fundamental structure of a webpage, acting as its skeleton. Click to explore key concepts.</p>",
+      "children": [],
+      "subModule": "modules/web-development/html.json"
+    },
+    "css": {
+      "id": "css",
+      "title": "CSS: The Style",
+      "content": "<h3>CSS (Cascading Style Sheets)</h3><p>CSS is the language used to describe the presentation of a document written in HTML. It controls the layout, colors, fonts, and overall visual appearance of the web page. Click to explore key concepts.</p>",
+      "children": [],
+      "subModule": "modules/web-development/css.json"
+    },
+    "javascript": {
+      "id": "javascript",
+      "title": "JavaScript: The Logic",
+      "content": "<h3>JavaScript (JS)</h3><p>JavaScript is a high-level programming language that enables interactive web pages. It is the 'brains' of a website, handling user actions, manipulating the page content dynamically, and communicating with servers. Click to explore key concepts.</p>",
+      "children": [],
+      "subModule": "modules/web-development/javascript.json"
+    },
+    "frameworks": {
+      "id": "frameworks",
+      "title": "Frameworks & Libraries",
+      "content": "<h3>Frameworks & Libraries</h3><p>To speed up development and manage complexity, developers often use frameworks and libraries built on top of JavaScript. Popular examples include React, Angular, and Vue.js, which provide pre-built components and structures for building complex applications.</p>",
+      "children": []
+    },
+    "web-ai": {
+      "id": "web-ai",
+      "title": "Web & AI Integration",
+      "content": "<h3>Web & AI Integration</h3><p>Modern web technologies allow for powerful AI integration directly in the browser or by communicating with AI services. This connects to your interest in using AI for productivity and creating new use cases.</p><ul><li><strong>Client-Side AI:</strong> Using libraries like <strong>TensorFlow.js</strong>, you can run machine learning models directly in the user's browser.</li><li><strong>API-Based AI:</strong> The most common approach is using JavaScript to make API calls to powerful AI services (like OpenAI's GPT or Azure AI Services) to add features like voice recognition, order validation, or content generation to a web app.</li></ul>",
+      "children": []
+    }
+  }
+}

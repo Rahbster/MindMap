@@ -1,0 +1,38 @@
+{
+  "id": "html",
+  "name": "HTML Concepts",
+  "isTopLevel": false,
+  "nodes": {
+    "root": {
+      "id": "root",
+      "title": "HTML Concepts",
+      "content": "<h2>HTML Concepts</h2><p>Understanding core HTML concepts is crucial for building accessible, well-structured, and search-engine-optimized web pages.</p>",
+      "children": ["semantic-html", "forms", "accessibility"]
+    },
+    "semantic-html": {
+      "id": "semantic-html",
+      "title": "Semantic HTML",
+      "content": "<h3>Semantic HTML</h3><p>Using HTML tags that accurately describe the content they hold. For example, using <strong>&lt;nav&gt;</strong> for navigation links, <strong>&lt;article&gt;</strong> for a blog post, and <strong>&lt;footer&gt;</strong> for the page footer, instead of using generic <strong>&lt;div&gt;</strong> tags for everything. This improves accessibility and SEO.</p>",
+      "children": []
+    },
+    "forms": {
+      "id": "forms",
+      "title": "Forms & Input",
+      "content": "<h3>Forms & Input</h3><p>HTML forms are used to collect user input. Key elements include <strong>&lt;form&gt;</strong>, <strong>&lt;input&gt;</strong> (with various types like 'text', 'password', 'checkbox'), <strong>&lt;textarea&gt;</strong>, and <strong>&lt;button&gt;</strong>. Proper use of labels and input types is essential for usability.</p>",
+      "children": []
+    },
+    "accessibility": {
+      "id": "accessibility",
+      "title": "Accessibility (a11y)",
+      "content": "<h3>Accessibility (a11y)</h3><p>Designing web pages so that people with disabilities can use them. In HTML, this includes using 'alt' text for images (<strong>&lt;img alt='description'&gt;</strong>), using semantic tags correctly, and ensuring keyboard navigability.</p>",
+      "children": [],
+      "quiz": [
+        {
+          "question": "What is the purpose of the 'alt' attribute on an <img> tag?",
+          "options": ["To provide a caption below the image", "To style the image with CSS"],
+          "answer": "To provide a text description for screen readers"
+        }
+      ]
+    }
+  }
+}

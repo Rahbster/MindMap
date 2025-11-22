@@ -1,39 +1,57 @@
 export class SearchHandler {
-    constructor(stateManager, callbacks) {
+    constructor(stateManager, availableModules, callbacks) {
         this.state = stateManager.getState();
+        this.availableModules = availableModules;
         this.callbacks = callbacks;
     }
 
-    performSearch(term) {
+    async performSearch(term) {
         if (!term || term.length < 2) {
             this.callbacks.onSearchResults([]);
             return;
         }
         const searchTerm = term.toLowerCase();
-        const results = [];
-        Object.values(this.state.mindMapData.nodes).forEach(node => {
-            const title = node.title.toLowerCase();
-            const content = node.content.replace(/<[^>]*>/g, ' ').toLowerCase();
-            let matchIndex = -1;
-            let foundIn = '';
-            if (title.includes(searchTerm)) {
-                matchIndex = title.indexOf(searchTerm);
-                foundIn = 'title';
-            } else if (content.includes(searchTerm)) {
-                matchIndex = content.indexOf(searchTerm);
-                foundIn = 'content';
-            }
-            if (matchIndex > -1) {
-                const sourceText = foundIn === 'title' ? node.title : node.content.replace(/<[^>]*>/g, ' ');
-                const snippetStart = Math.max(0, matchIndex - 30);
-                const snippetEnd = Math.min(sourceText.length, matchIndex + term.length + 30);
-                let snippet = sourceText.substring(snippetStart, snippetEnd);
-                if (snippetStart > 0) snippet = '...' + snippet;
-                if (snippetEnd < sourceText.length) snippet = snippet + '...';
-                results.push({ nodeId: node.id, title: node.title, snippet: snippet });
-            }
-        });
-        this.callbacks.onSearchResults(results);
+        const allResults = [];
+
+        const modulePromises = this.availableModules.map(moduleInfo =>
+            fetch(moduleInfo.path)
+                .then(res => res.json())
+                .then(moduleData => {
+                    Object.values(moduleData.nodes).forEach(node => {
+                        const title = node.title.toLowerCase();
+                        const content = (node.content || '').replace(/<[^>]*>/g, ' ').toLowerCase();
+                        let matchIndex = -1;
+                        let foundIn = '';
+
+                        if (title.includes(searchTerm)) {
+                            matchIndex = title.indexOf(searchTerm);
+                            foundIn = 'title';
+                        } else if (content.includes(searchTerm)) {
+                            matchIndex = content.indexOf(searchTerm);
+                            foundIn = 'content';
+                        }
+
+                        if (matchIndex > -1) {
+                            const sourceText = foundIn === 'title' ? node.title : node.content.replace(/<[^>]*>/g, ' ');
+                            const snippetStart = Math.max(0, matchIndex - 30);
+                            const snippetEnd = Math.min(sourceText.length, matchIndex + term.length + 30);
+                            let snippet = sourceText.substring(snippetStart, snippetEnd).trim();
+                            if (snippetStart > 0) snippet = '...' + snippet;
+                            if (snippetEnd < sourceText.length) snippet = snippet + '...';
+                            allResults.push({
+                                nodeId: node.id,
+                                title: node.title,
+                                snippet: snippet,
+                                moduleName: moduleData.name,
+                                modulePath: moduleInfo.path
+                            });
+                        }
+                    });
+                }).catch(err => console.warn(`Could not fetch ${moduleInfo.path} for search.`))
+        );
+
+        await Promise.all(modulePromises);
+        this.callbacks.onSearchResults(allResults);
     }
 
     goToNode(nodeId) {

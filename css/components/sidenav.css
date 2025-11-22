@@ -76,6 +76,14 @@
     color: white;
 }
 
+.search-group-header {
+    padding: 10px 32px 4px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: #7f8c8d;
+    text-transform: uppercase;
+}
+
 .sidenav h2 {
     padding: 0 32px;
     color: #ecf0f1;

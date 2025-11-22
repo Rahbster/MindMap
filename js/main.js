@@ -16,14 +16,15 @@ document.addEventListener('DOMContentLoaded', () => {
             this.availableModules = [
                 { name: 'Artificial Intelligence', path: 'modules/ai.json' }, // Main entry point
                 // ... other modules
-                { name: 'Machine Learning', path: 'modules/ml.json' },
-                { name: 'Deep Learning', path: 'modules/deep-learning.json' },
-                { name: 'Natural Language Processing', path: 'modules/nlp.json' },
-                { name: 'History of AI', path: 'modules/history-of-ai.json' },
-                { name: 'Computer Vision', path: 'modules/computer-vision.json' },
-                { name: 'Generative AI', path: 'modules/generative-ai.json' },
-                { name: 'AI Applications', path: 'modules/applications.json' },
-                { name: 'AI Ethics', path: 'modules/ethics.json' }
+                { name: 'Machine Learning', path: 'modules/ai/ml.json' },
+                { name: 'Deep Learning', path: 'modules/ai/ml/deep-learning.json' },
+                { name: 'Natural Language Processing', path: 'modules/ai/applications/nlp.json' },
+                { name: 'History of AI', path: 'modules/ai/history-of-ai.json' },
+                { name: 'Computer Vision', path: 'modules/ai/applications/computer-vision.json' },
+                { name: 'Generative AI', path: 'modules/ai/applications/generative-ai.json' },
+                { name: 'AI Applications', path: 'modules/ai/applications.json' },
+                { name: 'AI Ethics', path: 'modules/ai/ethics.json' },
+                { name: 'Modern Web Development', path: 'modules/web-development.json' }
             ];
 
             this.mindmapContainer = document.getElementById('mindmap-svg-container');
@@ -40,7 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 onDragEnd: () => this.stateManager.saveModuleToStorage(),
             });
 
-            this.moduleLoader = new ModuleLoader(this.stateManager, {
+            this.moduleLoader = new ModuleLoader(this.stateManager, this.availableModules, {
                 onModuleLoaded: () => {
                     this.quizManager.setMindMapData(this.state.mindMapData);
                     this.renderMindMap();
@@ -63,7 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
 
-            this.searchHandler = new SearchHandler(this.stateManager, {
+            this.searchHandler = new SearchHandler(this.stateManager, this.availableModules, {
                 onSearchResults: (results) => this.uiManager.renderSearchResults(results),
                 onGoToNode: (nodeId) => {
                     this.renderer.applyTransform(this.state.pan, this.state.zoom);
@@ -78,7 +79,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 onModuleSelect: (path) => this.moduleLoader.loadModuleAndResetStack(path),
                 onBreadcrumbClick: (index) => this.moduleLoader.navigateToStackIndex(index),
                 onSearch: (term) => this.searchHandler.performSearch(term),
-                onSearchResultClick: (nodeId) => this.searchHandler.goToNode(nodeId),
+                onSearchResultClick: (nodeId, modulePath) => {
+                    // Find the path of the currently loaded module from the available modules list for a reliable comparison.
+                    const currentModuleInfo = this.availableModules.find(m => m.name === this.state.mindMapData.name);
+                    const currentModulePath = currentModuleInfo ? currentModuleInfo.path : null;
+
+                    if (currentModulePath === modulePath) {
+                        // Result is in the current module, just go to it.
+                        this.searchHandler.goToNode(nodeId);
+                    } else {
+                        // Result is in a different module, load it and then go to the node.
+                        // Use a callback to ensure goToNode is called *after* the module is loaded.
+                        this.moduleLoader.loadModuleAndResetStack(modulePath, () => this.searchHandler.goToNode(nodeId));
+                    }
+                },
                 onStartQuiz: (nodeId) => this.quizManager.startQuizForNode(nodeId),
                 getActionButton: (type) => {
                     const button = document.createElement('button');
@@ -100,10 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     return button;
                 },
                 onFontSizeChange: () => {
-                    if (this.state.mindMapData && this.state.mindMapData.positions) {
-                        delete this.state.mindMapData.positions;
-                        this.stateManager.saveModuleToStorage();
-                    }
+                    // Re-render the mind map to adjust for any size changes, but do not delete positions.
                     this.renderMindMap();
                 },
                 onSaveModule: () => this.moduleLoader.saveModuleToFile(),
@@ -123,6 +134,9 @@ document.addEventListener('DOMContentLoaded', () => {
         renderMindMap() {
             if (!this.state.mindMapData) return;
 
+            // Check if positions exist before rendering.
+            const hadPositions = this.state.mindMapData.positions && Object.keys(this.state.mindMapData.positions).length > 0;
+
             const baseFontSize = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--mindmap-font-size'));
             this.state.positions = this.state.mindMapData.positions || {};
 
@@ -136,6 +150,11 @@ document.addEventListener('DOMContentLoaded', () => {
             this.state.pan = pan;
             this.state.zoom = zoom;
             this.renderer.applyTransform(this.state.pan, this.state.zoom);
+
+            // If positions did not exist before, save the newly generated ones.
+            if (!hadPositions) {
+                this.stateManager.saveModuleToStorage();
+            }
         }
 
         setActiveNode(nodeId) {
@@ -151,7 +170,9 @@ document.addEventListener('DOMContentLoaded', () => {
         selectNode(nodeId) {
             const node = this.state.mindMapData.nodes[nodeId];
             if (node.subModule) {
-                this.moduleLoader.loadModule(node.subModule);
+                // This is a sub-module navigation. Push the current module to the stack first.
+                this.state.moduleStack.push(this.state.mindMapData);
+                this.moduleLoader.loadModule(node.subModule); // Then load the new one.
             } else {
                 this.setActiveNode(nodeId);
             }
@@ -175,6 +196,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         stopAutoOrganize() {
             this.renderer.runLayoutAnimation(false); // Stop the animation
+            // CRITICAL FIX: Sync the final animated positions back to the main data object before saving.
+            this.state.mindMapData.positions = this.state.positions;
             this.uiManager.stopOrganizeIndicator(); // Stop the blinking
             this.stateManager.saveModuleToStorage(); // Save the final positions
         }

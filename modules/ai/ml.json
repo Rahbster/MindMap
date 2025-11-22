@@ -1,0 +1,53 @@
+{
+  "id": "ml",
+  "name": "Machine Learning",
+  "nodes": {
+    "root": {
+      "id": "root",
+      "title": "Machine Learning",
+      "content": "<h2>Machine Learning (ML)</h2><p>A subset of AI that gives computers the ability to learn without being explicitly programmed. It focuses on the development of algorithms that can access data and use it to learn for themselves. Deep Learning is a popular and powerful subfield of ML.</p>",
+      "children": ["supervised", "unsupervised", "reinforcement", "deep-learning"],
+      "quiz": [
+        {
+          "question": "What is the primary goal of Machine Learning?",
+          "options": ["To create perfect, bug-free programs", "To replace all human jobs with robots"],
+          "answer": "To allow systems to learn from data"
+        },
+        {
+          "question": "Machine Learning is a subfield of which broader field of computer science?",
+          "options": ["Database Management", "Web Development"],
+          "answer": "Artificial Intelligence"
+        }
+      ]
+    },
+    "supervised": {
+      "id": "supervised",
+      "title": "Supervised Learning",
+      "content": "<h3>Supervised Learning</h3><p>The model is trained on a dataset where each data point is 'labeled' with the correct output or category. It's like learning with a teacher who provides the answers. Click to explore types like Classification and Regression.</p>",
+      "children": [],
+      "quiz": [],
+      "subModule": "modules/ai/ml/supervised.json"
+    },
+    "unsupervised": {
+      "id": "unsupervised",
+      "title": "Unsupervised Learning",
+      "content": "<h3>Unsupervised Learning</h3><p>The model works with unlabeled data to find hidden patterns or intrinsic structures. It's like learning without a teacher, by discovering relationships on its own. Click to explore types like Clustering and Association.</p>",
+      "children": [],
+      "subModule": "modules/ai/ml/unsupervised.json"
+    },
+    "reinforcement": {
+      "id": "reinforcement",
+      "title": "Reinforcement Learning",
+      "content": "<h3>Reinforcement Learning</h3><p>An agent learns to make decisions by taking actions in an environment to maximize a cumulative reward. It learns from trial and error, much like training a pet with treats. Click to explore concepts like agents, environments, and rewards.</p>",
+      "children": [],
+      "subModule": "modules/ai/ml/reinforcement.json"
+    },
+    "deep-learning": {
+      "id": "deep-learning",
+      "title": "Deep Learning",
+      "content": "<h3>Deep Learning</h3><p>A powerful subfield of ML based on artificial neural networks with many layers (hence 'deep'). These networks are capable of learning very complex patterns from large amounts of data. Click to explore architectures like CNNs and RNNs.</p>",
+      "children": [],
+      "subModule": "modules/ai/ml/deep-learning.json"
+    }
+  }
+}

@@ -87,7 +87,7 @@ export class UIManager {
         this.searchResultsContainer.addEventListener('click', (e) => {
             const resultItem = e.target.closest('.search-result-item');
             if (resultItem) {
-                this.callbacks.onSearchResultClick(resultItem.dataset.nodeId);
+                this.callbacks.onSearchResultClick(resultItem.dataset.nodeId, resultItem.dataset.modulePath);
             }
         });
         this.saveModuleBtn.addEventListener('click', () => this.callbacks.onSaveModule());
@@ -215,6 +215,34 @@ export class UIManager {
             this.moduleLoaderEl.appendChild(link);
         });
         this.updateActiveModuleInLoader();
+    }
+
+    renderSearchResults(results) {
+        if (results.length === 0) {
+            this.searchResultsContainer.innerHTML = '';
+            return;
+        }
+
+        // Group results by module
+        const groupedResults = results.reduce((acc, result) => {
+            if (!acc[result.moduleName]) {
+                acc[result.moduleName] = [];
+            }
+            acc[result.moduleName].push(result);
+            return acc;
+        }, {});
+
+        let html = '';
+        for (const moduleName in groupedResults) {
+            html += `<h4 class="search-group-header">In ${moduleName}</h4>`;
+            html += groupedResults[moduleName].map(result => `
+                <div class="search-result-item" data-node-id="${result.nodeId}" data-module-path="${result.modulePath}">
+                    <h5>${result.title}</h5>
+                    <p>${result.snippet.replace(new RegExp(this.nodeSearchInput.value, 'gi'), '<strong>$&</strong>')}</p>
+                </div>
+            `).join('');
+        }
+        this.searchResultsContainer.innerHTML = html;
     }
 
     updateActiveModuleInLoader() {
