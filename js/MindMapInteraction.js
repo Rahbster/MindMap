@@ -126,6 +126,9 @@ export class MindMapInteraction {
                     preventDefault: () => e.preventDefault()
                 };
                 this.handleNodeMouseDown(eventWithTarget, targetElement.closest('.node-group').dataset.nodeId);
+            } else {
+                // This was missing. It's needed to start a pan.
+                this.handlePanStart(touch);
             }
         } else if (e.touches.length === 2) {
             // Two touches for pinch-to-zoom
@@ -141,8 +144,8 @@ export class MindMapInteraction {
             const touch = e.touches[0];
             const CTM = this.container.querySelector('svg').getScreenCTM();
             const newPos = {
-                x: (touch.clientX - CTM.e) / this.state.zoom - this.dragOffset.x,
-                y: (touch.clientY - CTM.f) / this.state.zoom - this.dragOffset.y
+                x: (touch.clientX - CTM.e) / CTM.a - this.dragOffset.x,
+                y: (touch.clientY - CTM.f) / CTM.d - this.dragOffset.y
             };
             this.callbacks.onNodeDrag(this.draggedNodeId, newPos);
         } else if (e.touches.length === 1 && this.isPanning) {
