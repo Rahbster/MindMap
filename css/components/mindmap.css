@@ -1,3 +1,19 @@
+.map-controls .icon-button {
+    /* Prevent iOS from showing the copy/paste menu on long press */
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+}
+
+.map-controls .icon-button {
+    /* Prevent iOS from showing the copy/paste menu on long press */
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+}
+
 .map-controls {
     position: absolute;
     top: 1.5rem;
