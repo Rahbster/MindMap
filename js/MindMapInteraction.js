@@ -118,8 +118,13 @@ export class MindMapInteraction {
 
             if (targetElement && targetElement.closest('.node-group')) {
                 // For touch, we need to manually set the target on the event object
-                // so that handleNodeMouseDown can find the SVG element.
-                const eventWithTarget = { ...touch, target: targetElement };
+                // so that handleNodeMouseDown can find the SVG element and call stopPropagation.
+                const eventWithTarget = {
+                    ...touch,
+                    target: targetElement,
+                    stopPropagation: () => e.stopPropagation(),
+                    preventDefault: () => e.preventDefault()
+                };
                 this.handleNodeMouseDown(eventWithTarget, targetElement.closest('.node-group').dataset.nodeId);
             } else {
                 this.handlePanStart(touch);
@@ -135,7 +140,13 @@ export class MindMapInteraction {
     handleTouchMove(e) {
         e.preventDefault();
         if (e.touches.length === 1 && (this.isDraggingNode || this.isPanning)) {
-            this.handlePanMove(e.touches[0]);
+            // Create a mock event with a target for handlePanMove
+            const touch = e.touches[0];
+            const eventWithTarget = {
+                ...touch,
+                target: document.elementFromPoint(touch.clientX, touch.clientY)
+            };
+            this.handlePanMove(eventWithTarget);
         } else if (e.touches.length === 2 && this.initialPinchDistance) {
             const newPinchDistance = this.getPinchDistance(e);
             const zoomFactor = newPinchDistance / this.initialPinchDistance;
