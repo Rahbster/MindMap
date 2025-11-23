@@ -126,27 +126,32 @@ export class MindMapInteraction {
                     preventDefault: () => e.preventDefault()
                 };
                 this.handleNodeMouseDown(eventWithTarget, targetElement.closest('.node-group').dataset.nodeId);
-            } else {
-                this.handlePanStart(touch);
             }
         } else if (e.touches.length === 2) {
             // Two touches for pinch-to-zoom
             this.isPanning = false; // Stop panning if it was active
             this.isDraggingNode = false; // Stop dragging if it was active
             this.initialPinchDistance = this.getPinchDistance(e);
-        }
     }
 
     handleTouchMove(e) {
         e.preventDefault();
-        if (e.touches.length === 1 && (this.isDraggingNode || this.isPanning)) {
-            // Create a mock event with a target for handlePanMove
+        if (e.touches.length === 1 && this.isDraggingNode) {
             const touch = e.touches[0];
-            const eventWithTarget = {
-                ...touch,
-                target: document.elementFromPoint(touch.clientX, touch.clientY)
+            const CTM = this.container.querySelector('svg').getScreenCTM();
+            const newPos = {
+                x: (touch.clientX - CTM.e) / this.state.zoom - this.dragOffset.x,
+                y: (touch.clientY - CTM.f) / this.state.zoom - this.dragOffset.y
             };
-            this.handlePanMove(eventWithTarget);
+            this.callbacks.onNodeDrag(this.draggedNodeId, newPos);
+        } else if (e.touches.length === 1 && this.isPanning) {
+            const touch = e.touches[0];
+            const dx = touch.clientX - this.startPanPoint.x;
+            const dy = touch.clientY - this.startPanPoint.y;
+            this.state.pan.x += dx;
+            this.state.pan.y += dy;
+            this.startPanPoint = { x: touch.clientX, y: touch.clientY };
+            this.callbacks.onPanZoom();
         } else if (e.touches.length === 2 && this.initialPinchDistance) {
             const newPinchDistance = this.getPinchDistance(e);
             const zoomFactor = newPinchDistance / this.initialPinchDistance;
