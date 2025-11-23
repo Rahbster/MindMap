@@ -170,8 +170,13 @@ document.addEventListener('DOMContentLoaded', () => {
         selectNode(nodeId) {
             const node = this.state.mindMapData.nodes[nodeId];
             if (node.subModule) {
-                // This is a sub-module navigation. Push the current module to the stack first.
-                this.state.moduleStack.push(this.state.mindMapData);
+                // This is a sub-module navigation.
+                // To prevent duplicates, only push the current module if it's not already at the top of the stack.
+                const stackTop = this.state.moduleStack[this.state.moduleStack.length - 1];
+                if (!stackTop || stackTop.id !== this.state.mindMapData.id) {
+                    this.state.moduleStack.push(this.state.mindMapData);
+                }
+
                 this.moduleLoader.loadModule(node.subModule); // Then load the new one.
             } else {
                 this.setActiveNode(nodeId);

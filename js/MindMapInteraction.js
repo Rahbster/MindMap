@@ -117,7 +117,10 @@ export class MindMapInteraction {
             const targetElement = document.elementFromPoint(touch.clientX, touch.clientY);
 
             if (targetElement && targetElement.closest('.node-group')) {
-                this.handleNodeMouseDown(touch, targetElement.closest('.node-group').dataset.nodeId);
+                // For touch, we need to manually set the target on the event object
+                // so that handleNodeMouseDown can find the SVG element.
+                const eventWithTarget = { ...touch, target: targetElement };
+                this.handleNodeMouseDown(eventWithTarget, targetElement.closest('.node-group').dataset.nodeId);
             } else {
                 this.handlePanStart(touch);
             }
