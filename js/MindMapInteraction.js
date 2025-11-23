@@ -132,6 +132,7 @@ export class MindMapInteraction {
             this.isPanning = false; // Stop panning if it was active
             this.isDraggingNode = false; // Stop dragging if it was active
             this.initialPinchDistance = this.getPinchDistance(e);
+        }
     }
 
     handleTouchMove(e) {
@@ -163,7 +164,7 @@ export class MindMapInteraction {
             const CTM = this.container.querySelector('svg').getScreenCTM();
             const pinchCenterX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
             const pinchCenterY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
-            
+
             const svgRect = this.container.getBoundingClientRect();
             const pointBeforeZoom = {
                 x: (pinchCenterX - svgRect.left - this.state.pan.x) / oldZoom,
