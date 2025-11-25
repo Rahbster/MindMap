@@ -24,14 +24,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 { name: 'Generative AI', path: 'modules/ai/applications/generative-ai.json' },
                 { name: 'AI Applications', path: 'modules/ai/applications.json' },
                 { name: 'AI Ethics', path: 'modules/ai/ethics.json' },
-                { name: 'Modern Web Development', path: 'modules/web-development.json' }
+                { name: 'Modern Web Development', path: 'modules/web-development.json' },
+                { name: 'Learning Paradigms', path: 'modules/ai/learning-paradigms.json' },
+                { name: 'Programming with AI', path: 'modules/ai/programming-with-ai.json' }
             ];
 
             this.mindmapContainer = document.getElementById('mindmap-svg-container');
             this.quizManager = new QuizManager(this.state);
             this.renderer = new MindMapRenderer(this.mindmapContainer, this.state);
             
-            this.interaction = new MindMapInteraction(this.mindmapContainer, this.state, {
+            this.interaction = new MindMapInteraction(this.mindmapContainer, this, {
                 onPanZoom: () => this.renderer.applyTransform(this.state.pan, this.state.zoom),
                 onNodeDrag: (nodeId, position) => {
                     this.renderer.runLayoutAnimation(false); // Stop auto-layout on manual drag
@@ -155,6 +157,10 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!hadPositions) {
                 this.stateManager.saveModuleToStorage();
             }
+        }
+
+        getState() {
+            return this.state;
         }
 
         setActiveNode(nodeId) {

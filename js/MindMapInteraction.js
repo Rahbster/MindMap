@@ -1,7 +1,7 @@
 export class MindMapInteraction {
-    constructor(container, state, callbacks) {
+    constructor(container, app, callbacks) {
         this.container = container;
-        this.state = state;
+        this.app = app;
         this.callbacks = callbacks;
 
         this.isPanning = false;
@@ -12,6 +12,10 @@ export class MindMapInteraction {
         this.initialPinchDistance = null;
 
         this.initListeners();
+    }
+
+    get state() {
+        return this.app.getState();
     }
 
     initListeners() {
@@ -32,11 +36,17 @@ export class MindMapInteraction {
 
         this.isDraggingNode = true;
         this.draggedNodeId = nodeId;
-        const CTM = event.target.closest('svg').getScreenCTM();
+        // CRITICAL FIX: Always use the main container's SVG for consistent coordinate transformations,
+        // not the event.target, which can be a child element with a different CTM.
+        const CTM = this.container.querySelector('svg').getScreenCTM();
         const mouseX = (event.clientX - CTM.e) / CTM.a;
         const mouseY = (event.clientY - CTM.f) / CTM.d;
-        this.dragOffset.x = this.state.positions[nodeId].x - mouseX;
-        this.dragOffset.y = this.state.positions[nodeId].y - mouseY;
+
+        // Robustness: If positions haven't been populated yet (e.g., during a fast module load), default to 0 to prevent NaN.
+        const nodePosition = this.state.positions[nodeId];
+        this.dragOffset.x = (nodePosition?.x || 0) - mouseX;
+        this.dragOffset.y = (nodePosition?.y || 0) - mouseY;
+
         this.startPanPoint = { x: event.clientX, y: event.clientY };
     }
 
@@ -49,7 +59,9 @@ export class MindMapInteraction {
 
     handlePanMove(event) {
         if (this.isDraggingNode && this.draggedNodeId) {
-            const CTM = event.target.closest('svg').getScreenCTM();
+            // CRITICAL FIX: Always use the main container's SVG for consistent coordinate transformations,
+            // not event.target, which can be inconsistent between mouse and mocked touch events.
+            const CTM = this.container.querySelector('svg').getScreenCTM();
             const mouseX = (event.clientX - CTM.e) / CTM.a;
             const mouseY = (event.clientY - CTM.f) / CTM.d;
 
@@ -120,8 +132,10 @@ export class MindMapInteraction {
                 // For touch, we need to manually set the target on the event object
                 // so that handleNodeMouseDown can find the SVG element and call stopPropagation.
                 const eventWithTarget = {
-                    ...touch,
                     target: targetElement,
+                    // Manually copy properties as {...touch} doesn't work on Touch objects
+                    clientX: touch.clientX,
+                    clientY: touch.clientY,
                     stopPropagation: () => e.stopPropagation(),
                     preventDefault: () => e.preventDefault()
                 };
@@ -140,14 +154,16 @@ export class MindMapInteraction {
 
     handleTouchMove(e) {
         e.preventDefault();
-        if (e.touches.length === 1 && this.isDraggingNode) {
+        if (e.touches.length === 1 && (this.isDraggingNode || this.isPanning)) {
+            // Create a mock event with a target for handlePanMove, which is used for both dragging and panning.
             const touch = e.touches[0];
-            const CTM = this.container.querySelector('svg').getScreenCTM();
-            const newPos = {
-                x: (touch.clientX - CTM.e) / CTM.a - this.dragOffset.x,
-                y: (touch.clientY - CTM.f) / CTM.d - this.dragOffset.y
+            const eventWithTarget = {
+                target: document.elementFromPoint(touch.clientX, touch.clientY),
+                // Manually copy properties as {...touch} doesn't work on Touch objects
+                clientX: touch.clientX,
+                clientY: touch.clientY
             };
-            this.callbacks.onNodeDrag(this.draggedNodeId, newPos);
+            this.handlePanMove(eventWithTarget);
         } else if (e.touches.length === 1 && this.isPanning) {
             const touch = e.touches[0];
             const dx = touch.clientX - this.startPanPoint.x;

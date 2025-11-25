@@ -52,7 +52,7 @@
       "title": "Learning Paradigms",
       "content": "<h3>Learning Paradigms</h3><p>Beyond the main types of ML, there are other important learning strategies and concepts. Click to explore.</p>",
       "children": [],
-      "subModule": "modules/learning-paradigms.json"
+      "subModule": "modules/ai/learning-paradigms.json"
     },
     "programming": {
       "id": "programming",
