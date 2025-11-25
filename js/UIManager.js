@@ -101,6 +101,14 @@ export class UIManager {
         this.autoOrganizeBtn.addEventListener('mouseup', () => this.callbacks.onStopAutoOrganize());
         this.autoOrganizeBtn.addEventListener('mouseleave', () => this.callbacks.onStopAutoOrganize());
 
+        // Add touch equivalents for iPad/touch devices
+        this.autoOrganizeBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault(); // Prevent mouse event emulation and scrolling
+            this.startOrganizeIndicator();
+            this.callbacks.onAutoOrganize();
+        });
+        this.autoOrganizeBtn.addEventListener('touchend', () => this.callbacks.onStopAutoOrganize());
+
         document.getElementById('show-readme-btn').addEventListener('click', () => this.openReadmeModal());
         document.getElementById('close-readme-btn').addEventListener('click', () => this.closeReadmeModal());
         this.readmeSearchInput.addEventListener('input', () => this.performReadmeSearch());
