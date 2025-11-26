@@ -59,10 +59,13 @@ export class UIManager {
         // Reset Modal Elements
         this.resetModal = document.getElementById('reset-modal');
 
+        this.mainContainer = document.querySelector('.container');
+
 
         this.FONT_SIZE_KEY = 'mindmap-font-size';
         this.MAP_FONT_SIZE_KEY = 'mindmap-map-font-size';
         this.THEME_KEY = 'mindmap-theme';
+        this.VIEW_MODE_KEY = 'mindmap-view-mode';
 
         // Define bounds for font size
         this.MIN_FONT_SIZE = 16;
@@ -71,6 +74,7 @@ export class UIManager {
         this.initListeners();
         this.applySavedFontSize();
         this.applySavedTheme();
+        this.applySavedViewMode();
     }
 
     initListeners() {
@@ -166,6 +170,30 @@ export class UIManager {
                     break;
             }
         });
+    }
+
+    initViewModeControls() {
+        const wrapper = document.querySelector('.title-actions-wrapper');
+        if (!wrapper || document.getElementById('view-mode-controls')) return;
+
+        const viewModeControls = document.createElement('div');
+        viewModeControls.id = 'view-mode-controls';
+        viewModeControls.className = 'view-mode-controls';
+
+        viewModeControls.innerHTML = `
+            <button id="view-content-btn" class="icon-button" title="Show Content Only">C</button>
+            <button id="view-quiz-btn" class="icon-button" title="Show Quiz Only">Q</button>
+            <button id="view-both-btn" class="icon-button" title="Show Both">C+Q</button>
+        `;
+
+        // Prepend to the wrapper so it appears before font controls
+        wrapper.prepend(viewModeControls);
+
+        document.getElementById('view-content-btn').addEventListener('click', () => this.setViewMode('content-only'));
+        document.getElementById('view-quiz-btn').addEventListener('click', () => this.setViewMode('quiz-only'));
+        document.getElementById('view-both-btn').addEventListener('click', () => this.setViewMode('both'));
+
+        this.applySavedViewMode(); // Apply saved mode after creating buttons
     }
 
     openMenu() {
@@ -309,7 +337,7 @@ export class UIManager {
         actions.className = 'content-actions';
 
         // Add and Edit are always available.
-        actions.append(this.callbacks.getActionButton('add'), this.callbacks.getActionButton('edit'));
+        actions.append(this.callbacks.getActionButton('add'), this.callbacks.getActionButton('edit'), this.callbacks.getActionButton('quiz'));
 
         // Only add the Remove button if it's not the root of a top-level module.
         if (!(node.id === 'root' && this.state.mindMapData.isTopLevel)) actions.appendChild(this.callbacks.getActionButton('remove'));
@@ -326,6 +354,9 @@ export class UIManager {
 
         // Display the main content
         this.contentDisplayEl.innerHTML = node.content;
+
+        // Ensure view mode controls are present
+        this.initViewModeControls();
     }
 
     changeFontSize(amount) {
@@ -500,5 +531,30 @@ export class UIManager {
             document.getElementById('theme-switch').checked = false;
         }
         localStorage.setItem(this.THEME_KEY, theme);
+    }
+
+    applySavedViewMode() {
+        const savedMode = localStorage.getItem(this.VIEW_MODE_KEY) || 'both';
+        this.setViewMode(savedMode);
+    }
+
+    setViewMode(mode) {
+        this.mainContainer.classList.remove('view-mode-content-only', 'view-mode-quiz-only', 'view-mode-both');
+        this.mainContainer.classList.add(`view-mode-${mode}`);
+
+        // Update active state on buttons
+        const viewModeControls = document.getElementById('view-mode-controls');
+        if (viewModeControls) {
+            viewModeControls.querySelectorAll('.icon-button').forEach(btn => btn.classList.remove('active'));
+            // Correct the ID construction to match the actual button IDs.
+            // e.g., for mode 'content-only', it should look for 'view-content-btn'.
+            const buttonId = `view-${mode.replace('-only', '')}-btn`;
+            const activeBtn = document.getElementById(buttonId);
+            if (activeBtn) {
+                activeBtn.classList.add('active');
+            }
+        }
+
+        localStorage.setItem(this.VIEW_MODE_KEY, mode);
     }
 }

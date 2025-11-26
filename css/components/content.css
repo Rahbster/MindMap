@@ -68,3 +68,28 @@ h1, h2 {
     /* Set font size via CSS variable for global control */
     font-size: var(--dynamic-font-size);
 }
+
+/* --- View Mode Styles --- */
+.view-mode-controls {
+    display: flex;
+    gap: 0.25rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 2px;
+}
+
+.view-mode-controls .icon-button {
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.view-mode-controls .icon-button.active {
+    background-color: #3498db;
+    color: white;
+}
+
+.view-mode-content-only #quiz-container { display: none; }
+.view-mode-quiz-only #content-display { display: none; }
+
+body.dark-mode .view-mode-controls { border-color: #444c56; }
+body.dark-mode .view-mode-controls .icon-button.active { background-color: #3498db; }

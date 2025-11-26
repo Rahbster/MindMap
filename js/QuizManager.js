@@ -72,7 +72,7 @@ export class QuizManager {
 
         const nextButton = document.createElement('button');
         nextButton.textContent = 'Next Question';
-        nextButton.className = 'quiz-button'; // Add class for styling
+        nextButton.className = 'button-primary'; // Use the standard primary button style
         nextButton.onclick = () => {
             this.currentQuestionIndex++;
             this.displayQuestion();

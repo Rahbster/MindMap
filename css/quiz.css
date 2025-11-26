@@ -1,37 +1,35 @@
-.quiz-button, .quiz-option {
-    background-color: var(--primary-color);
+.quiz-option {
     color: var(--text-color);
-    border: none;
     padding: 0.6em 1.2em;
     border-radius: var(--border-radius);
     cursor: pointer;
     font-size: inherit; /* Use the inherited font size */
     font-weight: 600;
-    margin-top: 1em;
-    transition: background-color 0.2s ease, transform 0.1s ease, border-color 0.2s ease;
+    margin-bottom: 0.5rem; /* Add space between options */
+    transition: background-color 0.2s ease, transform 0.1s ease;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    border: 1px solid transparent;
     width: 100%;
     text-align: left;
 }
 
-.quiz-button {
-    color: #ffffff;
-    text-align: center;
-}
-
 .quiz-option {
-    background-color: var(--background-color);
+    background-color: #f0f2f5; /* A slightly darker, more visible grey for light mode */
+    border: 1px solid #ddd;
 }
 
-.quiz-button:hover, .quiz-option:hover:not(:disabled) {
-    background-color: var(--primary-color-darker);
-    border-color: var(--primary-color);
-    color: #ffffff;
+.quiz-option:hover:not(:disabled) {
+    background-color: #e4e6eb; /* A clearer hover state */
 }
 
-.quiz-button:active {
-    transform: translateY(1px);
+/* Style for the "Next Question" button */
+#quiz-feedback .button-primary {
+    margin-top: 1rem;
+    padding: 10px 20px;
+    font-size: 1rem;
+    font-weight: bold;
+    width: auto; /* Override the 100% width from .quiz-option */
+    text-align: center;
+    border: none;
 }
 
 /* Styles moved from style.css */
@@ -67,12 +65,12 @@
 
 .quiz-option.correct {
     background-color: #2ecc71 !important;
-    color: white !important;
+    color: #ffffff !important;
     border-color: #27ae60 !important;
 }
 
 .quiz-option.incorrect {
     background-color: #e74c3c !important;
-    color: white !important;
+    color: #ffffff !important;
     border-color: #c0392b !important;
 }

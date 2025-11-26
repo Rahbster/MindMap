@@ -109,3 +109,14 @@ body.dark-mode .readme-header {
 body.dark-mode .icon-button:hover {
     background-color: #3a414c;
 }
+
+/* --- Dark Mode Quiz Options --- */
+body.dark-mode .quiz-option {
+    background-color: #3a414c; /* A dark, but distinct button color */
+    border-color: #444c56;
+    color: #cdd9e5; /* Ensure text is light */
+}
+
+body.dark-mode .quiz-option:hover:not(:disabled) {
+    background-color: #444c56; /* A slightly lighter hover state */
+}
