@@ -1,0 +1,56 @@
+{
+  "id": "dotnet-development",
+  "name": "Modern .NET Development",
+  "isTopLevel": true,
+  "nodes": {
+    "root": {
+      "id": "root",
+      "title": "Modern .NET Development",
+      "content": "<h2>The .NET Ecosystem</h2><p>Explore the modern .NET ecosystem for building a wide range of applications, from dynamic web UIs with Blazor to cross-platform native apps with .NET MAUI. This learning path covers the core technologies and rendering models that define modern app development.</p>",
+      "children": ["rendering-models", "blazor", "maui", "wasm"],
+      "quiz": [
+        {
+          "question": "Which technology allows C# code to run directly in a web browser?",
+          "options": [
+            "Blazor Server",
+            ".NET MAUI"
+          ],
+          "answer": "WebAssembly (WASM)"
+        }
+      ]
+    },
+    "rendering-models": {
+      "id": "rendering-models",
+      "title": "Web Rendering Models",
+      "content": "<h3>Web Rendering Models</h3><p>Understanding how a web page is rendered is fundamental to web development. Different models offer trade-offs in performance, SEO, and user experience. Click to explore Server-Side Rendering (SSR) vs. Client-Side Rendering (CSR).</p>",
+      "children": [],
+      "subModule": "modules/dotnet/web-rendering-models.json"
+    },
+    "blazor": {
+      "id": "blazor",
+      "title": ".NET Blazor",
+      "content": "<h3>.NET Blazor</h3><p>A powerful framework for building interactive web UIs using C# instead of JavaScript. Blazor offers different hosting models to suit various application needs. Click to learn more.</p>",
+      "children": [],
+      "subModule": "modules/dotnet/blazor.json"
+    },
+    "maui": {
+      "id": "maui",
+      "title": ".NET MAUI",
+      "content": "<h3>.NET MAUI</h3><p>Multi-platform App UI (MAUI) is a cross-platform framework for creating native mobile and desktop apps with C# and XAML from a single, shared code-base.</p>",
+      "children": []
+    },
+    "wasm": {
+      "id": "wasm",
+      "title": "WebAssembly (WASM)",
+      "content": "<h3>WebAssembly (WASM)</h3><p>WebAssembly is a binary instruction format for a stack-based virtual machine. It is designed as a portable compilation target for programming languages, enabling deployment on the web for client and server applications. It allows languages like C, C++, and C# to run in the browser at near-native speed, which is the technology that powers Blazor WebAssembly.</p>",
+      "children": []
+    }
+  },
+  "positions": {
+    "root": { "x": 0, "y": 0 },
+    "rendering-models": { "x": -250, "y": -150 },
+    "blazor": { "x": 250, "y": -150 },
+    "maui": { "x": -250, "y": 150 },
+    "wasm": { "x": 250, "y": 150 }
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "id": "blazor",
+  "name": "Blazor Framework",
+  "isTopLevel": false,
+  "nodes": {
+    "root": {
+      "id": "root",
+      "title": ".NET Blazor",
+      "content": "<h2>Blazor Framework</h2><p>Blazor lets you build interactive web UIs using C# instead of JavaScript. You can share server-side and client-side app logic written in .NET. It offers two main hosting models.</p>",
+      "children": ["blazor-server", "blazor-wasm", "razor-components", "blazor-hybrid"],
+      "quiz": [
+        {
+          "question": "What is the primary programming language used in a Blazor application?",
+          "options": [
+            "JavaScript",
+            "Python"
+          ],
+          "answer": "C#"
+        }
+      ]
+    },
+    "blazor-server": {
+      "id": "blazor-server",
+      "title": "Blazor Server",
+      "content": "<h3>Blazor Server</h3><p>The application UI runs on the server. UI updates, event handling, and JavaScript calls are handled over a real-time SignalR connection. This is a form of Server-Side Rendering (SSR).</p><ul><li><strong>Pros:</strong> Thin client (small download size). Full .NET capabilities on the server. More secure as code is not sent to the client.</li><li><strong>Cons:</strong> Requires a constant connection to the server. Latency can be an issue. Each user consumes server memory.</li></ul>",
+      "children": []
+    },
+    "blazor-wasm": {
+      "id": "blazor-wasm",
+      "title": "Blazor WebAssembly",
+      "content": "<h3>Blazor WebAssembly (WASM)</h3><p>The application UI and logic run directly in the browser on a WebAssembly-based .NET runtime. This is a form of Client-Side Rendering (CSR).</p><ul><li><strong>Pros:</strong> Can run fully offline after initial download. Offloads processing to the client. Can be deployed to static file hosts.</li><li><strong>Cons:</strong> Larger initial download size. Restricted by the browser's security sandbox.</li></ul>",
+      "children": []
+    },
+    "razor-components": {
+      "id": "razor-components",
+      "title": "Razor Components",
+      "content": "<h3>Razor Components</h3><p>The fundamental building block of a Blazor application. A Razor Component is a self-contained chunk of UI, containing both HTML markup and C# processing logic in a single `.razor` file. These components can be nested, reused, and shared across projects. This component model is used by both Blazor Server and Blazor WebAssembly. Click to learn about the syntax used to write them.</p>",
+      "children": [],
+      "subModule": "modules/dotnet/razor-syntax.json"
+    },
+    "blazor-hybrid": {
+      "id": "blazor-hybrid",
+      "title": "Blazor Hybrid",
+      "content": "<h3>Blazor Hybrid</h3><p>Blazor Hybrid allows you to embed Razor components into a native client application (like .NET MAUI, WPF, or WinForms). The components render to an embedded Web View control, but the .NET code runs natively on the device, giving full access to the device's capabilities. This is not a web application, but a way to build native client apps using web UI technologies.</p>",
+      "children": []
+    }
+  }
+}

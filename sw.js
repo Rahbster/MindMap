@@ -43,6 +43,11 @@ const urlsToCache = [
     // Web Dev Sub-modules
     './modules/web-development/css.json',
     './modules/web-development/html.json',
+    // .NET Sub-modules
+    './modules/dotnet.json',
+    './modules/dotnet/web-rendering-models.json',
+    './modules/dotnet/blazor.json',
+    './modules/dotnet/razor-syntax.json',
     // Manifest and Icons
     './manifest.json',
     './icons/icon-192x192.png',

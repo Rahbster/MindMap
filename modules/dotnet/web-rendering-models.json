@@ -1,0 +1,34 @@
+{
+  "id": "web-rendering-models",
+  "name": "Web Rendering Models",
+  "isTopLevel": false,
+  "nodes": {
+    "root": {
+      "id": "root",
+      "title": "Web Rendering Models",
+      "content": "<h2>Server-Side vs. Client-Side</h2><p>This module explores the two primary models for rendering web applications. The choice between them has significant impacts on performance, user experience, and SEO.</p>",
+      "children": ["ssr", "csr"],
+      "quiz": [
+        {
+          "question": "Which rendering model generally provides better SEO out-of-the-box?",
+          "options": [
+            "Client-Side Rendering (CSR)"
+          ],
+          "answer": "Server-Side Rendering (SSR)"
+        }
+      ]
+    },
+    "ssr": {
+      "id": "ssr",
+      "title": "Server-Side Rendering (SSR)",
+      "content": "<h3>Server-Side Rendering (SSR)</h3><p>In SSR, the server generates the full HTML for a page in response to a browser request. The browser can then display this content immediately.</p><ul><li><strong>Pros:</strong> Excellent for SEO as search engine crawlers can easily read the content. Faster initial page load (First Contentful Paint).</li><li><strong>Cons:</strong> Can be slower for subsequent navigations as each page requires a full round-trip to the server. Higher server load.</li><li><strong>Example:</strong> Traditional web applications, Blazor Server.</li></ul>",
+      "children": []
+    },
+    "csr": {
+      "id": "csr",
+      "title": "Client-Side Rendering (CSR)",
+      "content": "<h3>Client-Side Rendering (CSR)</h3><p>In CSR, the server sends a minimal HTML shell and a large JavaScript bundle. The browser then executes the JavaScript to fetch data and render the page content.</p><ul><li><strong>Pros:</strong> Rich, interactive 'app-like' experiences. Faster navigation after the initial load as only data needs to be fetched, not full HTML pages.</li><li><strong>Cons:</strong> Slower initial load time (Time to Interactive). Can be challenging for SEO as crawlers may not execute the JavaScript correctly.</li><li><strong>Example:</strong> Single-Page Applications (SPAs) like React, Angular, Vue, and Blazor WebAssembly.</li></ul>",
+      "children": []
+    }
+  }
+}

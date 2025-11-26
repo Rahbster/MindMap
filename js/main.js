@@ -26,7 +26,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 { name: 'AI Ethics', path: 'modules/ai/ethics.json' },
                 { name: 'Modern Web Development', path: 'modules/web-development.json' },
                 { name: 'Learning Paradigms', path: 'modules/ai/learning-paradigms.json' },
-                { name: 'Programming with AI', path: 'modules/ai/programming-with-ai.json' }
+                { name: 'Programming with AI', path: 'modules/ai/programming-with-ai.json' },
+                // New .NET Development Modules
+                { name: 'Modern .NET Development', path: 'modules/dotnet.json' },
+                { name: 'Web Rendering Models', path: 'modules/dotnet/web-rendering-models.json' },
+                { name: 'Blazor Framework', path: 'modules/dotnet/blazor.json' },
+                { name: 'Razor Syntax', path: 'modules/dotnet/razor-syntax.json' }
             ];
 
             this.mindmapContainer = document.getElementById('mindmap-svg-container');

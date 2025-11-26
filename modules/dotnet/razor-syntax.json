@@ -1,0 +1,50 @@
+{
+  "id": "razor-syntax",
+  "name": "Razor Syntax",
+  "isTopLevel": false,
+  "nodes": {
+    "root": {
+      "id": "root",
+      "title": "Razor Syntax",
+      "content": "<h2>Razor Syntax</h2><p>Razor is a markup syntax for embedding .NET based code into webpages. It combines HTML markup with C# code. The syntax is designed to be compact, expressive, and easy to learn, enabling a fluid coding workflow.</p>",
+      "children": ["directives", "code-blocks", "data-binding", "event-handling", "control-structures"],
+      "quiz": [
+        {
+          "question": "What character is used to transition from HTML to C# in a Razor file?",
+          "options": ["$", "#", "&"],
+          "answer": "@"
+        }
+      ]
+    },
+    "directives": {
+      "id": "directives",
+      "title": "Directives",
+      "content": "<h3>Razor Directives</h3><p>Directives are keywords, prefixed with <strong>@</strong>, that provide instructions to the Razor compiler. Common directives include:</p><ul><li><strong>@page \"/path\"</strong>: Specifies that the component is a routable page.</li><li><strong>@using Namespace</strong>: Imports a C# namespace, similar to a `using` statement in a C# file.</li><li><strong>@inject Type PropertyName</strong>: Used for dependency injection, providing an instance of a service to the component.</li></ul>",
+      "children": []
+    },
+    "code-blocks": {
+      "id": "code-blocks",
+      "title": "Code Blocks",
+      "content": "<h3>Code Blocks</h3><p>The <strong>@code { ... }</strong> block is where you write the C# logic for your component. This includes properties, fields, methods, and event handlers that control the component's behavior.</p><p><code>@code {<br>  private int currentCount = 0;<br><br>  private void IncrementCount() {<br>    currentCount++;<br>  }<br>}</code></p>",
+      "children": []
+    },
+    "data-binding": {
+      "id": "data-binding",
+      "title": "Data Binding",
+      "content": "<h3>Data Binding</h3><p>Data binding connects UI elements to component data. Razor supports:</p><ul><li><strong>One-way binding:</strong> Renders a C# variable's value in HTML. Syntax: <code>&lt;p&gt;Current count: @currentCount&lt;/p&gt;</code></li><li><strong>Two-way binding:</strong> Binds an HTML input element to a C# property. Changes in the UI update the property, and changes to the property update the UI. Syntax: <code>&lt;input @bind=\"@currentCount\" /&gt;</code></li></ul>",
+      "children": []
+    },
+    "event-handling": {
+      "id": "event-handling",
+      "title": "Event Handling",
+      "content": "<h3>Event Handling</h3><p>You can handle DOM events (like clicks or input changes) by wiring them to C# methods. The syntax uses an <strong>@</strong> prefix followed by the event name.</p><p><code>&lt;button @onclick=\"IncrementCount\"&gt;Click me&lt;/button&gt;</code></p><p>This calls the `IncrementCount` method in the `@code` block when the button is clicked.</p>",
+      "children": []
+    },
+    "control-structures": {
+      "id": "control-structures",
+      "title": "Control Structures",
+      "content": "<h3>Control Structures</h3><p>Standard C# control structures can be used directly in your HTML markup to conditionally render content or loop over collections.</p><ul><li><strong>@if / @else if / @else:</strong> Conditionally renders a block of HTML.</li><li><strong>@foreach:</strong> Loops over a collection to render a list of items.</li><li><strong>@switch:</strong> A switch statement for rendering content based on a value.</li></ul>",
+      "children": []
+    }
+  }
+}
