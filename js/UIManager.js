@@ -75,6 +75,7 @@ export class UIManager {
         this.applySavedFontSize();
         this.applySavedTheme();
         this.applySavedViewMode();
+        this._injectBreadcrumbStyles();
     }
 
     initListeners() {
@@ -310,26 +311,69 @@ export class UIManager {
         });
     }
 
-    renderBreadcrumbs() {
+    renderBreadcrumbs(breadcrumbs) {
         this.breadcrumbNav.innerHTML = '';
-        if (this.state.moduleStack.length > 0) {
-            this.state.moduleStack.forEach((module, index) => {
-                const link = document.createElement('a');
-                link.href = '#';
-                link.textContent = module.name;
-                link.className = 'breadcrumb-link';
-                link.onclick = (e) => {
-                    e.preventDefault();
-                    this.callbacks.onBreadcrumbClick(index);
-                };
-                this.breadcrumbNav.appendChild(link);
+        if (!breadcrumbs || breadcrumbs.length === 0) return;
 
-                const separator = document.createElement('span');
-                separator.className = 'breadcrumb-separator';
-                separator.textContent = '>';
-                this.breadcrumbNav.appendChild(separator);
-            });
-        }
+        const ol = document.createElement('ol');
+
+        breadcrumbs.forEach((crumb, index) => {
+            const li = document.createElement('li');
+
+            if (index === breadcrumbs.length - 1) {
+                li.textContent = crumb.title;
+                li.setAttribute('aria-current', 'page');
+            } else {
+                const a = document.createElement('a');
+                a.href = '#';
+                a.textContent = crumb.title;
+                a.dataset.nodeId = crumb.nodeId;
+                a.dataset.modulePath = crumb.modulePath;
+
+                a.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    this.callbacks.onSearchResultClick(crumb.nodeId, crumb.modulePath);
+                });
+
+                li.appendChild(a);
+            }
+            ol.appendChild(li);
+        });
+
+        this.breadcrumbNav.appendChild(ol);
+    }
+
+    /**
+     * Injects the necessary CSS for the breadcrumb navigation.
+     * This makes the component self-contained.
+     * @private
+     */
+    _injectBreadcrumbStyles() {
+        const styleId = 'breadcrumb-styles';
+        if (document.getElementById(styleId)) return;
+
+        const style = document.createElement('style');
+        style.id = styleId;
+        style.innerHTML = `
+            #breadcrumb-nav ol {
+                list-style: none;
+                padding: 0;
+                margin: 0;
+                display: flex;
+                align-items: center;
+                flex-wrap: wrap;
+            }
+            #breadcrumb-nav li + li::before {
+                content: '>';
+                margin: 0 0.6em;
+                color: var(--text-color-secondary);
+                opacity: 0.7;
+            }
+            #breadcrumb-nav a {
+                color: var(--link-color);
+            }
+        `;
+        document.head.appendChild(style);
     }
 
     displayNodeContent(nodeId) {

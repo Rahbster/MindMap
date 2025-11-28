@@ -6,6 +6,7 @@ import { NodeManager } from './NodeManager.js';
 import { StateManager } from './StateManager.js';
 import { ModuleLoader } from './ModuleLoader.js';
 import { SearchHandler } from './SearchHandler.js';
+import { BreadcrumbManager } from './BreadcrumbManager.js';
 import { ToastManager } from './ToastManager.js';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -56,6 +57,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 onModuleLoaded: () => {
                     this.quizManager.setMindMapData(this.state.mindMapData);
                     this.renderMindMap();
+                    // After rendering, generate breadcrumbs for the root of the new module.
+                    this.searchHandler.callbacks.onGenerateBreadcrumbs('root', this.state.mindMapData.path);
                     this.uiManager.updateOnModuleLoad();
                     this.setActiveNode('root');
                 },
@@ -77,14 +80,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
             this.searchHandler = new SearchHandler(this.stateManager, this.availableModules, {
                 onSearchResults: (results) => this.uiManager.renderSearchResults(results),
-                onGoToNode: (nodeId) => {
-                    this.renderer.applyTransform(this.state.pan, this.state.zoom);
+                onGoToNode: (nodeId, targetPan, targetZoom) => {
+                    this.renderer.animateToView(targetPan, targetZoom);
                     this.selectNode(nodeId);
                     this.uiManager.closeMenu();
                 },
                 getContainerWidth: () => this.mindmapContainer.clientWidth,
                 getContainerHeight: () => this.mindmapContainer.clientHeight,
+                onGenerateBreadcrumbs: async (nodeId, modulePath) => {
+                    try {
+                        const breadcrumbs = await this.breadcrumbManager.generateBreadcrumbs(nodeId, modulePath);
+                        this.uiManager.renderBreadcrumbs(breadcrumbs);
+                    } catch (error) {
+                        console.error("Failed to generate breadcrumbs:", error);
+                    }
+                },
             });
+
+            this.breadcrumbManager = new BreadcrumbManager(this.availableModules.map(m => m.path), this.moduleLoader);
 
             this.uiManager = new UIManager(this.state, {
                 onModuleSelect: (path) => this.moduleLoader.loadModuleAndResetStack(path),
@@ -97,11 +110,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     if (currentModulePath === modulePath) {
                         // Result is in the current module, just go to it.
-                        this.searchHandler.goToNode(nodeId);
+                        this.searchHandler.goToNode(nodeId, true);
                     } else {
                         // Result is in a different module, load it and then go to the node.
                         // Use a callback to ensure goToNode is called *after* the module is loaded.
-                        this.moduleLoader.loadModuleAndResetStack(modulePath, () => this.searchHandler.goToNode(nodeId));
+                        this.moduleLoader.loadModuleAndResetStack(modulePath, () => this.searchHandler.goToNode(nodeId, true));
                     }
                 },
                 onStartQuiz: (nodeId) => this.quizManager.startQuizForNode(nodeId),

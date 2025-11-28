@@ -6,21 +6,31 @@ export class ModuleLoader {
         this.callbacks = callbacks;
     }
 
-    async loadModule(moduleSource, onComplete) {
+    /**
+     * Fetches or retrieves module data without triggering side effects.
+     * This is the "silent" data-loading function for use by other managers.
+     * @param {string | object} moduleSource - The path to the module file or the module object itself.
+     * @returns {Promise<object|null>} The parsed module data.
+     */
+    async getModuleData(moduleSource) {
         try {
-            let newModuleData;
             if (typeof moduleSource === 'string') {
                 const moduleId = moduleSource.split('/').pop().replace('.json', '');
                 const savedModule = this.stateManager.getModuleFromStorage(moduleId);
-                if (savedModule) {
-                    newModuleData = savedModule;
-                } else {
-                    newModuleData = await (await fetch(moduleSource)).json();
-                }
-            } else {
-                newModuleData = moduleSource;
+                return savedModule ? savedModule : await (await fetch(moduleSource)).json();
             }
+            return moduleSource; // It's already an object
+        } catch (error) {
+            console.error(`Failed to get module data for:`, moduleSource, error);
+            return null;
+        }
+    }
 
+    async loadModule(moduleSource, onComplete) {
+        try {
+            const newModuleData = await this.getModuleData(moduleSource);
+            if (!newModuleData) throw new Error("Module data could not be retrieved.");
+            
             this.state.mindMapData = newModuleData;
             this.state.mindMapData.path = typeof moduleSource === 'string' ? moduleSource : null;
             this.callbacks.onModuleLoaded();

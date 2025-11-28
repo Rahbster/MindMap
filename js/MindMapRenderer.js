@@ -497,6 +497,41 @@ export class MindMapRenderer {
         }
     }
 
+    /**
+     * Smoothly animates the viewport to a target pan and zoom.
+     * @param {object} targetPan - The destination pan object {x, y}.
+     * @param {number} targetZoom - The destination zoom level.
+     */
+    animateToView(targetPan, targetZoom) {
+        const duration = 500; // Animation duration in ms
+        const startPan = { ...this.state.mindMapData.pan };
+        const startZoom = this.state.mindMapData.zoom;
+        let startTime = null;
+
+        const animationStep = (timestamp) => {
+            if (!startTime) startTime = timestamp;
+            const progress = Math.min((timestamp - startTime) / duration, 1);
+            const ease = 1 - Math.pow(1 - progress, 3); // Ease-out cubic function
+
+            // Interpolate pan and zoom
+            const currentPan = {
+                x: startPan.x + (targetPan.x - startPan.x) * ease,
+                y: startPan.y + (targetPan.y - startPan.y) * ease
+            };
+            const currentZoom = startZoom + (targetZoom - startZoom) * ease;
+
+            this.state.mindMapData.pan = currentPan;
+            this.state.mindMapData.zoom = currentZoom;
+            this.applyTransform(currentPan, currentZoom);
+
+            if (progress < 1) {
+                requestAnimationFrame(animationStep);
+            }
+        };
+
+        requestAnimationFrame(animationStep);
+    }
+
     updateConnectingLines(nodeId, position) {
         const lineToParent = this.container.querySelector(`line[data-child-id="${nodeId}"]`);
         if (lineToParent) {

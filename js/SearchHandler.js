@@ -54,14 +54,23 @@ export class SearchHandler {
         this.callbacks.onSearchResults(allResults);
     }
 
-    goToNode(nodeId) {
-        const nodePosition = this.state.positions[nodeId];
+    /**
+     * Navigates the view to a specific node and optionally updates the breadcrumb trail.
+     * @param {string} nodeId The ID of the node to navigate to.
+     * @param {boolean} [updateBreadcrumbs=false] Whether to generate and update the full breadcrumb trail.
+     */
+    goToNode(nodeId, updateBreadcrumbs = false) {
+        const nodePosition = this.state.mindMapData?.positions?.[nodeId];
         if (!nodePosition) return;
 
-        this.state.zoom = 1;
-        this.state.pan.x = (this.callbacks.getContainerWidth() / 2) - (nodePosition.x * this.state.zoom);
-        this.state.pan.y = (this.callbacks.getContainerHeight() / 2) - (nodePosition.y * this.state.zoom);
-        
-        this.callbacks.onGoToNode(nodeId);
+        this.state.mindMapData.zoom = 1;
+        this.state.mindMapData.pan.x = (this.callbacks.getContainerWidth() / 2) - (nodePosition.x * this.state.mindMapData.zoom);
+        this.state.mindMapData.pan.y = (this.callbacks.getContainerHeight() / 2) - (nodePosition.y * this.state.mindMapData.zoom);
+
+        if (updateBreadcrumbs) {
+            this.callbacks.onGenerateBreadcrumbs(nodeId, this.state.mindMapData.path);
+        }
+
+        this.callbacks.onGoToNode(nodeId, this.state.mindMapData.pan, this.state.mindMapData.zoom);
     }
 }
