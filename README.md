@@ -49,6 +49,7 @@ MindMap/
 │   ├── MindMapRenderer.js  # Handles all SVG drawing and layout
 │   ├── MindMapInteraction.js # Manages pan, zoom, and drag events
 │   ├── UIManager.js        # Controls UI elements (side panel, modals, etc.)
+│   ├── ToastManager.js     # Manages non-intrusive "toast" notifications
 │   ├── NodeManager.js      # Manages node creation, editing, and deletion
 │   └── quiz.js           # Logic for the adaptive quizzing system
 ├── modules/

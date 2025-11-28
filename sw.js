@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mindmap-pwa-cache-v6';
+const CACHE_NAME = 'mindmap-pwa-cache-v7';
 const urlsToCache = [
     './',
     './index.html',
@@ -19,6 +19,8 @@ const urlsToCache = [
     './js/StateManager.js',
     './js/ModuleLoader.js',
     './js/SearchHandler.js',
+    './js/ToastManager.js',
+    './js/quiz.js',
     './js/editor.js',
     './README.md',
     // Top-Level Modules
@@ -46,6 +48,7 @@ const urlsToCache = [
     // .NET Sub-modules
     './modules/dotnet.json',
     './modules/dotnet/web-rendering-models.json',
+    './modules/dotnet/dotnet-development.json',
     './modules/dotnet/blazor.json',
     './modules/dotnet/razor-syntax.json',
     // Manifest and Icons

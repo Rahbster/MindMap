@@ -30,8 +30,8 @@ MindMap/
 │   ├── QuizManager.js
 │   ├── SearchHandler.js
 │   ├── StateManager.js
-│   ├── UIManager.js
-│   └── web-rendering-models.json
+│   ├── ToastManager.js
+│   └── UIManager.js
 ├── modules/
 │   ├── ai/
 │   │   ├── applications/
