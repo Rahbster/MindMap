@@ -61,5 +61,6 @@
       "children": [],
       "subModule": "modules/ai/programming-with-ai.json"
     }
-  }
+  },
+  "positions": {}
 }

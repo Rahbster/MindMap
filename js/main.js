@@ -6,6 +6,7 @@ import { NodeManager } from './NodeManager.js';
 import { StateManager } from './StateManager.js';
 import { ModuleLoader } from './ModuleLoader.js';
 import { SearchHandler } from './SearchHandler.js';
+import { ToastManager } from './ToastManager.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     class MindMapApp {
@@ -37,15 +38,18 @@ document.addEventListener('DOMContentLoaded', () => {
             this.mindmapContainer = document.getElementById('mindmap-svg-container');
             this.quizManager = new QuizManager(this.state);
             this.renderer = new MindMapRenderer(this.mindmapContainer, this.state);
+            this.toastManager = new ToastManager();
             
             this.interaction = new MindMapInteraction(this.mindmapContainer, this, {
-                onPanZoom: () => this.renderer.applyTransform(this.state.pan, this.state.zoom),
+                onPanZoom: (pan, zoom) => this.renderer.applyTransform(pan, zoom),
                 onNodeDrag: (nodeId, position) => {
                     this.renderer.runLayoutAnimation(false); // Stop auto-layout on manual drag
                     this.handleNodeDrag(nodeId, position);
                 },
                 onNodeSelect: (nodeId) => this.selectNode(nodeId),
-                onDragEnd: () => this.stateManager.saveModuleToStorage(),
+                onDragEnd: () => {
+                    this.stateManager.saveModuleToStorage();
+                },
             });
 
             this.moduleLoader = new ModuleLoader(this.stateManager, this.availableModules, {
@@ -132,10 +136,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 onLoadModuleFromFile: () => this.moduleLoader.loadModuleFromFile(),
                 onAutoOrganize: () => this.autoOrganize(),
             });
-            this.uiManager.callbacks.onStopAutoOrganize = () => this.stopAutoOrganize();
+            this.uiManager.callbacks.onStopAutoOrganize = (event) => this.stopAutoOrganize(event);
             this.renderer.callbacks = { onLayoutEnd: () => {
-                this.stateManager.saveModuleToStorage();
-                this.uiManager.stopOrganizeIndicator();
+                // This callback is for when the animation finishes on its own (cools down).
+                this._finalizeLayout();
             }};
 
             this.uiManager.populateModuleLoader(this.availableModules);
@@ -148,19 +152,19 @@ document.addEventListener('DOMContentLoaded', () => {
             // Check if positions exist before rendering.
             const hadPositions = this.state.mindMapData.positions && Object.keys(this.state.mindMapData.positions).length > 0;
 
-            const baseFontSize = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--mindmap-font-size'));
-            this.state.positions = this.state.mindMapData.positions || {};
+            const baseFontSize = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--mindmap-font-size')) || 24;
+            this.state.mindMapData.positions = this.state.mindMapData.positions || {};
+            this.state.mindMapData.pan = this.state.mindMapData.pan || { x: 0, y: 0 };
+            this.state.mindMapData.zoom = this.state.mindMapData.zoom || 1;
 
-            const { pan, zoom } = this.renderer.render(
+            this.renderer.render(
                 this.state.mindMapData,
-                this.state.positions,
+                this.state.mindMapData.positions,
                 baseFontSize,
                 (e, nodeId) => this.interaction.handleNodeMouseDown(e, nodeId)
             );
 
-            this.state.pan = pan;
-            this.state.zoom = zoom;
-            this.renderer.applyTransform(this.state.pan, this.state.zoom);
+            this.renderer.applyTransform(this.state.mindMapData.pan, this.state.mindMapData.zoom);
 
             // If positions did not exist before, save the newly generated ones.
             if (!hadPositions) {
@@ -174,7 +178,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         setActiveNode(nodeId) {
             this.stateManager.setActiveNode(nodeId);
-            document.querySelectorAll('.node-circle').forEach(c => c.classList.remove('active'));
+            this.mindmapContainer.querySelectorAll('.node-circle').forEach(c => c.classList.remove('active'));
             const group = this.mindmapContainer.querySelector(`g[data-node-id="${nodeId}"]`);
             if (group) {
                 group.querySelector('.node-circle').classList.add('active');
@@ -188,10 +192,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 // This is a sub-module navigation.
                 // To prevent duplicates, only push the current module if it's not already at the top of the stack.
                 const stackTop = this.state.moduleStack[this.state.moduleStack.length - 1];
-                if (!stackTop || stackTop.id !== this.state.mindMapData.id) {
-                    this.state.moduleStack.push(this.state.mindMapData);
-                }
-
+                // CRITICAL FIX: Save the current module's state (with its new positions) before navigating away.
+                this.stateManager.saveModuleToStorage();
+                
+                // Push only the identifier for the current module, not the full data object.
+                // This prevents stale data from being stored in the stack.
+                this.state.moduleStack.push({ name: this.state.mindMapData.name, path: this.state.mindMapData.path });
+                
                 this.moduleLoader.loadModule(node.subModule); // Then load the new one.
             } else {
                 this.setActiveNode(nodeId);
@@ -210,16 +217,37 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         autoOrganize() {
-            // This will either start a new animation or boost the existing one.
-            this.renderer.runLayoutAnimation(true, this.state.positions);
+            // Ensure positions object exists and pass it to the animation.
+            // The renderer will mutate this object directly.
+            if (!this.state.mindMapData.positions) this.state.mindMapData.positions = {};
+            this.renderer.runLayoutAnimation(true, this.state.mindMapData.positions);
         }
 
-        stopAutoOrganize() {
+        stopAutoOrganize(event) {
+            if (event) {
+                // Stop the mouseup event from bubbling to the interaction handler
+                // and triggering a drag-end event.
+                event.stopPropagation();
+            }
             this.renderer.runLayoutAnimation(false); // Stop the animation
-            // CRITICAL FIX: Sync the final animated positions back to the main data object before saving.
-            this.state.mindMapData.positions = this.state.positions;
-            this.uiManager.stopOrganizeIndicator(); // Stop the blinking
-            this.stateManager.saveModuleToStorage(); // Save the final positions
+            this._finalizeLayout();
+        }
+
+        /**
+         * A helper function called after any layout operation (auto or manual stop).
+         * It ensures the final state is captured, saved, and the UI is updated.
+         * @private
+         */
+        _finalizeLayout() {
+            // When stopping manually, we need to get the final animated state from the renderer.
+            const finalState = this.renderer.getFinalLayoutState();
+            if (finalState) {
+                this.state.mindMapData.pan = finalState.pan;
+                this.state.mindMapData.zoom = finalState.zoom;
+            }
+            // Now, save the fully updated state.
+            this.stateManager.saveModuleToStorage();
+            this.uiManager.stopOrganizeIndicator(); // Stop the blinking indicator
         }
     }
 

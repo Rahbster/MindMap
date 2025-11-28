@@ -43,7 +43,7 @@ export class MindMapInteraction {
         const mouseY = (event.clientY - CTM.f) / CTM.d;
 
         // Robustness: If positions haven't been populated yet (e.g., during a fast module load), default to 0 to prevent NaN.
-        const nodePosition = this.state.positions[nodeId];
+        const nodePosition = this.state.mindMapData.positions[nodeId];
         this.dragOffset.x = (nodePosition?.x || 0) - mouseX;
         this.dragOffset.y = (nodePosition?.y || 0) - mouseY;
 
@@ -65,19 +65,21 @@ export class MindMapInteraction {
             const mouseX = (event.clientX - CTM.e) / CTM.a;
             const mouseY = (event.clientY - CTM.f) / CTM.d;
 
-            this.state.positions[this.draggedNodeId].x = mouseX + this.dragOffset.x;
-            this.state.positions[this.draggedNodeId].y = mouseY + this.dragOffset.y;
+            const newPosition = {
+                x: mouseX + this.dragOffset.x,
+                y: mouseY + this.dragOffset.y
+            };
 
-            this.callbacks.onNodeDrag(this.draggedNodeId, this.state.positions[this.draggedNodeId]);
+            this.callbacks.onNodeDrag(this.draggedNodeId, newPosition);
         } else if (this.isPanning) {
             const dx = event.clientX - this.startPanPoint.x;
             const dy = event.clientY - this.startPanPoint.y;
-            this.state.pan.x += dx;
-            this.state.pan.y += dy;
+            this.state.mindMapData.pan.x += dx;
+            this.state.mindMapData.pan.y += dy;
             this.startPanPoint = { x: event.clientX, y: event.clientY };
         }
 
-        this.callbacks.onPanZoom();
+        this.callbacks.onPanZoom(this.state.mindMapData.pan, this.state.mindMapData.zoom);
     }
 
     handlePanEnd(event) {
@@ -103,20 +105,20 @@ export class MindMapInteraction {
         const svgRect = this.container.getBoundingClientRect();
 
         const pointBeforeZoom = {
-            x: (clientX - svgRect.left - this.state.pan.x) / this.state.zoom,
-            y: (clientY - svgRect.top - this.state.pan.y) / this.state.zoom
+            x: (clientX - svgRect.left - this.state.mindMapData.pan.x) / this.state.mindMapData.zoom,
+            y: (clientY - svgRect.top - this.state.mindMapData.pan.y) / this.state.mindMapData.zoom
         };
 
         if (event.deltaY < 0) {
-            this.state.zoom *= zoomFactor;
+            this.state.mindMapData.zoom *= zoomFactor;
         } else {
-            this.state.zoom /= zoomFactor;
+            this.state.mindMapData.zoom /= zoomFactor;
         }
 
-        this.state.pan.x = (clientX - svgRect.left) - pointBeforeZoom.x * this.state.zoom;
-        this.state.pan.y = (clientY - svgRect.top) - pointBeforeZoom.y * this.state.zoom;
+        this.state.mindMapData.pan.x = (clientX - svgRect.left) - pointBeforeZoom.x * this.state.mindMapData.zoom;
+        this.state.mindMapData.pan.y = (clientY - svgRect.top) - pointBeforeZoom.y * this.state.mindMapData.zoom;
 
-        this.callbacks.onPanZoom();
+        this.callbacks.onPanZoom(this.state.mindMapData.pan, this.state.mindMapData.zoom);
     }
 
     // --- Touch Event Handlers ---
@@ -168,16 +170,16 @@ export class MindMapInteraction {
             const touch = e.touches[0];
             const dx = touch.clientX - this.startPanPoint.x;
             const dy = touch.clientY - this.startPanPoint.y;
-            this.state.pan.x += dx;
-            this.state.pan.y += dy;
+            this.state.mindMapData.pan.x += dx;
+            this.state.mindMapData.pan.y += dy;
             this.startPanPoint = { x: touch.clientX, y: touch.clientY };
-            this.callbacks.onPanZoom();
+            this.callbacks.onPanZoom(this.state.mindMapData.pan, this.state.mindMapData.zoom);
         } else if (e.touches.length === 2 && this.initialPinchDistance) {
             const newPinchDistance = this.getPinchDistance(e);
             const zoomFactor = newPinchDistance / this.initialPinchDistance;
 
-            const oldZoom = this.state.zoom;
-            this.state.zoom = Math.max(0.1, Math.min(5, oldZoom * zoomFactor));
+            const oldZoom = this.state.mindMapData.zoom;
+            this.state.mindMapData.zoom = Math.max(0.1, Math.min(5, oldZoom * zoomFactor));
 
             // Zoom towards the center of the pinch
             const CTM = this.container.querySelector('svg').getScreenCTM();
@@ -186,14 +188,14 @@ export class MindMapInteraction {
 
             const svgRect = this.container.getBoundingClientRect();
             const pointBeforeZoom = {
-                x: (pinchCenterX - svgRect.left - this.state.pan.x) / oldZoom,
-                y: (pinchCenterY - svgRect.top - this.state.pan.y) / oldZoom
+                x: (pinchCenterX - svgRect.left - this.state.mindMapData.pan.x) / oldZoom,
+                y: (pinchCenterY - svgRect.top - this.state.mindMapData.pan.y) / oldZoom
             };
 
-            this.state.pan.x = (pinchCenterX - svgRect.left) - pointBeforeZoom.x * this.state.zoom;
-            this.state.pan.y = (pinchCenterY - svgRect.top) - pointBeforeZoom.y * this.state.zoom;
+            this.state.mindMapData.pan.x = (pinchCenterX - svgRect.left) - pointBeforeZoom.x * this.state.mindMapData.zoom;
+            this.state.mindMapData.pan.y = (pinchCenterY - svgRect.top) - pointBeforeZoom.y * this.state.mindMapData.zoom;
 
-            this.callbacks.onPanZoom();
+            this.callbacks.onPanZoom(this.state.mindMapData.pan, this.state.mindMapData.zoom);
             this.initialPinchDistance = newPinchDistance; // Update for continuous zoom
         }
     }
@@ -233,19 +235,19 @@ export class MindMapInteraction {
         const svgRect = this.container.getBoundingClientRect();
 
         const pointBeforeZoom = {
-            x: (clientX - svgRect.left - this.state.pan.x) / this.state.zoom,
-            y: (clientY - svgRect.top - this.state.pan.y) / this.state.zoom
+            x: (clientX - svgRect.left - this.state.mindMapData.pan.x) / this.state.mindMapData.zoom,
+            y: (clientY - svgRect.top - this.state.mindMapData.pan.y) / this.state.mindMapData.zoom
         };
 
         if (event.deltaY < 0) {
-            this.state.zoom *= zoomFactor;
+            this.state.mindMapData.zoom *= zoomFactor;
         } else {
-            this.state.zoom /= zoomFactor;
+            this.state.mindMapData.zoom /= zoomFactor;
         }
 
-        this.state.pan.x = (clientX - svgRect.left) - pointBeforeZoom.x * this.state.zoom;
-        this.state.pan.y = (clientY - svgRect.top) - pointBeforeZoom.y * this.state.zoom;
+        this.state.mindMapData.pan.x = (clientX - svgRect.left) - pointBeforeZoom.x * this.state.mindMapData.zoom;
+        this.state.mindMapData.pan.y = (clientY - svgRect.top) - pointBeforeZoom.y * this.state.mindMapData.zoom;
 
-        this.callbacks.onPanZoom();
+        this.callbacks.onPanZoom(this.state.mindMapData.pan, this.state.mindMapData.zoom);
     }
 }

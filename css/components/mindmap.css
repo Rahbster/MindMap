@@ -103,11 +103,6 @@
     stroke-width: calc(var(--mindmap-font-size) / 8); /* Make stroke proportional */
 }
 
-/* Add a glow to nodes that link to a sub-module */
-.has-submodule {
-    filter: drop-shadow(0 0 5px #3498db);
-}
-
 /* Add a shadow to child nodes */
 .is-child-node {
     filter: drop-shadow(3px 3px 3px rgba(0, 0, 0, 0.4));
@@ -130,4 +125,9 @@
 }
 .modal-buttons {
     margin-top: 1rem; /* Add margin to the top of the button container instead */
+}
+
+/* Style for nodes that link to a sub-module */
+.node-group.has-submodule .node-circle {
+  filter: drop-shadow(0 0 6px #34a3ee);
 }

@@ -50,5 +50,6 @@
       "content": "<h3>Facial Recognition</h3><p>A specific application of computer vision capable of identifying or verifying a person from a digital image or a video frame. It is widely used in security systems and for unlocking smartphones.</p>",
       "children": []
     }
-  }
+  },
+  "positions": {}
 }

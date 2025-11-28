@@ -42,5 +42,6 @@
       "content": "<h3>Web & AI Integration</h3><p>Modern web technologies allow for powerful AI integration directly in the browser or by communicating with AI services. This connects to your interest in using AI for productivity and creating new use cases.</p><ul><li><strong>Client-Side AI:</strong> Using libraries like <strong>TensorFlow.js</strong>, you can run machine learning models directly in the user's browser.</li><li><strong>API-Based AI:</strong> The most common approach is using JavaScript to make API calls to powerful AI services (like OpenAI's GPT or Azure AI Services) to add features like voice recognition, order validation, or content generation to a web app.</li></ul>",
       "children": []
     }
-  }
+  },
+  "positions": {}
 }

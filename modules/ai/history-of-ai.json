@@ -60,5 +60,6 @@
       "content": "<h3>The Deep Learning Revolution</h3><p>Fueled by massive datasets (like ImageNet), powerful GPUs, and algorithmic breakthroughs, Deep Learning has led to astonishing progress. Pioneers like <strong>Geoffrey Hinton, Yann LeCun, and Yoshua Bengio</strong> (the 'Godfathers of AI') won the Turing Award for their work on neural networks.</p>",
       "children": []
     }
-  }
+  },
+  "positions": {}
 }

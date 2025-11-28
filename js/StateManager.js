@@ -4,9 +4,6 @@ export class StateManager {
             mindMapData: null,
             moduleStack: [],
             activeNodeId: null,
-            positions: {},
-            pan: { x: 0, y: 0 },
-            zoom: 1,
         };
     }
 
@@ -20,11 +17,18 @@ export class StateManager {
 
     saveModuleToStorage() {
         if (!this.state.mindMapData || !this.state.mindMapData.id) return;
-        localStorage.setItem(`mindmap-module-${this.state.mindMapData.id}`, JSON.stringify(this.state.mindMapData));
+        const moduleId = this.state.mindMapData.id;
+        const key = `mindmap-module-${moduleId}`;
+        try {
+            localStorage.setItem(key, JSON.stringify(this.state.mindMapData));
+        } catch (error) {
+            console.error(`[StateManager] Failed to save module '${moduleId}' to localStorage:`, error);
+        }
     }
 
     getModuleFromStorage(moduleId) {
-        const savedData = localStorage.getItem(`mindmap-module-${moduleId}`);
-        return savedData ? JSON.parse(savedData) : null;
+        const key = `mindmap-module-${moduleId}`;
+        const savedDataString = localStorage.getItem(key);
+        return savedDataString ? JSON.parse(savedDataString) : null;
     }
 }

@@ -83,5 +83,6 @@
       "children": [],
       "subModule": "modules/ai/applications/generative-ai.json"
     }
-  }
+  },
+  "positions": {}
 }

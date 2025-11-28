@@ -40,5 +40,6 @@
       "content": "<h3>Responsive Design</h3><p>The practice of ensuring that web content looks good on all devices (desktops, tablets, and phones). This is primarily achieved using <strong>Media Queries</strong>, which apply different CSS rules based on the screen size or device characteristics.</p>",
       "children": []
     }
-  }
+  },
+  "positions": {}
 }

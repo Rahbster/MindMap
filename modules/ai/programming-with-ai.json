@@ -58,5 +58,6 @@
       "content": "<h4>AI-Powered Order Validation</h4><p>An AI model can act as a 'second pair of eyes' for staff entering orders, reducing errors and increasing sales. It can be trained to:</p><ul><li><strong>Detect Common Mistakes:</strong> Flag orders that seem unusual or are commonly entered incorrectly (e.g., a meal combo missing its drink).</li><li><strong>Suggest Upsells:</strong> Recommend add-ons or combos based on the items already in the order ('Would you like to make that a meal?').</li><li><strong>Fraud Detection:</strong> Analyze ordering patterns to flag potentially fraudulent activity in real-time.</li></ul>",
       "children": []
     }
-  }
+  },
+  "positions": {}
 }

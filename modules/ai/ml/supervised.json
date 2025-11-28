@@ -53,5 +53,6 @@
       "content": "<h4>Linear Regression</h4><p>One of the most basic regression algorithms. It attempts to model the relationship between a dependent variable and one or more independent variables by fitting a linear equation to the observed data.</p>",
       "children": []
     }
-  }
+  },
+  "positions": {}
 }

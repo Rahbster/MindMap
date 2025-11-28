@@ -46,5 +46,6 @@
       "content": "<h3>Control Structures</h3><p>Standard C# control structures can be used directly in your HTML markup to conditionally render content or loop over collections.</p><ul><li><strong>@if / @else if / @else:</strong> Conditionally renders a block of HTML.</li><li><strong>@foreach:</strong> Loops over a collection to render a list of items.</li><li><strong>@switch:</strong> A switch statement for rendering content based on a value.</li></ul>",
       "children": []
     }
-  }
+  },
+  "positions": {}
 }

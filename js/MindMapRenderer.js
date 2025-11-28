@@ -4,7 +4,6 @@ export class MindMapRenderer {
         this.layoutAnimationId = null;
         this.state = state;
         this.svg = null;
-        this.temperature = 0;
         this.starLayers = [];
         this.viewportG = null;
     }
@@ -20,6 +19,11 @@ export class MindMapRenderer {
         this.svg.style.cursor = 'grab';
         this.container.innerHTML = '';
         this.container.appendChild(this.svg);
+
+        // CRITICAL FIX: Initialize the text measurement helper element.
+        this._textMeasureEl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        this._textMeasureEl.setAttribute('style', 'position:absolute; visibility:hidden; pointer-events:none;');
+        this.svg.appendChild(this._textMeasureEl);
 
         // --- Starfield Background (inspired by TeamSudoku) ---
         const starGroups = [
@@ -64,10 +68,9 @@ export class MindMapRenderer {
 
         // Always draw the elements first.
         this.drawLines(mindMapData, positions);
-        this.drawNodes(mindMapData, positions, nodeRadius, textLineHeight, nodeMouseDownCallback);
+        this.drawNodes(mindMapData, positions, nodeRadius, baseFontSize, nodeMouseDownCallback);
 
-        // Always return the current pan/zoom. The layout is now only triggered manually.
-        return { pan: this.state.pan, zoom: this.state.zoom };
+        // No longer needs to return pan/zoom as they are part of the mindMapData object.
     }
 
     calculateInitialLayout(mindMapData, positions) {
@@ -112,13 +115,17 @@ export class MindMapRenderer {
 
         // If an animation is already running, just boost the temperature.
         if (this.layoutAnimationId) {
-            this.temperature = Math.min(200, this.temperature + 100); // Add energy, with a cap.
-            console.log(`[Renderer] Auto-organize boosted. New temperature: ${this.temperature.toFixed(2)}`);
+            // Always reset the temperature to its initial high value to re-energize the system.
+            this.temperature = 100.0;
             return;
         }
 
+        // Store the current pan/zoom to be animated during the layout.
+        this.currentPan = { ...this.state.mindMapData.pan };
+        this.currentZoom = this.state.mindMapData.zoom;
+
         const nodes = Object.values(this.state.mindMapData.nodes);
-        const positions = this.state.positions; // Use the main state positions object
+        const positions = this.state.mindMapData.positions; // Use the module's positions object
         const { clientWidth: width, clientHeight: height } = this.container;
 
         // Initialize physics properties for all nodes.
@@ -183,9 +190,53 @@ export class MindMapRenderer {
                     node._ui.fx += tx * tangentialForce;
                     node._ui.fy += ty * tangentialForce;
 
+                    // --- Improved Straightening Logic ---
+                    // Instead of applying a force, we dampen velocity that moves the node off-axis.
+                    // This is more effective at "snapping" nodes into a grid without fighting other forces.
+                    const DAMPING_FACTOR = 0.5; // How strongly to dampen off-axis velocity.
+                    const angle = Math.atan2(dy, dx); // Angle in radians
+                    const snapThreshold = 0.2; // Radians (about 11 degrees)
+
+                    // If close to horizontal, dampen vertical velocity.
+                    if (Math.abs(angle) < snapThreshold || Math.abs(Math.abs(angle) - Math.PI) < snapThreshold) {
+                        node._ui.vy *= DAMPING_FACTOR;
+                    }
+                    // If close to vertical, dampen horizontal velocity.
+                    if (Math.abs(Math.abs(angle) - Math.PI / 2) < snapThreshold) {
+                        node._ui.vx *= DAMPING_FACTOR;
+                    }
+
                     targetNode._ui.fx -= fx;
                     targetNode._ui.fy -= fy;
                 });
+            }
+            
+            // --- Global Alignment Force (User Suggestion) ---
+            // This force encourages any two nodes that are close on an axis to snap to the same line.
+            const K_ALIGN = 0.05; // Increased strength of the alignment pull.
+            const SNAP_DISTANCE = 30; // Increased range for the force to activate.
+
+            for (let i = 0; i < nodes.length; i++) {
+                for (let j = i + 1; j < nodes.length; j++) {
+                    const nodeA = nodes[i];
+                    const nodeB = nodes[j];
+                    const posA = positions[nodeA.id];
+                    const posB = positions[nodeB.id];
+
+                    // Check for vertical alignment (close X values)
+                    if (Math.abs(posA.x - posB.x) < SNAP_DISTANCE) {
+                        const avgX = (posA.x + posB.x) / 2;
+                        nodeA._ui.fx += (avgX - posA.x) * K_ALIGN;
+                        nodeB._ui.fx += (avgX - posB.x) * K_ALIGN;
+                    }
+
+                    // Check for horizontal alignment (close Y values)
+                    if (Math.abs(posA.y - posB.y) < SNAP_DISTANCE) {
+                        const avgY = (posA.y + posB.y) / 2;
+                        nodeA._ui.fy += (avgY - posA.y) * K_ALIGN;
+                        nodeB._ui.fy += (avgY - posB.y) * K_ALIGN;
+                    }
+                }
             }
 
             // 2. Apply Forces and Update Positions
@@ -205,14 +256,37 @@ export class MindMapRenderer {
                 this.updateNodeAndLines(node.id, positions[node.id]);
             }
 
+            // --- DYNAMIC ZOOM-TO-FIT (User Suggestion) ---
+            // In each frame, calculate the ideal pan/zoom and smoothly move the camera towards it.
+            const baseFontSize = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--mindmap-font-size')) || 24;
+            const nodeRadius = baseFontSize * 2.5;
+            const { pan: targetPan, zoom: targetZoom } = this.calculateZoomToFit(positions, nodeRadius);
+
+            // Smoothly interpolate the current pan and zoom towards the target.
+            const LERP_FACTOR = 0.08; // Controls the smoothness of the camera motion.
+            this.currentPan.x += (targetPan.x - this.currentPan.x) * LERP_FACTOR;
+            this.currentPan.y += (targetPan.y - this.currentPan.y) * LERP_FACTOR;
+            this.currentZoom += (targetZoom - this.currentZoom) * LERP_FACTOR;
+
+            // Apply the interpolated transform to the view.
+            this.applyTransform(this.currentPan, this.currentZoom);
+
             this.temperature *= COOLING_RATE;
 
             if (this.temperature > 0.1) {
                 this.layoutAnimationId = requestAnimationFrame(step);
             } else {
-                console.log('--- Auto Organize Complete: Final Node Positions ---');
-                console.log(JSON.stringify(positions, null, 2));
-                console.log('----------------------------------------------------');
+                // --- CRITICAL FIX: Round final positions to integers ---
+                // This cleans up the data without any noticeable visual impact.
+                for (const nodeId in positions) {
+                    positions[nodeId].x = Math.round(positions[nodeId].x);
+                    positions[nodeId].y = Math.round(positions[nodeId].y);
+                }
+
+                // On completion, update the main state with the final pan and zoom.
+                this.state.mindMapData.pan = this.currentPan;
+                this.state.mindMapData.zoom = this.currentZoom;
+
                 this.state.mindMapData.positions = positions;
                 this.callbacks.onLayoutEnd();
             }
@@ -238,7 +312,7 @@ export class MindMapRenderer {
         });
     }
 
-    drawNodes(mindMapData, positions, nodeRadius, textLineHeight, nodeMouseDownCallback) {
+    drawNodes(mindMapData, positions, nodeRadius, baseFontSize, nodeMouseDownCallback) {
         Object.values(mindMapData.nodes).forEach(node => {
             if (positions[node.id]) {
                 const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
@@ -255,21 +329,128 @@ export class MindMapRenderer {
 
                 const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
                 text.classList.add('node-text');
-                const words = node.title.split(' ');
-                const initialY = -((words.length - 1) * textLineHeight) / 2;
-                words.forEach((word, index) => {
-                    const tspan = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
-                    tspan.textContent = word;
-                    tspan.setAttribute('x', 0);
-                    tspan.setAttribute('dy', index === 0 ? `${initialY}px` : `${textLineHeight}px`);
-                    text.appendChild(tspan);
-                });
+                text.textContent = node.title; // Set initial text for wrapping
 
                 group.append(circle, text);
                 group.addEventListener('mousedown', (e) => nodeMouseDownCallback(e, node.id));
                 this.viewportG.appendChild(group);
+
+                // Apply text wrapping after the element is in the DOM
+                this.fitTextInCircle(text, nodeRadius, baseFontSize);
             }
         });
+    }
+
+    /**
+     * Wraps SVG text to a given width.
+     * @param {SVGTextElement} textElement - The SVG text element to wrap.
+     * @param {number} radius - The radius of the containing circle.
+     * @param {number} baseFontSize - The ideal font size to start with.
+     */
+    fitTextInCircle(textElement, radius, baseFontSize) {
+        const text = (textElement.textContent || "").trim();
+        if (!text) return;
+
+        const INSET = radius * 0.1; // 10% inset from the edge
+        const LINE_CUT = 3; // Affects when a new line is created.
+        const MAX_SCALE = 1.2; // Allow font to be slightly larger than base if it fits
+        const FONT_HEIGHT_RATIO = 1.0; // Ratio for line height based on font size.
+
+        // --- 1. Pre-measure words at the base font size ---
+        textElement.style.fontSize = `${baseFontSize}px`;
+        const spaceWidth = this.measureText(' ', baseFontSize);
+        const words = text.split(" ").map((wordText, i, arr) => ({
+            text: wordText,
+            width: this.measureText(wordText, baseFontSize),
+            space: i < arr.length - 1 ? spaceWidth : 0
+        }));
+        const totalWidth = words.reduce((acc, w) => acc + w.width + w.space, 0) - words[words.length - 1].space;
+
+        // --- 2. Determine line breaks and calculate bounding radius ---
+        const lines = [];
+
+        if (words.length > 0) {
+            let currentLine = { from: 0, to: 1 };
+            for (let i = 1; i < words.length; i++) {
+                // Check width of the current line if we add the next word
+                const testLineWords = words.slice(currentLine.from, i + 1);
+                const testLineWidth = testLineWords.reduce((acc, w) => acc + w.width + w.space, 0) - testLineWords[testLineWords.length - 1].space;
+
+                // If the line is too long, finalize the previous line and start a new one
+                const breakThreshold = radius * 2.2;
+                
+                // --- New, more aggressive breaking logic ---
+                // Condition 1: The line is absolutely too long.
+                const isTooLong = testLineWidth > breakThreshold;
+                // Condition 2: The line is getting full. This encourages wrapping for better balance.
+                const isGoodToBreak = testLineWidth > breakThreshold * 0.55; // Use a 55% threshold as a good general-purpose starting point.
+                // Exception: Don't do a "good break" if the line is still short. This prevents "with AI" from breaking unnecessarily.
+                const isShort = testLineWidth < breakThreshold * 0.65;
+
+                // Break if the line is too long, OR if it's a good break point AND not a short line.
+                if (isTooLong || (isGoodToBreak && !isShort)) {
+                    lines.push({ from: currentLine.from, to: i });
+                    currentLine = { from: i, to: i + 1 };
+                } else {
+                    currentLine.to = i + 1;
+                }
+            }
+            lines.push(currentLine); // Add the last line
+
+            let boundRadius = 0;
+            const lineMetrics = lines.map((line, i) => {
+                const lineWidth = line.to > line.from ? words.slice(line.from, line.to).reduce((acc, w) => acc + w.width + w.space, 0) - words[line.to - 1].space : 0;
+                const lineHeight = (-(lines.length - 1) * 0.5 + i) * baseFontSize * FONT_HEIGHT_RATIO;
+                const lineTop = lineHeight - (baseFontSize * FONT_HEIGHT_RATIO * 0.5);
+                const lineBottom = lineHeight + (baseFontSize * FONT_HEIGHT_RATIO * 0.5);
+                boundRadius = Math.max(boundRadius, Math.hypot(lineWidth * 0.5, lineTop), Math.hypot(lineWidth * 0.5, lineBottom));
+                return { width: lineWidth, y: lineHeight };
+            });
+
+            var scale = (radius - INSET) / boundRadius;
+            lines.forEach((line, i) => {
+                line.x = -lineMetrics[i].width * 0.5;
+                line.y = lineMetrics[i].y;
+            });
+
+        } else { // Single line
+            // This case is handled by the loop above, so this block is no longer needed.
+            var scale = Math.min(MAX_SCALE, ((radius - INSET) * 2) / totalWidth);
+        }
+
+        const finalFontSize = baseFontSize * scale;
+        // --- 3. Render the final text with calculated scale and layout ---
+        const finalLineHeight = finalFontSize * FONT_HEIGHT_RATIO;
+        textElement.textContent = null; // Clear original text
+        textElement.style.fontSize = `${finalFontSize}px`;
+
+        lines.forEach((line, i) => {
+            const tspan = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
+            tspan.setAttribute('x', 0);
+            // The 'y' attribute on the text element handles vertical centering, so dy is just for line breaks.
+            tspan.setAttribute('dy', i === 0 ? 0 : `${finalLineHeight}px`);
+            tspan.textContent = words.slice(line.from, line.to).map(w => w.text).join(' ');
+            textElement.appendChild(tspan);
+        });
+
+        // Final vertical centering of the entire text block
+        const totalTextHeight = (lines.length) * finalLineHeight;
+        // To center the block, we shift it up by half its total height,
+        // then shift it down by half the height of a single line to account for the baseline.
+        textElement.setAttribute('y', `-${(totalTextHeight / 2) - (finalLineHeight / 2)}`);
+    }
+
+    // Helper to measure text width without relying on an existing element in the main SVG.
+    measureText(text, fontSize) {
+        // Self-healing: If the helper element doesn't exist or is detached from the current SVG, recreate it.
+        if (!this._textMeasureEl || !this.svg.contains(this._textMeasureEl)) {
+            this._textMeasureEl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            this._textMeasureEl.setAttribute('style', 'position:absolute; visibility:hidden; pointer-events:none;');
+            this.svg.appendChild(this._textMeasureEl);
+        }
+        this._textMeasureEl.style.fontSize = `${fontSize}px`;
+        this._textMeasureEl.textContent = text;
+        return this._textMeasureEl.getComputedTextLength();
     }
 
     calculateZoomToFit(positions, nodeRadius) {
@@ -331,5 +512,16 @@ export class MindMapRenderer {
                 lineToChild.setAttribute('y1', position.y);
             }
         });
+    }
+
+    /**
+     * Returns the final state of the layout animation, including pan and zoom.
+     * This is used when the animation is stopped manually.
+     */
+    getFinalLayoutState() {
+        return {
+            pan: this.currentPan,
+            zoom: this.currentZoom
+        };
     }
 }

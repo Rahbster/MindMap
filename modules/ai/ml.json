@@ -49,5 +49,6 @@
       "children": [],
       "subModule": "modules/ai/ml/deep-learning.json"
     }
-  }
+  },
+  "positions": {}
 }

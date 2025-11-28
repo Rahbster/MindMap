@@ -12,7 +12,11 @@ export class ModuleLoader {
             if (typeof moduleSource === 'string') {
                 const moduleId = moduleSource.split('/').pop().replace('.json', '');
                 const savedModule = this.stateManager.getModuleFromStorage(moduleId);
-                newModuleData = savedModule || await (await fetch(moduleSource)).json();
+                if (savedModule) {
+                    newModuleData = savedModule;
+                } else {
+                    newModuleData = await (await fetch(moduleSource)).json();
+                }
             } else {
                 newModuleData = moduleSource;
             }
@@ -33,13 +37,16 @@ export class ModuleLoader {
     }
 
     navigateToStackIndex(index) {
+        // Save the state of the current module before navigating away.
+        this.stateManager.saveModuleToStorage();
+
         // Get the module data for the breadcrumb link that was clicked.
         const targetModule = this.state.moduleStack[index];
         // Truncate the stack to the level of the clicked breadcrumb.
         this.state.moduleStack = this.state.moduleStack.slice(0, index);
 
         // Reload the target module. The stack is now in the correct state.
-        this.loadModule(targetModule.path || targetModule);
+        this.loadModule(targetModule.path);
     }
 
     saveModuleToFile() {

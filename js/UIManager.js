@@ -102,8 +102,18 @@ export class UIManager {
             this.startOrganizeIndicator();
             this.callbacks.onAutoOrganize();
         });
-        this.autoOrganizeBtn.addEventListener('mouseup', () => this.callbacks.onStopAutoOrganize());
-        this.autoOrganizeBtn.addEventListener('mouseleave', () => this.callbacks.onStopAutoOrganize());
+        this.autoOrganizeBtn.addEventListener('mouseup', (event) => {
+            // Only trigger stop if it was actually running.
+            if (this.autoOrganizeBtn.classList.contains('organizing')) {
+                this.callbacks.onStopAutoOrganize(event);
+            }
+        });
+        this.autoOrganizeBtn.addEventListener('mouseleave', (event) => {
+            // Only trigger stop if it was actually running.
+            if (this.autoOrganizeBtn.classList.contains('organizing')) {
+                this.callbacks.onStopAutoOrganize(event);
+            }
+        });
 
         // Add touch equivalents for iPad/touch devices
         this.autoOrganizeBtn.addEventListener('touchstart', (e) => {
@@ -111,7 +121,12 @@ export class UIManager {
             this.startOrganizeIndicator();
             this.callbacks.onAutoOrganize();
         });
-        this.autoOrganizeBtn.addEventListener('touchend', () => this.callbacks.onStopAutoOrganize());
+        this.autoOrganizeBtn.addEventListener('touchend', (event) => {
+            // Only trigger stop if it was actually running.
+            if (this.autoOrganizeBtn.classList.contains('organizing')) {
+                this.callbacks.onStopAutoOrganize(event);
+            }
+        });
 
         document.getElementById('show-readme-btn').addEventListener('click', () => this.openReadmeModal());
         document.getElementById('close-readme-btn').addEventListener('click', () => this.closeReadmeModal());
@@ -330,7 +345,7 @@ export class UIManager {
         // Create and add the title
         const title = document.createElement('h2');
         title.textContent = node.title;
-        titleWrapper.prepend(title);
+        titleWrapper.insertBefore(title, titleWrapper.firstChild);
 
         // Create the container for the action buttons.
         const actions = document.createElement('div');
