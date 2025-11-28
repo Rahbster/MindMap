@@ -5,9 +5,9 @@
   "nodes": {
     "root": {
       "id": "root",
-      "title": "Other Learning Paradigms",
-      "content": "<h2>Other Learning Paradigms</h2><p>Beyond supervised, unsupervised, and reinforcement learning, other paradigms have emerged to tackle different types of problems.</p>",
-      "children": ["semi-supervised", "self-supervised", "transfer-learning"],
+      "title": "Learning Paradigms",
+      "content": "<h2>Learning Paradigms</h2><p>Machine learning models learn using different strategies or 'paradigms'. The main types are Supervised, Unsupervised, and Reinforcement learning, but other specialized paradigms also exist.</p>",
+      "children": ["supervised", "unsupervised", "reinforcement", "semi-supervised", "self-supervised", "transfer-learning"],
       "quiz": [
         {
           "question": "Which learning paradigm is most useful when you have a large amount of data, but only a small portion of it is labeled?",
@@ -15,6 +15,28 @@
           "answer": "Semi-Supervised Learning"
         }
       ]
+    },
+    "supervised": {
+      "id": "supervised",
+      "title": "Supervised Learning",
+      "content": "<h3>Supervised Learning</h3><p>The model is trained on a dataset where each data point is 'labeled' with the correct output or category. It's like learning with a teacher who provides the answers. Click to explore types like Classification and Regression.</p>",
+      "children": [],
+      "quiz": [],
+      "subModule": "modules/ai/ml/supervised.json"
+    },
+    "unsupervised": {
+      "id": "unsupervised",
+      "title": "Unsupervised Learning",
+      "content": "<h3>Unsupervised Learning</h3><p>The model works with unlabeled data to find hidden patterns or intrinsic structures. It's like learning without a teacher, by discovering relationships on its own. Click to explore types like Clustering and Association.</p>",
+      "children": [],
+      "subModule": "modules/ai/ml/unsupervised.json"
+    },
+    "reinforcement": {
+      "id": "reinforcement",
+      "title": "Reinforcement Learning",
+      "content": "<h3>Reinforcement Learning</h3><p>An agent learns to make decisions by taking actions in an environment to maximize a cumulative reward. It learns from trial and error, much like training a pet with treats. Click to explore concepts like agents, environments, and rewards.</p>",
+      "children": [],
+      "subModule": "modules/ai/ml/reinforcement.json"
     },
     "semi-supervised": {
       "id": "semi-supervised",

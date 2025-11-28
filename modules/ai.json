@@ -7,7 +7,7 @@
       "id": "root",
       "title": "Artificial Intelligence",
       "content": "<h2>Artificial Intelligence (AI)</h2><p>The theory and development of computer systems able to perform tasks that normally require human intelligence, such as visual perception, speech recognition, decision-making, and translation between languages.</p>",
-      "children": ["history", "ml", "applications", "ethics", "paradigms", "programming"],
+      "children": ["history", "ml", "applications", "ethics", "programming"],
       "quiz": [
         {
           "question": "What is the core concept of Artificial Intelligence?",
@@ -46,13 +46,6 @@
       "content": "<h3>AI Ethics</h3><p>The ethical considerations surrounding the development and deployment of AI are crucial. Click to learn more about bias, privacy, and autonomy.</p>",
       "children": [],
       "subModule": "modules/ai/ethics.json"
-    },
-    "paradigms": {
-      "id": "paradigms",
-      "title": "Learning Paradigms",
-      "content": "<h3>Learning Paradigms</h3><p>Beyond the main types of ML, there are other important learning strategies and concepts. Click to explore.</p>",
-      "children": [],
-      "subModule": "modules/ai/learning-paradigms.json"
     },
     "programming": {
       "id": "programming",

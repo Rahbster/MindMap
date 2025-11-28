@@ -12,6 +12,29 @@ import { ToastManager } from './ToastManager.js';
 document.addEventListener('DOMContentLoaded', () => {
     class MindMapApp {
         constructor() {
+            /**
+             * Logs detailed diagnostic information about the MindMap state to the console.
+             * @param {string} source - The origin of the event (e.g., 'Node Click', 'Breadcrumb Click').
+             * @param {string} nodeId - The ID of the selected node.
+             */
+            this.logDiagnostics = (source, nodeId) => {
+                const nodeData = this.state.mindMapData?.nodes[nodeId];
+                const svgElement = this.mindmapContainer.querySelector('svg');
+
+                console.group(`[MindMap Diagnostics] - Event Source: ${source}`);
+                console.log(`Timestamp: ${new Date().toISOString()}`);
+                console.log(`🔹 Selected Node ID: ${nodeId}`);
+                console.log('🔹 Selected Node Data:', nodeData);
+
+                if (svgElement) {
+                    const transform = this.state.mindMapData; // Pan/zoom are on the data object
+                    console.group("SVG Transform State (at time of click)");
+                    console.log(`Pan (x, y): (${transform.pan.x.toFixed(2)}, ${transform.pan.y.toFixed(2)})`);
+                    console.log(`Zoom (k): ${transform.zoom.toFixed(2)}`);
+                    console.groupEnd();
+                }
+                console.groupEnd();
+            };
             this.stateManager = new StateManager();
             this.state = this.stateManager.getState();
 
@@ -101,7 +124,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
             this.uiManager = new UIManager(this.state, {
                 onModuleSelect: (path) => this.moduleLoader.loadModuleAndResetStack(path),
-                onBreadcrumbClick: (index) => this.moduleLoader.navigateToStackIndex(index),
+                onBreadcrumbClick: (index, modulePath) => {
+                    this.logDiagnostics('Breadcrumb Click', 'root');
+                    // The index from the UI represents the desired position in the stack.
+                    // We navigate back by slicing the stack and then loading the target module.
+                    this.moduleLoader.navigateToStackIndex(index, modulePath);
+                },
                 onSearch: (term) => this.searchHandler.performSearch(term),
                 onSearchResultClick: (nodeId, modulePath) => {
                     // Find the path of the currently loaded module from the available modules list for a reliable comparison.
@@ -166,9 +194,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const hadPositions = this.state.mindMapData.positions && Object.keys(this.state.mindMapData.positions).length > 0;
 
             const baseFontSize = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--mindmap-font-size')) || 24;
-            this.state.mindMapData.positions = this.state.mindMapData.positions || {};
-            this.state.mindMapData.pan = this.state.mindMapData.pan || { x: 0, y: 0 };
-            this.state.mindMapData.zoom = this.state.mindMapData.zoom || 1;
 
             this.renderer.render(
                 this.state.mindMapData,
@@ -200,19 +225,22 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         selectNode(nodeId) {
+            // --- DIAGNOSTIC LOGGING ---
+            this.logDiagnostics('Node Click', nodeId);
+
             const node = this.state.mindMapData.nodes[nodeId];
             if (node.subModule) {
                 // This is a sub-module navigation.
-                // To prevent duplicates, only push the current module if it's not already at the top of the stack.
-                const stackTop = this.state.moduleStack[this.state.moduleStack.length - 1];
                 // CRITICAL FIX: Save the current module's state (with its new positions) before navigating away.
                 this.stateManager.saveModuleToStorage();
                 
-                // Push only the identifier for the current module, not the full data object.
-                // This prevents stale data from being stored in the stack.
-                this.state.moduleStack.push({ name: this.state.mindMapData.name, path: this.state.mindMapData.path });
+                // When navigating forward, the current module becomes part of the history.
+                // The stack should represent the path taken, so we ensure the current module is the last thing on it
+                // before adding the new one. The ModuleLoader will handle adding the new module to the stack upon load.
+                // The key is to NOT reset the stack here.
+                // The existing `loadModule` logic correctly adds the current module to the stack.
                 
-                this.moduleLoader.loadModule(node.subModule); // Then load the new one.
+                this.moduleLoader.loadModule(node.subModule, null, false); // Then load the new one, indicating forward navigation.
             } else {
                 this.setActiveNode(nodeId);
             }

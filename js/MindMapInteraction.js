@@ -91,6 +91,9 @@ export class MindMapInteraction {
             } else {
                 this.callbacks.onDragEnd();
             }
+        } else if (this.isPanning) {
+            // If we were panning the background, save the final state.
+            this.callbacks.onDragEnd();
         }
         this.isDraggingNode = false;
         this.draggedNodeId = null;

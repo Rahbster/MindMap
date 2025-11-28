@@ -26,12 +26,25 @@ export class ModuleLoader {
         }
     }
 
-    async loadModule(moduleSource, onComplete) {
+    async loadModule(moduleSource, onComplete, isNavigatingBack = false) {
         try {
             const newModuleData = await this.getModuleData(moduleSource);
             if (!newModuleData) throw new Error("Module data could not be retrieved.");
+
+            // Only update the history stack on forward navigation.
+            // On backward navigation, the stack has already been managed by navigateToStackIndex.
+            if (!isNavigatingBack && this.state.mindMapData && this.state.mindMapData.path) {
+                this.stateManager.saveModuleToStorage();
+                this.state.moduleStack.push({ name: this.state.mindMapData.name, path: this.state.mindMapData.path });
+            }
             
             this.state.mindMapData = newModuleData;
+
+            // Ensure pan, zoom, and positions are initialized if they don't exist on the loaded data.
+            this.state.mindMapData.pan = this.state.mindMapData.pan || { x: 0, y: 0 };
+            this.state.mindMapData.zoom = this.state.mindMapData.zoom || 1;
+            this.state.mindMapData.positions = this.state.mindMapData.positions || {};
+
             this.state.mindMapData.path = typeof moduleSource === 'string' ? moduleSource : null;
             this.callbacks.onModuleLoaded();
             if (onComplete) onComplete(); // Execute the callback after loading is done.
@@ -46,17 +59,16 @@ export class ModuleLoader {
         this.callbacks.onMenuClose();
     }
 
-    navigateToStackIndex(index) {
+    navigateToStackIndex(index, modulePath) {
         // Save the state of the current module before navigating away.
         this.stateManager.saveModuleToStorage();
 
-        // Get the module data for the breadcrumb link that was clicked.
-        const targetModule = this.state.moduleStack[index];
         // Truncate the stack to the level of the clicked breadcrumb.
+        // The `index` corresponds to the position in the stack we want to return to.
         this.state.moduleStack = this.state.moduleStack.slice(0, index);
 
         // Reload the target module. The stack is now in the correct state.
-        this.loadModule(targetModule.path);
+        this.loadModule(modulePath, null, true); // Pass true for isNavigatingBack
     }
 
     saveModuleToFile() {

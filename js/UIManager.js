@@ -332,8 +332,8 @@ export class UIManager {
 
                 a.addEventListener('click', (e) => {
                     e.preventDefault();
-                    // Correctly call the breadcrumb-specific callback with the stack index.
-                    this.callbacks.onBreadcrumbClick(index);
+                    // Pass the index and the module path for more robust navigation.
+                    this.callbacks.onBreadcrumbClick(index, crumb.modulePath);
                 });
 
                 li.appendChild(a);

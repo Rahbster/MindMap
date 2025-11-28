@@ -85,37 +85,25 @@ export class BreadcrumbManager {
      * @returns {Promise<Array<object>>} A promise that resolves to an array of breadcrumb segment objects.
      */
     async generateBreadcrumbs(targetNodeId, targetModulePath) {
-        let fullBreadcrumbPath = [];
-        let currentModulePath = targetModulePath;
-        let currentNodeId = targetNodeId;
+        // The moduleStack is the source of truth for the navigation history.
+        const history = this.moduleLoader.state.moduleStack;
+        const currentModuleData = await this.moduleLoader.getModuleData(targetModulePath);
+        if (!currentModuleData) return [];
 
-        while (currentModulePath) {
-            const currentModuleData = await this.moduleLoader.getModuleData(currentModulePath);
-            if (!currentModuleData) break; // Stop if a module fails to load
-            const pathWithinModule = this._findPathWithinModule(currentModuleData, currentNodeId);
+        // The breadcrumb trail consists of the modules in the history stack...
+        const breadcrumbs = history.map(moduleInStack => ({
+            title: moduleInStack.name,
+            nodeId: 'root', // When navigating back to a module, we always go to its root.
+            modulePath: moduleInStack.path
+        }));
 
-            if (pathWithinModule) {
-                const breadcrumbSegments = pathWithinModule.map(node => ({
-                    title: node.title,
-                    nodeId: node.id,
-                    modulePath: currentModulePath
-                }));
-                fullBreadcrumbPath = [...breadcrumbSegments, ...fullBreadcrumbPath];
-            }
-
-            const parentInfo = await this._findModuleParent(currentModulePath);
-
-            if (parentInfo) {
-                currentModulePath = parentInfo.parentModulePath;
-                currentNodeId = parentInfo.parentNodeId;
-            } else {
-                currentModulePath = null;
-            }
-        }
-
-        // Clean up duplicates where a parent node and a child module's root have the same title
-        return fullBreadcrumbPath.filter((item, index, arr) => {
-            return index === 0 || item.title !== arr[index - 1].title;
+        // ...plus the current module itself.
+        breadcrumbs.push({
+            title: currentModuleData.name,
+            nodeId: 'root',
+            modulePath: targetModulePath
         });
+
+        return breadcrumbs;
     }
 }
