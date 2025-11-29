@@ -49,32 +49,32 @@ export class BreadcrumbManager {
      * @returns {Promise<object|null>} A promise that resolves to an object { parentModulePath, parentNodeId } or null.
      */
     async _findModuleParent(childModulePath) {
-        // Infer the parent directory from the child's path
-        const parentDir = childModulePath.substring(0, childModulePath.lastIndexOf('/'));
-        if (!parentDir || parentDir === 'modules') { // Reached the top level directory
-            return null;
-        }
-
-        // The convention is that the parent JSON file has the same name as its directory
-        const parentModulePath = `${parentDir}.json`;
-
-        if (this.allModulePaths.includes(parentModulePath)) {
+        // To find the parent, we must iterate through all available modules
+        // and check if any of their nodes link to the child module.
+        for (const potentialParentPath of this.allModulePaths) {
+            // A module cannot be its own parent.
+            if (potentialParentPath === childModulePath) {
+                continue;
+            }
+            
             try {
-                const parentModuleData = await this.moduleLoader.getModuleData(parentModulePath);
-                if (!parentModuleData) return null;
-                // Search the nodes in the parent module
-                for (const nodeId in parentModuleData.nodes) {
-                    const node = parentModuleData.nodes[nodeId];
-                    // Find the node that links to our child module
-                    if (node.subModule === childModulePath) {
-                        return { parentModulePath, parentNodeId: nodeId };
+                const parentModuleData = await this.moduleLoader.getModuleData(potentialParentPath);
+                if (parentModuleData && parentModuleData.nodes) {
+                    // Search the nodes in the potential parent module
+                    for (const nodeId in parentModuleData.nodes) {
+                        const node = parentModuleData.nodes[nodeId];
+                        // If we find a node that links to our child module, we've found the parent.
+                        if (node.subModule === childModulePath) {
+                            return { parentModulePath: potentialParentPath, parentNodeId: nodeId };
+                        }
                     }
                 }
             } catch (error) {
-                console.error(`Error loading or parsing parent module ${parentModulePath}:`, error);
-                return null;
+                // This can happen if a module path is invalid, so we log it but continue searching.
+                console.warn(`Error checking potential parent module ${potentialParentPath}:`, error);
             }
         }
+
         return null; // No parent found
     }
 
@@ -85,25 +85,54 @@ export class BreadcrumbManager {
      * @returns {Promise<Array<object>>} A promise that resolves to an array of breadcrumb segment objects.
      */
     async generateBreadcrumbs(targetNodeId, targetModulePath) {
-        // The moduleStack is the source of truth for the navigation history.
-        const history = this.moduleLoader.state.moduleStack;
+        let history = this.moduleLoader.state.moduleStack;
+
+        // If the history is empty (e.g., after a search jump), we must rebuild it.
+        if (history.length === 0 && targetModulePath) {
+            const moduleHierarchy = [];
+            let currentPath = targetModulePath;
+            while (currentPath) {
+                const parentInfo = await this._findModuleParent(currentPath);
+                if (parentInfo) {
+                    const parentModuleData = await this.moduleLoader.getModuleData(parentInfo.parentModulePath);
+                    if (parentModuleData) {
+                        moduleHierarchy.unshift({ name: parentModuleData.name, path: parentInfo.parentModulePath });
+                    }
+                    currentPath = parentInfo.parentModulePath;
+                } else {
+                    currentPath = null; // Reached the top or no parent found
+                }
+            }
+            history = moduleHierarchy;
+            // CRITICAL FIX: After rebuilding the history, we must update the application's
+            // actual state so that subsequent breadcrumb clicks work correctly.
+            this.moduleLoader.state.moduleStack = history;
+        }
+
         const currentModuleData = await this.moduleLoader.getModuleData(targetModulePath);
         if (!currentModuleData) return [];
 
-        // The breadcrumb trail consists of the modules in the history stack...
-        const breadcrumbs = history.map(moduleInStack => ({
+        // 1. Build the breadcrumbs from the module navigation history (either existing or rebuilt).
+        let breadcrumbs = history.map(moduleInStack => ({
             title: moduleInStack.name,
             nodeId: 'root', // When navigating back to a module, we always go to its root.
             modulePath: moduleInStack.path
         }));
 
-        // ...plus the current module itself.
-        breadcrumbs.push({
-            title: currentModuleData.name,
-            nodeId: 'root',
-            modulePath: targetModulePath
-        });
+        const pathWithinModule = this._findPathWithinModule(currentModuleData, targetNodeId);
 
-        return breadcrumbs;
+        if (pathWithinModule) {
+            // 3. Convert the nodes in that path to breadcrumb segments and add them.
+            // This correctly includes the module name itself (as the root of the path)
+            // and any child nodes.
+            const intraModuleCrumbs = pathWithinModule.map(node => ({
+                title: node.title,
+                nodeId: node.id,
+                modulePath: targetModulePath // All these crumbs are in the same module.
+            }));
+            breadcrumbs = breadcrumbs.concat(intraModuleCrumbs);
+        }
+
+        return breadcrumbs; // Return the final combined breadcrumb trail.
     }
 }
