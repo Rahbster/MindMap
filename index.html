@@ -6,7 +6,6 @@
     <meta name="theme-color" content="#3498db" />
     <title>MindMap Knowledge System</title>
     <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/quiz.css">
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" href="icons/icon-192x192.png">
     <!-- Quill Rich Text Editor -->
@@ -23,14 +22,13 @@
             <!-- Search results will appear here -->
         </div>
         <hr>
-        <div class="theme-switcher-container">
-            <label for="theme-switch" class="theme-label">Dark Mode</label>
-            <label class="switch">
-                <input type="checkbox" id="theme-switch">
-                <span class="slider round"></span>
+        <div class="theme-toggle-container menu-item">
+            <label class="toggle" for="theme-toggle-checkbox">
+                <span class="toggle-label">Dark Mode</span>
+                <input class="toggle-checkbox" type="checkbox" id="theme-toggle-checkbox">
+                <div class="toggle-switch"></div>
             </label>
         </div>
-        <hr>
         <h2>Load Module</h2>
         <div id="module-loader">
             <!-- Module links will be populated here -->

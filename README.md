@@ -38,29 +38,6 @@ A dynamic, interactive Progressive Web App (PWA) for creating, navigating, and l
 *   **Rich Text Editing**: Quill.js
 *   **Offline Capabilities**: Service Workers
 
-## 📂 Project Structure & Architecture
-
-```
-MindMap/
-├── css/
-│   └── style.css         # Main stylesheet
-├── js/
-│   ├── main.js           # Main application orchestrator
-│   ├── MindMapRenderer.js  # Handles all SVG drawing and layout
-│   ├── MindMapInteraction.js # Manages pan, zoom, and drag events
-│   ├── UIManager.js        # Controls UI elements (side panel, modals, etc.)
-│   ├── ToastManager.js     # Manages non-intrusive "toast" notifications
-│   ├── NodeManager.js      # Manages node creation, editing, and deletion
-│   └── quiz.js           # Logic for the adaptive quizzing system
-├── modules/
-│   └── *.json            # Data files for each knowledge module
-├── icons/
-│   └── *.png             # PWA icons
-├── index.html
-├── manifest.json         # PWA manifest
-└── sw.js                 # Service Worker for offline caching
-```
-
 ## 🚀 How to Run Locally
 
 1.  Ensure all the project files are in a single directory.
@@ -89,6 +66,21 @@ MindMap/
 *   **Organize & Save**:
     *   Click the "Arrange" button (grid icon) in the map panel to reset all nodes to their default positions.
     *   Click the "Save" button (download icon) to save the current module, including all your edits and custom positions, to a `.json` file.
+
+## 🧠 Available Knowledge Modules
+
+The application comes pre-loaded with a rich set of modules covering various technology domains. The main topics include:
+
+*   **Artificial Intelligence**:
+    *   Core Concepts & History
+    *   Machine Learning Paradigms (Supervised, Unsupervised, Deep Learning)
+    *   Real-World Applications (Healthcare, Finance, etc.)
+    *   AI Ethics
+    *   Programming with AI (Python, C#/.NET, JS)
+*   **Modern Web Development**:
+    *   Core Concepts (HTML, CSS)
+*   **.NET Development**:
+    *   The Blazor Framework & Razor Syntax
 
 ### 🤖 Development with AI Assistance
 

@@ -1,0 +1,58 @@
+/* === GoldFin-style Toggle Switch CSS === */
+.toggle {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.toggle-label {
+    font-size: 0.9rem;
+    /* The color is now handled by a more specific rule in sidenav.css */
+}
+
+.toggle-checkbox {
+    display: none; /* Hide the default checkbox */
+}
+
+.toggle-switch {
+  display: inline-block;
+  background: var(--toggle-bg, #ccc); /* Use variable with fallback */
+  border-radius: 16px;
+  width: 58px;
+  height: 32px;
+  position: relative;
+  vertical-align: middle;
+  transition: background 0.2s;
+}
+
+.toggle-switch::before {
+  content: "";
+  display: block;
+  /* Use the image for the toggle knob */
+  background-image: url('../../icons/toggle.png'); /* Adjusted path for components folder */
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  width: 24px;
+  height: 24px;
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  transition: left 0.2s, transform 0.2s, filter 0.2s;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.3));
+}
+
+.toggle:hover .toggle-switch::before {
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.4));
+}
+
+.toggle-checkbox:checked + .toggle-switch {
+    background-color: var(--toggle-bg-checked, #2196F3); /* Use variable with fallback */
+}
+
+.toggle-checkbox:checked + .toggle-switch::before {
+    left: 30px;
+    transform: scaleX(-1); /* Flip the image horizontally */
+    filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.7));
+}

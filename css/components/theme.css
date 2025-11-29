@@ -14,7 +14,7 @@ body.dark-mode .sidenav {
 }
 
 body.dark-mode .sidenav a, body.dark-mode .sidenav button, body.dark-mode .theme-label {
-    color: #9a9a9a;
+    color: #9a9a9a; /* Revert this line, as it was not the correct target */
 }
 body.dark-mode .sidenav a:hover, body.dark-mode .sidenav button:hover {
     color: #e0e0e0;
@@ -119,4 +119,9 @@ body.dark-mode .quiz-option {
 
 body.dark-mode .quiz-option:hover:not(:disabled) {
     background-color: #444c56; /* A slightly lighter hover state */
+}
+
+/* New, more specific rule to fix the toggle label color in dark mode */
+body.dark-mode .sidenav .toggle-label {
+    color: var(--text-color);
 }

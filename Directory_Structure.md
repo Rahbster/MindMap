@@ -10,9 +10,10 @@ MindMap/
 │   │   ├── mindmap.css
 │   │   ├── modals.css
 │   │   ├── sidenav.css
-│   │   └── theme.css
+│   │   ├── toggle.css
+│   │   ├── theme.css
+│   │   └── quiz.css
 │   ├── base.css
-│   ├── quiz.css
 │   └── style.css
 ├── icons/
 │   ├── icon-192x192.png

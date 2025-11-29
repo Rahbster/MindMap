@@ -134,8 +134,16 @@ export class UIManager {
         this.readmeSearchInput.addEventListener('input', () => this.performReadmeSearch());
         
         // Theme switcher
-        document.getElementById('theme-switch').addEventListener('change', (e) => {
-            this.setTheme(e.target.checked ? 'dark' : 'light');
+        const themeToggle = document.getElementById('theme-toggle-checkbox');
+        if (themeToggle) {
+            themeToggle.addEventListener('change', (e) => {
+                this.setTheme(e.target.checked ? 'dark' : 'light');
+            });
+        }
+
+        // Reset Modal Listeners
+        document.getElementById('open-reset-modal-btn').addEventListener('click', () => {
+            this.resetModal.classList.remove('hidden');
         });
 
         // Reset Modal Listeners
@@ -583,12 +591,17 @@ export class UIManager {
     }
 
     setTheme(theme) {
+        const themeToggle = document.getElementById('theme-toggle-checkbox');
+        const themeLabel = document.querySelector('.toggle-label');
+
         if (theme === 'dark') {
             document.body.classList.add('dark-mode');
-            document.getElementById('theme-switch').checked = true;
+            if (themeToggle) themeToggle.checked = true;
+            if (themeLabel) themeLabel.textContent = 'Dark Mode'; // Set text to current mode
         } else {
             document.body.classList.remove('dark-mode');
-            document.getElementById('theme-switch').checked = false;
+            if (themeToggle) themeToggle.checked = false;
+            if (themeLabel) themeLabel.textContent = 'Light Mode'; // Set text to current mode
         }
         localStorage.setItem(this.THEME_KEY, theme);
     }

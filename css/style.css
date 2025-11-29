@@ -1,8 +1,9 @@
 /* Import all stylesheets */
 @import url('base.css');
-@import url('quiz.css');
 @import url('components/sidenav.css');
 @import url('components/mindmap.css');
 @import url('components/content.css');
 @import url('components/modals.css');
+@import url('components/toggle.css');
 @import url('components/theme.css');
+@import url('components/quiz.css');

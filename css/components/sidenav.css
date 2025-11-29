@@ -27,6 +27,14 @@
     cursor: pointer;
 }
 
+/* 
+ * Final Fix: Set the toggle label color to be consistent with other
+ * text in the always-dark side navigation panel.
+*/
+.sidenav .toggle-label {
+    color: #bdc3c7;
+}
+
 .sidenav a:hover, .sidenav button:hover {
     color: #ffffff;
 }

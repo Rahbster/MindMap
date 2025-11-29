@@ -58,6 +58,9 @@ export class MindMapInteraction {
     }
 
     handlePanMove(event) {
+        // Guard clause: Don't do anything if the data isn't loaded yet.
+        if (!this.state.mindMapData) return;
+
         if (this.isDraggingNode && this.draggedNodeId) {
             // CRITICAL FIX: Always use the main container's SVG for consistent coordinate transformations,
             // not event.target, which can be inconsistent between mouse and mocked touch events.
