@@ -6,14 +6,6 @@
     user-select: none;
 }
 
-.map-controls .icon-button {
-    /* Prevent iOS from showing the copy/paste menu on long press */
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    user-select: none;
-}
-
 .map-controls {
     position: absolute;
     top: 1.5rem;
@@ -106,25 +98,6 @@
 /* Add a shadow to child nodes */
 .is-child-node {
     filter: drop-shadow(3px 3px 3px rgba(0, 0, 0, 0.4));
-}
-
-/* Make the Quiz Editor dialog taller and its content scrollable */
-#quiz-editor-modal .modal-content {
-    min-height: 70vh; /* Use 70% of the viewport height */
-    display: flex;
-    flex-direction: column;
-}
-
-#quiz-editor-container {
-    flex-grow: 1; /* Allow the container to fill the available space */
-    overflow-y: auto; /* Add a scrollbar if content overflows */
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    /* margin-bottom is removed to allow flex-grow to work correctly */
-}
-.modal-buttons {
-    margin-top: 1rem; /* Add margin to the top of the button container instead */
 }
 
 /* Style for nodes that link to a sub-module */

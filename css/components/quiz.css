@@ -1,4 +1,4 @@
-.quiz-option {
+ .quiz-option {
     color: var(--text-color);
     padding: 0.6em 1.2em;
     border-radius: var(--border-radius);
@@ -10,9 +10,6 @@
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     width: 100%;
     text-align: left;
-}
-
-.quiz-option {
     background-color: #f0f2f5; /* A slightly darker, more visible grey for light mode */
     border: 1px solid #ddd;
 }
@@ -34,13 +31,9 @@
 
 /* Styles moved from style.css */
 #quiz-container {
-    font-size: var(--dynamic-font-size);
-    margin-top: 2rem;
-    border-top: 2px solid #eee;
-    padding-top: 1.5rem;
-}
-
-#quiz-container {
+    font-size: var(--dynamic-font-size); /* Use the global font size variable */
+    margin-top: 2rem; /* Add space above the quiz section */
+    padding-top: 1.5rem; /* Add padding inside the top border */
     background-color: var(--background-color-light);
     border-top: 1px solid var(--border-color);
     padding: 1rem;

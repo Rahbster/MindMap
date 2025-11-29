@@ -10,7 +10,6 @@ const urlsToCache = [
     './css/components/modals.css',
     './css/components/sidenav.css',
     './css/components/toggle.css',
-    './css/components/toggle.css',
     './css/components/theme.css',
     './js/main.js',
     './js/QuizManager.js',

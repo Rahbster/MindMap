@@ -76,11 +76,30 @@
     font-weight: bold;
 }
 
+/* Make the Quiz Editor dialog taller and its content scrollable */
+#quiz-editor-modal .modal-content {
+    min-height: 70vh; /* Use 70% of the viewport height */
+}
+
+#quiz-editor-container {
+    flex-grow: 1; /* Allow the container to fill the available space */
+    overflow-y: auto; /* Add a scrollbar if content overflows */
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    /* margin-bottom is removed to allow flex-grow to work correctly */
+}
+
+/*
+ * This rule was defined in two places (here and mindmap.css).
+ * It is now consolidated here.
+*/
 .modal-buttons {
-    margin-top: 1rem;
+    margin-top: 1rem; /* Add margin to the top of the button container instead */
     display: flex;
     gap: 1rem;
 }
+
 
 /* ReadMe Modal Styles */
 .readme-content {
