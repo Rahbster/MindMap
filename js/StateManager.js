@@ -26,9 +26,20 @@ export class StateManager {
         }
     }
 
-    getModuleFromStorage(moduleId) {
+    getModuleFromStorage(moduleId, availableModules) {
         const key = `mindmap-module-${moduleId}`;
         const savedDataString = localStorage.getItem(key);
-        return savedDataString ? JSON.parse(savedDataString) : null;
+        if (!savedDataString) return null;
+
+        const savedModule = JSON.parse(savedDataString);
+
+        // CRITICAL FIX: If the saved module doesn't have a path (e.g., from an old save or file upload),
+        // find its original path from the master list of available modules. This is essential for
+        // breadcrumb navigation to function correctly.
+        if (!savedModule.path) {
+            const moduleInfo = availableModules.find(m => m.path.includes(`${moduleId}.json`));
+            if (moduleInfo) savedModule.path = moduleInfo.path;
+        }
+        return savedModule;
     }
 }

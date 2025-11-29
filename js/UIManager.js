@@ -306,12 +306,14 @@ export class UIManager {
     }
 
     updateActiveModuleInLoader() {
-        const currentModule = this.state.moduleStack[this.state.moduleStack.length - 1];
-        if (!currentModule) return;
+        // When loading from the side menu, the moduleStack is cleared, so we can't rely on it.
+        // The true source of truth for the currently loaded module is the `path` property on the data itself.
+        const currentModulePath = this.state.mindMapData?.path;
+        if (!currentModulePath) return;
 
         const links = this.moduleLoaderEl.querySelectorAll('a');
         links.forEach(link => {
-            if (link.dataset.path === currentModule.path) {
+            if (link.dataset.path === currentModulePath) {
                 link.classList.add('active-module');
             } else {
                 link.classList.remove('active-module');

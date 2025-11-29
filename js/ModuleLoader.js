@@ -16,7 +16,7 @@ export class ModuleLoader {
         try {
             if (typeof moduleSource === 'string') {
                 const moduleId = moduleSource.split('/').pop().replace('.json', '');
-                const savedModule = this.stateManager.getModuleFromStorage(moduleId);
+                const savedModule = this.stateManager.getModuleFromStorage(moduleId, this.availableModules);
                 return savedModule ? savedModule : await (await fetch(moduleSource)).json();
             }
             return moduleSource; // It's already an object
@@ -55,8 +55,12 @@ export class ModuleLoader {
     }
 
     loadModuleAndResetStack(modulePath, onComplete) {
-        this.state.moduleStack.length = 0;
-        this.loadModule(modulePath, onComplete, { isNewStack: true });
+        // The stack is cleared, and then the new module is loaded.
+        // The `loadModule` function will see `isNewStack: true` and won't push the *previous* module.
+        // However, the stack will be empty when `onModuleLoaded` fires.
+        // We need to manually set the stack to contain just the new module.
+        this.state.moduleStack.length = 0; // Clear the history
+        this.loadModule(modulePath, onComplete, { isNewStack: true }); // Load the new module
         this.callbacks.onMenuClose();
     }
 
