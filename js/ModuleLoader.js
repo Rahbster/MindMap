@@ -26,14 +26,15 @@ export class ModuleLoader {
         }
     }
 
-    async loadModule(moduleSource, onComplete, isNavigatingBack = false) {
+    async loadModule(moduleSource, onComplete, { isNavigatingBack = false, isNewStack = false } = {}) {
         try {
             const newModuleData = await this.getModuleData(moduleSource);
             if (!newModuleData) throw new Error("Module data could not be retrieved.");
 
             // Only update the history stack on forward navigation.
             // On backward navigation, the stack has already been managed by navigateToStackIndex.
-            if (!isNavigatingBack && this.state.mindMapData && this.state.mindMapData.path) {
+            // Also, do not push to the stack if we are starting a fresh one (e.g., from the side menu).
+            if (!isNavigatingBack && !isNewStack && this.state.mindMapData && this.state.mindMapData.path) {
                 this.stateManager.saveModuleToStorage();
                 this.state.moduleStack.push({ name: this.state.mindMapData.name, path: this.state.mindMapData.path });
             }
@@ -55,7 +56,7 @@ export class ModuleLoader {
 
     loadModuleAndResetStack(modulePath, onComplete) {
         this.state.moduleStack.length = 0;
-        this.loadModule(modulePath, onComplete);
+        this.loadModule(modulePath, onComplete, { isNewStack: true });
         this.callbacks.onMenuClose();
     }
 
@@ -68,7 +69,7 @@ export class ModuleLoader {
         this.state.moduleStack = this.state.moduleStack.slice(0, index);
 
         // Reload the target module. The stack is now in the correct state.
-        this.loadModule(modulePath, null, true); // Pass true for isNavigatingBack
+        this.loadModule(modulePath, null, { isNavigatingBack: true }); // Pass true for isNavigatingBack
     }
 
     saveModuleToFile() {

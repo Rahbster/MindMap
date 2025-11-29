@@ -240,7 +240,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // The key is to NOT reset the stack here.
                 // The existing `loadModule` logic correctly adds the current module to the stack.
                 
-                this.moduleLoader.loadModule(node.subModule, null, false); // Then load the new one, indicating forward navigation.
+                this.moduleLoader.loadModule(node.subModule); // Then load the new one, indicating forward navigation.
             } else {
                 this.setActiveNode(nodeId);
             }
