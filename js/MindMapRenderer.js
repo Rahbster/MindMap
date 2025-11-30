@@ -6,6 +6,12 @@ export class MindMapRenderer {
         this.svg = null;
         this.starLayers = [];
         this.viewportG = null;
+
+        // --- CONFIGURABLE GRID PARAMETERS ---
+        this.GRID_SIZE = 50; // The distance between grid lines.
+        this.GRID_STRENGTH = 0.02; // How strongly nodes are pulled to the grid. Keep this value low.
+
+        this._injectStyles();
     }
 
     render(mindMapData, positions, baseFontSize, nodeMouseDownCallback) {
@@ -237,6 +243,19 @@ export class MindMapRenderer {
                         nodeB._ui.fy += (avgY - posB.y) * K_ALIGN;
                     }
                 }
+            }
+
+            // --- Grid Attraction Force ---
+            // Gently pulls each node towards the nearest point on a hidden grid.
+            for (const node of nodes) {
+                // We can exclude the root node to let it center more freely if desired.
+                if (node.id === 'root') continue;
+
+                const pos = positions[node.id];
+                const nearestGridX = Math.round(pos.x / this.GRID_SIZE) * this.GRID_SIZE;
+                const nearestGridY = Math.round(pos.y / this.GRID_SIZE) * this.GRID_SIZE;
+                node._ui.fx += (nearestGridX - pos.x) * this.GRID_STRENGTH;
+                node._ui.fy += (nearestGridY - pos.y) * this.GRID_STRENGTH;
             }
 
             // 2. Apply Forces and Update Positions
@@ -558,5 +577,33 @@ export class MindMapRenderer {
             pan: this.currentPan,
             zoom: this.currentZoom
         };
+    }
+
+    /**
+     * Injects the necessary CSS for styling mind map elements, like sub-module nodes.
+     * This makes the component self-contained.
+     * @private
+     */
+    _injectStyles() {
+        const styleId = 'mindmap-renderer-styles';
+        if (document.getElementById(styleId)) return;
+
+        const style = document.createElement('style');
+        style.id = styleId;
+        style.innerHTML = `
+            /* Style for nodes that link to a sub-module */
+            .node-group.has-submodule .node-circle {
+                fill: var(--submodule-node-bg, var(--node-bg-color-alt));
+                stroke: var(--submodule-node-stroke, var(--accent-color));
+                stroke-width: 3px;
+                transition: stroke-width 0.2s ease-in-out;
+            }
+
+            /* Add a hover effect to make them more interactive */
+            .node-group.has-submodule:hover .node-circle {
+                stroke-width: 5px;
+            }
+        `;
+        document.head.appendChild(style);
     }
 }
