@@ -66,109 +66,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 },
             });
 
-            // Initialize ModuleLoader first, as it's needed for discovery.
-            this.moduleLoader = new ModuleLoader(this.stateManager, this.availableModules, this.storageManager, {
-                onModuleLoaded: () => {
-                    this.quizManager.setMindMapData(this.state.mindMapData);
-                    this.renderMindMap();
-                    // After rendering, generate breadcrumbs for the root of the new module.
-                    this.searchHandler.callbacks.onGenerateBreadcrumbs('root', this.state.mindMapData.path);
-                    this.uiManager.updateOnModuleLoad();
-                    this.setActiveNode('root');
-                },
-                onModuleCreated: (newModule) => {
-                    // This callback now receives the metadata for the new local module
-                    const userModulesString = localStorage.getItem('mindmap-user-modules') || '[]';
-                    const userModules = JSON.parse(userModulesString);
-                    userModules.push(newModule);
-                    localStorage.setItem('mindmap-user-modules', JSON.stringify(userModules));
-
-                    // Add the newly created module to the application's master list
-                    this.availableModules.push(newModule);
-                    // Repopulate the UI list to show the new module
-                    this.uiManager.populateModuleLoader(this.availableModules);
-                    this.toastManager.show(`Module '${newModule.name}' created and added to list.`, 'success');
-                },
-                onModulesLinked: (linkedModules) => {
-                    // 1. Save the manifest of the *new* linked modules.
-                    const newModuleManifest = linkedModules.map(m => ({ name: m.name, path: m.path, isTopLevel: m.isTopLevel, isLocal: m.isLocal })); // isRemote is now implicitly handled by isLocal
-                    localStorage.setItem('mindmap-user-modules', JSON.stringify(newModuleManifest));
-                    
-                    // 2. Rebuild the availableModules list from scratch to prevent duplicates.
-                    // Use a Map to handle deduplication based on the module path.
-                    const moduleMap = new Map();
-                    // Start with base modules, then add the new manifest.
-                    this.baseModules.forEach(m => moduleMap.set(m.path, m));
-                    newModuleManifest.forEach(m => moduleMap.set(m.path, m)); // These are now all isLocal
-                    
-                    this.availableModules = Array.from(moduleMap.values());
-                    
-                    // CRITICAL FIX: Update the ModuleLoader's reference to the new array.
-                    this.moduleLoader.availableModules = this.availableModules;
-
-                    // 3. Repopulate the UI with the fresh list.
-                    // At this point, no content is loaded, just the manifest.
-                    this.uiManager.populateModuleLoader(this.availableModules);
-                    this.toastManager.show(`Successfully linked manifest with ${linkedModules.length} modules.`, 'success');
-                },
-                onSaveSuccess: (message) => {
-                    this.toastManager.show(message, 'success');
-                },
-                onMenuClose: () => this.uiManager.closeMenu(),
-            });
-
-            // --- DYNAMIC MODULE DISCOVERY ---
-            try {
-                const cachedModules = localStorage.getItem('mindmap-discovered-modules');
-                // We no longer load base modules by default. The user must link them.
-                this.baseModules = []; // Initialize as empty.
-                
-                // Load any modules the user has previously linked.
-                const userModulesString = localStorage.getItem('mindmap-user-modules');
-                if (userModulesString) {
-                    this.availableModules.push(...JSON.parse(userModulesString));
-                }
-            } catch (error) {
-                console.error("Fatal Error: Could not initialize application modules.", error);
-                document.body.innerHTML = `<h1>Error</h1><p>Could not load and discover application modules. Please check the console for details and consider resetting the application.</p>`;
-                return;
-            }
-
-            this.nodeManager = new NodeManager(this.state, {
-                onDataUpdate: (resetView = false) => {
-                    this.stateManager.saveModuleToStorage();
-                    if (resetView) {
-                        this.stateManager.setActiveNode(null);
-                        document.getElementById('content-display').innerHTML = `<p>Select a node from the map to view its content.</p>`;
-                        document.getElementById('quiz-container').classList.add('hidden');
-                    }
-                    this.renderMindMap();
-                    this.uiManager.closeMenu();
-                }
-            });
-
-            this.searchHandler = new SearchHandler(this.stateManager, this.availableModules, {
-                onSearchResults: (results) => this.uiManager.renderSearchResults(results),
-                onGoToNode: (nodeId, targetPan, targetZoom) => {
-                    this.renderer.animateToView(targetPan, targetZoom);
-                    this.selectNode(nodeId);
-                    this.uiManager.closeMenu();
-                },
-                getContainerWidth: () => this.mindmapContainer.clientWidth,
-                getContainerHeight: () => this.mindmapContainer.clientHeight,
-                onGenerateBreadcrumbs: async (nodeId, modulePath) => {
-                    try {
-                        const breadcrumbs = await this.breadcrumbManager.generateBreadcrumbs(nodeId, modulePath);
-                        this.uiManager.renderBreadcrumbs(breadcrumbs);
-                    } catch (error) {
-                        console.error("Failed to generate breadcrumbs:", error);
-                    }
-                },
-            });
-
-            // Initialize BreadcrumbManager after module discovery so it has the full list of paths.
-            this.breadcrumbManager = new BreadcrumbManager(this.availableModules.map(m => m.path), this.moduleLoader);
-
             this.uiManager = new UIManager(this.state, {
                 onModuleSelect: (path) => {
                     this.moduleLoader.loadModuleAndResetStack(path);
@@ -237,6 +134,111 @@ document.addEventListener('DOMContentLoaded', () => {
                     this.moduleLoader.linkModulesFromDirectory(); // This will eventually call onModulesLinked.
                 }
             });
+
+            // Initialize ModuleLoader first, as it's needed for discovery.
+            this.moduleLoader = new ModuleLoader(this.stateManager, this.availableModules, this.storageManager, {
+                onModuleLoaded: () => {
+                    this.quizManager.setMindMapData(this.state.mindMapData);
+                    this.renderMindMap();
+                    // After rendering, generate breadcrumbs for the root of the new module.
+                    this.searchHandler.callbacks.onGenerateBreadcrumbs('root', this.state.mindMapData.path);
+                    this.uiManager.updateOnModuleLoad();
+                    this.setActiveNode('root');
+                },
+                onModuleCreated: (newModule) => {
+                    // This callback now receives the metadata for the new local module
+                    const userModulesString = localStorage.getItem('mindmap-user-modules') || '[]';
+                    const userModules = JSON.parse(userModulesString);
+                    userModules.push(newModule);
+                    localStorage.setItem('mindmap-user-modules', JSON.stringify(userModules));
+
+                    // Add the newly created module to the application's master list
+                    this.availableModules.push(newModule);
+                    // Repopulate the UI list to show the new module
+                    this.uiManager.populateModuleLoader(this.availableModules);
+                    this.toastManager.show(`Module '${newModule.name}' created and added to list.`, 'success');
+                },
+                onModulesLinked: (linkedModules) => {
+                    // 1. Save the manifest of the *new* linked modules.
+                    const newModuleManifest = linkedModules.map(m => ({ name: m.name, path: m.path, isTopLevel: m.isTopLevel, isLocal: m.isLocal })); // isRemote is now implicitly handled by isLocal
+                    localStorage.setItem('mindmap-user-modules', JSON.stringify(newModuleManifest));
+                    
+                    // 2. Rebuild the availableModules list from scratch to prevent duplicates.
+                    // Use a Map to handle deduplication based on the module path.
+                    const moduleMap = new Map();
+                    // Start with base modules, then add the new manifest.
+                    this.baseModules.forEach(m => moduleMap.set(m.path, m));
+                    newModuleManifest.forEach(m => moduleMap.set(m.path, m)); // These are now all isLocal
+                    
+                    this.availableModules = Array.from(moduleMap.values());
+                    
+                    // CRITICAL FIX: Update the ModuleLoader's reference to the new array.
+                    this.moduleLoader.availableModules = this.availableModules;
+
+                    // 3. Repopulate the UI with the fresh list.
+                    // At this point, no content is loaded, just the manifest.
+                    this.uiManager.populateModuleLoader(this.availableModules);
+                    this.toastManager.show(`Successfully linked manifest with ${linkedModules.length} modules.`, 'success');
+                },
+                onSaveSuccess: (message) => {
+                    this.toastManager.show(message, 'success');
+                },
+                onMenuClose: () => this.uiManager.closeMenu(),
+            });
+
+            // --- DYNAMIC MODULE DISCOVERY ---
+            try {
+                const cachedModules = localStorage.getItem('mindmap-discovered-modules');
+                // We no longer load base modules by default. The user must link them.
+                this.baseModules = []; // Initialize as empty.
+                
+                // Load any modules the user has previously linked.
+                const userModulesString = localStorage.getItem('mindmap-user-modules');
+                if (userModulesString) {
+                    this.availableModules.push(...JSON.parse(userModulesString));
+                }
+
+            } catch (error) {
+                console.error("Fatal Error: Could not initialize application modules.", error);
+                document.body.innerHTML = `<h1>Error</h1><p>Could not load and discover application modules. Please check the console for details and consider resetting the application.</p>`;
+                return;
+            }
+
+            this.nodeManager = new NodeManager(this.state, {
+                onDataUpdate: (resetView = false) => {
+                    this.stateManager.saveModuleToStorage();
+                    if (resetView) {
+                        this.stateManager.setActiveNode(null);
+                        document.getElementById('content-display').innerHTML = `<p>Select a node from the map to view its content.</p>`;
+                        document.getElementById('quiz-container').classList.add('hidden');
+                    }
+                    this.renderMindMap();
+                    this.uiManager.closeMenu();
+                }
+            });
+
+            this.searchHandler = new SearchHandler(this.stateManager, this.availableModules, {
+                onSearchResults: (results) => this.uiManager.renderSearchResults(results),
+                onGoToNode: (nodeId, targetPan, targetZoom) => {
+                    this.renderer.animateToView(targetPan, targetZoom);
+                    this.selectNode(nodeId);
+                    this.uiManager.closeMenu();
+                },
+                getContainerWidth: () => this.mindmapContainer.clientWidth,
+                getContainerHeight: () => this.mindmapContainer.clientHeight,
+                onGenerateBreadcrumbs: async (nodeId, modulePath) => {
+                    try {
+                        const breadcrumbs = await this.breadcrumbManager.generateBreadcrumbs(nodeId, modulePath);
+                        this.uiManager.renderBreadcrumbs(breadcrumbs);
+                    } catch (error) {
+                        console.error("Failed to generate breadcrumbs:", error);
+                    }
+                },
+            });
+
+            // Initialize BreadcrumbManager after module discovery so it has the full list of paths.
+            this.breadcrumbManager = new BreadcrumbManager(this.availableModules.map(m => m.path), this.moduleLoader);
+
             this.uiManager.callbacks.onStopAutoOrganize = (event) => this.stopAutoOrganize(event);
             this.renderer.callbacks = { onLayoutEnd: () => {
                 // This callback is for when the animation finishes on its own (cools down).
@@ -246,6 +248,11 @@ document.addEventListener('DOMContentLoaded', () => {
             this.uiManager.populateModuleLoader(this.availableModules);
         }
         renderMindMap() {
+            // Hide the welcome message once a map is being rendered.
+            const welcomeMessage = document.getElementById('welcome-message');
+            if (welcomeMessage) {
+                welcomeMessage.classList.add('hidden');
+            }
             if (!this.state.mindMapData) return;
 
             // Check if positions exist before rendering.

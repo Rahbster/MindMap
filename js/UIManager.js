@@ -190,6 +190,9 @@ export class UIManager {
         document.getElementById('reset-clear-linked-btn').addEventListener('click', () => {
             clearLinkedModules();
         });
+        document.getElementById('reset-clear-handle-btn').addEventListener('click', () => {
+            clearDirectoryHandle();
+        });
         this.resetModal.addEventListener('click', (event) => {
             if (event.target === this.resetModal) {
                 this.resetModal.classList.add('hidden');

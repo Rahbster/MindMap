@@ -27,24 +27,7 @@ export class ModuleLoader {
                 if (moduleInfo?.isLocal) {
                     const dirHandle = await this.storageManager.get('linkedDirectoryHandle');
                     if (!dirHandle) throw new Error('Cannot load local module: Directory access was not granted or has been lost.');
-                    
-                    // CRITICAL FIX: Traverse the directory structure to get the correct file handle.
-                    const pathSegments = moduleInfo.path.split('/');
-                    let currentHandle = dirHandle;
-                    for (let i = 0; i < pathSegments.length - 1; i++) {
-                        const segment = pathSegments[i].trim();
-                        if (segment && segment !== '.') {
-                            // CRITICAL FIX: Check if the subdirectory actually exists before trying to access it.
-                            // This handles cases where the user selects a subdirectory of the project.
-                            const subDirExists = await currentHandle.getDirectoryHandle(segment, { create: false }).then(() => true).catch(() => false);
-                            if (subDirExists) {
-                                currentHandle = await currentHandle.getDirectoryHandle(segment);
-                            }
-                            // If the subdirectory doesn't exist, we assume we're already in it and continue.
-                        }
-                    }
-                    const fileName = pathSegments[pathSegments.length - 1];
-                    const fileHandle = await currentHandle.getFileHandle(fileName);
+                    const fileHandle = await this._getLocalFileHandle(dirHandle, moduleInfo.path);
                     const file = await fileHandle.getFile();
                     return JSON.parse(await file.text());
                 } else {
@@ -57,6 +40,30 @@ export class ModuleLoader {
             console.error(`Failed to get module data for:`, moduleSource, error);
             return null;
         }
+    }
+
+    /**
+     * A private helper to traverse a directory handle and get a file handle from a relative path.
+     * @param {FileSystemDirectoryHandle} rootHandle The starting directory handle.
+     * @param {string} relativePath The relative path to the file (e.g., 'modules/ai.json').
+     * @returns {Promise<FileSystemFileHandle>} The handle to the requested file.
+     * @private
+     */
+    async _getLocalFileHandle(rootHandle, relativePath) {
+        const pathSegments = relativePath.split('/');
+        let currentHandle = rootHandle;
+        for (let i = 0; i < pathSegments.length - 1; i++) {
+            const segment = pathSegments[i].trim();
+            if (segment && segment !== '.') {
+                // Check if the subdirectory actually exists before trying to access it.
+                const subDirExists = await currentHandle.getDirectoryHandle(segment, { create: false }).then(() => true).catch(() => false);
+                if (subDirExists) {
+                    currentHandle = await currentHandle.getDirectoryHandle(segment);
+                }
+            }
+        }
+        const fileName = pathSegments[pathSegments.length - 1];
+        return await currentHandle.getFileHandle(fileName);
     }
 
     /**
@@ -294,25 +301,7 @@ export class ModuleLoader {
             // Eagerly read all module content from the selected directory and cache it.
             const newModules = [];
             for (const moduleInfo of localManifest) {
-                // CRITICAL FIX: Traverse the directory structure to get the correct file handle.
-                // The getFileHandle() method does not accept paths with slashes.
-                const pathSegments = moduleInfo.path.split('/');
-                let currentHandle = dirHandle;
-                for (let i = 0; i < pathSegments.length - 1; i++) {
-                    // Handle cases where path segments might be empty or invalid
-                    // This check ensures we only try to get a handle for a non-empty path segment.
-                    const segment = pathSegments[i];
-                    if (segment) {
-                        // CRITICAL FIX: Check if the subdirectory actually exists before trying to access it.
-                        // This handles cases where the user selects a subdirectory of the project.
-                        const subDirExists = await currentHandle.getDirectoryHandle(segment, { create: false }).then(() => true).catch(() => false);
-                        if (subDirExists) {
-                            currentHandle = await currentHandle.getDirectoryHandle(segment);
-                        }
-                    }
-                }
-                const fileName = pathSegments[pathSegments.length - 1];
-                const fileHandle = await currentHandle.getFileHandle(fileName);
+                const fileHandle = await this._getLocalFileHandle(dirHandle, moduleInfo.path);
                 const file = await fileHandle.getFile();
                 const fileText = await file.text();
                 const moduleData = JSON.parse(fileText);

@@ -49,8 +49,7 @@ A dynamic, interactive Progressive Web App (PWA) for creating, navigating, and l
 
 ## 📖 How to Use
 
-*   **Load a Module**: Click the hamburger icon (☰) in the top-left to open the side panel. Select a pre-defined module to get started.
-*   **Link More Modules**: Click "Link Modules" to connect to an external set of modules. You can either select a local folder on your computer that contains a `modules.json` manifest, or provide a URL to a remote repository. Linking from a URL will download the entire module set to a local folder you choose, enabling full offline editing and saving.
+*   **Link Your First Modules**: When the application starts, it's a blank canvas. Click the hamburger icon (☰) to open the side panel, then click "Link Modules". You can either select a local folder on your computer that contains a `modules.json` manifest (like the `modules` folder in this project), or provide a URL to a remote repository. Linking from a URL will download the entire module set to a local folder you choose, enabling full offline editing and saving.
 *   **Navigate the Map**:
     *   Click and drag on the map background to **pan**.
     *   Use the mouse wheel to **zoom** in and out.
@@ -66,9 +65,9 @@ A dynamic, interactive Progressive Web App (PWA) for creating, navigating, and l
     *   Click and drag any node to a new position.
     *   Click the "Save" button (download icon) in the map controls to save your changes. If the module is from a linked local folder, it will overwrite the original file. Otherwise, it will trigger a download.
 
-## 🧠 Available Knowledge Modules
+## 🧠 Example Knowledge Modules
 
-The application comes pre-loaded with a rich set of modules covering various technology domains. The main topics include:
+The project includes a rich set of example modules in the `/modules` directory that you can link to get started. The main topics include:
 
 *   **Artificial Intelligence**:
     *   Core Concepts & History
