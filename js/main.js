@@ -4,12 +4,19 @@ import { QuizManager } from './QuizManager.js';
 import { UIManager } from './UIManager.js';
 import { NodeManager } from './NodeManager.js';
 import { StateManager } from './StateManager.js';
-import { ModuleLoader } from './ModuleLoader.js';
+import { ModuleLoader } from './ModuleLoader.js'; // Import the new manager
+import { StorageManager } from './StorageManager.js';
 import { SearchHandler } from './SearchHandler.js';
 import { BreadcrumbManager } from './BreadcrumbManager.js';
 import { ToastManager } from './ToastManager.js';
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Immediately-invoked async function to initialize the app
+    (async () => {
+        await new MindMapApp().init();
+    })();
+});
+
     class MindMapApp {
         constructor() {
             /**
@@ -37,32 +44,15 @@ document.addEventListener('DOMContentLoaded', () => {
             };
             this.stateManager = new StateManager();
             this.state = this.stateManager.getState();
+            this.availableModules = []; // Will be populated from modules.json
+        }
 
-            this.availableModules = [
-                { name: 'Artificial Intelligence', path: 'modules/ai.json' }, // Main entry point
-                // ... other modules
-                { name: 'Machine Learning', path: 'modules/ai/ml.json' },
-                { name: 'Deep Learning', path: 'modules/ai/ml/deep-learning.json' },
-                { name: 'Natural Language Processing', path: 'modules/ai/applications/nlp.json' },
-                { name: 'History of AI', path: 'modules/ai/history-of-ai.json' },
-                { name: 'Computer Vision', path: 'modules/ai/applications/computer-vision.json' },
-                { name: 'Generative AI', path: 'modules/ai/applications/generative-ai.json' },
-                { name: 'AI Applications', path: 'modules/ai/applications.json' },
-                { name: 'AI Ethics', path: 'modules/ai/ethics.json' },
-                { name: 'Modern Web Development', path: 'modules/web-development.json' },
-                { name: 'Learning Paradigms', path: 'modules/ai/learning-paradigms.json' },
-                { name: 'Programming with AI', path: 'modules/ai/programming-with-ai.json' },
-                // New .NET Development Modules
-                { name: 'Modern .NET Development', path: 'modules/dotnet.json' },
-                { name: 'Web Rendering Models', path: 'modules/dotnet/web-rendering-models.json' },
-                { name: 'Blazor Framework', path: 'modules/dotnet/blazor.json' },
-                { name: 'Razor Syntax', path: 'modules/dotnet/razor-syntax.json' }
-            ];
-
+        async init() {
             this.mindmapContainer = document.getElementById('mindmap-svg-container');
             this.quizManager = new QuizManager(this.state);
             this.renderer = new MindMapRenderer(this.mindmapContainer, this.state);
             this.toastManager = new ToastManager();
+            this.storageManager = new StorageManager(); // Instantiate the new manager
             
             this.interaction = new MindMapInteraction(this.mindmapContainer, this, {
                 onPanZoom: (pan, zoom) => this.renderer.applyTransform(pan, zoom),
@@ -76,7 +66,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 },
             });
 
-            this.moduleLoader = new ModuleLoader(this.stateManager, this.availableModules, {
+            // Initialize ModuleLoader first, as it's needed for discovery.
+            this.moduleLoader = new ModuleLoader(this.stateManager, this.availableModules, this.storageManager, {
                 onModuleLoaded: () => {
                     this.quizManager.setMindMapData(this.state.mindMapData);
                     this.renderMindMap();
@@ -85,8 +76,63 @@ document.addEventListener('DOMContentLoaded', () => {
                     this.uiManager.updateOnModuleLoad();
                     this.setActiveNode('root');
                 },
+                onModuleCreated: (newModule) => {
+                    // This callback now receives the metadata for the new local module
+                    const userModulesString = localStorage.getItem('mindmap-user-modules') || '[]';
+                    const userModules = JSON.parse(userModulesString);
+                    userModules.push(newModule);
+                    localStorage.setItem('mindmap-user-modules', JSON.stringify(userModules));
+
+                    // Add the newly created module to the application's master list
+                    this.availableModules.push(newModule);
+                    // Repopulate the UI list to show the new module
+                    this.uiManager.populateModuleLoader(this.availableModules);
+                    this.toastManager.show(`Module '${newModule.name}' created and added to list.`, 'success');
+                },
+                onModulesLinked: (linkedModules) => {
+                    // 1. Save the manifest of the *new* linked modules.
+                    const newModuleManifest = linkedModules.map(m => ({ name: m.name, path: m.path, isTopLevel: m.isTopLevel, isLocal: m.isLocal })); // isRemote is now implicitly handled by isLocal
+                    localStorage.setItem('mindmap-user-modules', JSON.stringify(newModuleManifest));
+                    
+                    // 2. Rebuild the availableModules list from scratch to prevent duplicates.
+                    // Use a Map to handle deduplication based on the module path.
+                    const moduleMap = new Map();
+                    // Start with base modules, then add the new manifest.
+                    this.baseModules.forEach(m => moduleMap.set(m.path, m));
+                    newModuleManifest.forEach(m => moduleMap.set(m.path, m)); // These are now all isLocal
+                    
+                    this.availableModules = Array.from(moduleMap.values());
+                    
+                    // CRITICAL FIX: Update the ModuleLoader's reference to the new array.
+                    this.moduleLoader.availableModules = this.availableModules;
+
+                    // 3. Repopulate the UI with the fresh list.
+                    // At this point, no content is loaded, just the manifest.
+                    this.uiManager.populateModuleLoader(this.availableModules);
+                    this.toastManager.show(`Successfully linked manifest with ${linkedModules.length} modules.`, 'success');
+                },
+                onSaveSuccess: (message) => {
+                    this.toastManager.show(message, 'success');
+                },
                 onMenuClose: () => this.uiManager.closeMenu(),
             });
+
+            // --- DYNAMIC MODULE DISCOVERY ---
+            try {
+                const cachedModules = localStorage.getItem('mindmap-discovered-modules');
+                // We no longer load base modules by default. The user must link them.
+                this.baseModules = []; // Initialize as empty.
+                
+                // Load any modules the user has previously linked.
+                const userModulesString = localStorage.getItem('mindmap-user-modules');
+                if (userModulesString) {
+                    this.availableModules.push(...JSON.parse(userModulesString));
+                }
+            } catch (error) {
+                console.error("Fatal Error: Could not initialize application modules.", error);
+                document.body.innerHTML = `<h1>Error</h1><p>Could not load and discover application modules. Please check the console for details and consider resetting the application.</p>`;
+                return;
+            }
 
             this.nodeManager = new NodeManager(this.state, {
                 onDataUpdate: (resetView = false) => {
@@ -120,10 +166,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 },
             });
 
+            // Initialize BreadcrumbManager after module discovery so it has the full list of paths.
             this.breadcrumbManager = new BreadcrumbManager(this.availableModules.map(m => m.path), this.moduleLoader);
 
             this.uiManager = new UIManager(this.state, {
-                onModuleSelect: (path) => this.moduleLoader.loadModuleAndResetStack(path),
+                onModuleSelect: (path) => {
+                    this.moduleLoader.loadModuleAndResetStack(path);
+                },
                 onBreadcrumbClick: (index, modulePath) => {
                     this.logDiagnostics('Breadcrumb Click', 'root');
                     // The index from the UI represents the desired position in the stack.
@@ -174,8 +223,19 @@ document.addEventListener('DOMContentLoaded', () => {
                     this.renderMindMap();
                 },
                 onSaveModule: () => this.moduleLoader.saveModuleToFile(),
-                onLoadModuleFromFile: () => this.moduleLoader.loadModuleFromFile(),
                 onAutoOrganize: () => this.autoOrganize(),
+                onCreateModule: (moduleName, fileName) => {
+                    // This is the new callback from UIManager
+                    this.moduleLoader.createNewModule(moduleName, fileName);
+                },
+                onLinkFromUrl: (baseUrl) => {
+                    // New callback to discover and add remote modules from a URL manifest
+                    this.moduleLoader.linkModulesFromUrl(baseUrl);
+                },
+                onLinkFromDirectory: () => {
+                    // We now use the more generic onModulesLinked callback for this.
+                    this.moduleLoader.linkModulesFromDirectory(); // This will eventually call onModulesLinked.
+                }
             });
             this.uiManager.callbacks.onStopAutoOrganize = (event) => this.stopAutoOrganize(event);
             this.renderer.callbacks = { onLayoutEnd: () => {
@@ -184,9 +244,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }};
 
             this.uiManager.populateModuleLoader(this.availableModules);
-            this.moduleLoader.loadModule('modules/ai.json');
         }
-
         renderMindMap() {
             if (!this.state.mindMapData) return;
 
@@ -291,6 +349,3 @@ document.addEventListener('DOMContentLoaded', () => {
             this.uiManager.stopOrganizeIndicator(); // Stop the blinking indicator
         }
     }
-
-    new MindMapApp();
-});

@@ -13,44 +13,43 @@ export class SearchHandler {
         const searchTerm = term.toLowerCase();
         const allResults = [];
 
-        const modulePromises = this.availableModules.map(moduleInfo =>
-            fetch(moduleInfo.path)
-                .then(res => res.json())
-                .then(moduleData => {
-                    Object.values(moduleData.nodes).forEach(node => {
-                        const title = node.title.toLowerCase();
-                        const content = (node.content || '').replace(/<[^>]*>/g, ' ').toLowerCase();
-                        let matchIndex = -1;
-                        let foundIn = '';
+        // This search is now more robust. It will use cached data if available,
+        // but will fetch module data on-the-fly if it's not in the cache.
+        const searchPromises = this.availableModules.map(async (moduleInfo) => {
+            try {
+                const moduleData = await this.callbacks.getModuleData(moduleInfo.path);
+                if (!moduleData) return;
 
-                        if (title.includes(searchTerm)) {
-                            matchIndex = title.indexOf(searchTerm);
-                            foundIn = 'title';
-                        } else if (content.includes(searchTerm)) {
-                            matchIndex = content.indexOf(searchTerm);
-                            foundIn = 'content';
-                        }
+                Object.values(moduleData.nodes).forEach(node => {
+                    const title = node.title.toLowerCase();
+                    const content = (node.content || '').replace(/<[^>]*>/g, ' ').toLowerCase();
+                    let matchIndex = -1;
+                    let foundIn = '';
 
-                        if (matchIndex > -1) {
-                            const sourceText = foundIn === 'title' ? node.title : node.content.replace(/<[^>]*>/g, ' ');
-                            const snippetStart = Math.max(0, matchIndex - 30);
-                            const snippetEnd = Math.min(sourceText.length, matchIndex + term.length + 30);
-                            let snippet = sourceText.substring(snippetStart, snippetEnd).trim();
-                            if (snippetStart > 0) snippet = '...' + snippet;
-                            if (snippetEnd < sourceText.length) snippet = snippet + '...';
-                            allResults.push({
-                                nodeId: node.id,
-                                title: node.title,
-                                snippet: snippet,
-                                moduleName: moduleData.name,
-                                modulePath: moduleInfo.path
-                            });
-                        }
-                    });
-                }).catch(err => console.warn(`Could not fetch ${moduleInfo.path} for search.`))
-        );
+                    if (title.includes(searchTerm)) {
+                        matchIndex = title.indexOf(searchTerm);
+                        foundIn = 'title';
+                    } else if (content.includes(searchTerm)) {
+                        matchIndex = content.indexOf(searchTerm);
+                        foundIn = 'content';
+                    }
 
-        await Promise.all(modulePromises);
+                    if (matchIndex > -1) {
+                        const sourceText = foundIn === 'title' ? node.title : node.content.replace(/<[^>]*>/g, ' ');
+                        const snippetStart = Math.max(0, matchIndex - 30);
+                        const snippetEnd = Math.min(sourceText.length, matchIndex + term.length + 30);
+                        let snippet = sourceText.substring(snippetStart, snippetEnd).trim();
+                        if (snippetStart > 0) snippet = '...' + snippet;
+                        if (snippetEnd < sourceText.length) snippet = snippet + '...';
+                        allResults.push({ nodeId: node.id, title: node.title, snippet: snippet, moduleName: moduleData.name, modulePath: moduleInfo.path });
+                    }
+                });
+            } catch (error) {
+                console.warn(`Could not load module ${moduleInfo.path} for search:`, error);
+            }
+        });
+
+        await Promise.all(searchPromises);
         this.callbacks.onSearchResults(allResults);
     }
 

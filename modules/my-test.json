@@ -1,0 +1,14 @@
+{
+  "id": "my-test",
+  "name": "My Test",
+  "isTopLevel": true,
+  "nodes": {
+    "root": {
+      "id": "root",
+      "title": "My Test",
+      "content": "<h2>Welcome to My Test</h2><p>This is the root node of your new module. Select this node and click the 'Add' (+) icon to start building your mind map!</p>",
+      "children": []
+    }
+  },
+  "positions": {}
+}

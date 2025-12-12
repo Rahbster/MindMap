@@ -24,34 +24,8 @@ const urlsToCache = [
     './js/quiz.js',
     './js/editor.js',
     './README.md',
-    // Top-Level Modules
-    './modules/ai.json',
-    './modules/web-development.json',
-    // AI Sub-modules
-    './modules/ai/applications.json',
-    './modules/ai/ethics.json',
-    './modules/ai/history-of-ai.json',
-    './modules/ai/learning-paradigms.json',
-    './modules/ai/ml.json',
-    './modules/ai/programming-with-ai.json',
-    // AI/Applications Sub-modules
-    './modules/ai/applications/computer-vision.json',
-    './modules/ai/applications/generative-ai.json',
-    './modules/ai/applications/nlp.json',
-    // AI/ML Sub-modules
-    './modules/ai/ml/deep-learning.json',
-    './modules/ai/ml/reinforcement.json',
-    './modules/ai/ml/supervised.json',
-    './modules/ai/ml/unsupervised.json',
-    // Web Dev Sub-modules
-    './modules/web-development/css.json',
-    './modules/web-development/html.json',
-    // .NET Sub-modules
-    './modules/dotnet.json',
-    './modules/dotnet/web-rendering-models.json',
-    './modules/dotnet/dotnet-development.json',
-    './modules/dotnet/blazor.json',
-    './modules/dotnet/razor-syntax.json',
+    // Module Manifest
+    './modules/modules.json',
     // Manifest and Icons
     './manifest.json',
     './icons/icon-192x192.png',

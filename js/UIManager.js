@@ -1,4 +1,4 @@
-/**
+/**async 
  * Unregisters service workers, clears caches, and optionally clears all local storage.
  * @param {boolean} clearAllStorage - If true, localStorage and sessionStorage will be cleared.
  */
@@ -32,6 +32,25 @@ async function resetApplication(clearAllStorage) {
     }
 }
 
+/**
+ * Clears all data related to user-linked modules without a full reset.
+ */
+async function clearLinkedModules() {
+    try {
+        console.log('Clearing linked module data...');
+        // Clear the manifest of user-linked modules
+        localStorage.removeItem('mindmap-user-modules');
+        // Clear all cached module content
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key.startsWith('mindmap-module-')) localStorage.removeItem(key);
+        }
+        console.log('Linked module data cleared. Reloading page.');
+        window.location.reload();
+    } catch (error) {
+        console.error('Error clearing linked modules:', error);
+    }
+}
 export class UIManager {
     constructor(appState, callbacks) {
         this.state = appState;
@@ -58,6 +77,8 @@ export class UIManager {
 
         // Reset Modal Elements
         this.resetModal = document.getElementById('reset-modal');
+        this.createModuleModal = document.getElementById('create-module-modal');
+        this.linkModulesModal = document.getElementById('link-modules-modal');
 
         this.mainContainer = document.querySelector('.container');
 
@@ -86,7 +107,6 @@ export class UIManager {
                 this.closeMenu();
             }
         });
-        // Event delegation for dynamically added font buttons
         this.initFontControlListeners();
         this.nodeSearchInput.addEventListener('input', (e) => this.callbacks.onSearch(e.target.value));
         this.searchResultsContainer.addEventListener('click', (e) => {
@@ -96,7 +116,8 @@ export class UIManager {
             }
         });
         this.saveModuleBtn.addEventListener('click', () => this.callbacks.onSaveModule());
-        document.getElementById('load-module-btn').addEventListener('click', () => this.callbacks.onLoadModuleFromFile());
+        document.getElementById('create-module-btn').addEventListener('click', () => this.openCreateModuleModal());
+        document.getElementById('open-link-modules-modal-btn').addEventListener('click', () => this.openLinkModulesModal());
         
         // Change Auto-Organize to press-and-hold
         this.autoOrganizeBtn.addEventListener('mousedown', () => {
@@ -166,10 +187,65 @@ export class UIManager {
         document.getElementById('reset-full-btn').addEventListener('click', () => {
             resetApplication(true); // true = clear all storage
         });
+        document.getElementById('reset-clear-linked-btn').addEventListener('click', () => {
+            clearLinkedModules();
+        });
         this.resetModal.addEventListener('click', (event) => {
             if (event.target === this.resetModal) {
                 this.resetModal.classList.add('hidden');
             }
+        });
+
+        // Create Module Modal Listeners
+        document.getElementById('create-module-cancel-btn').addEventListener('click', () => this.closeCreateModuleModal());
+        document.getElementById('create-module-save-btn').addEventListener('click', () => {
+            const moduleName = document.getElementById('new-module-name-input').value;
+            const fileName = document.getElementById('new-module-filename-input').value;
+            this.callbacks.onCreateModule(moduleName, fileName);
+            this.closeCreateModuleModal();
+        });
+        this.createModuleModal.addEventListener('click', (event) => {
+            // Close modal if clicking on the overlay
+            if (event.target === this.createModuleModal) {
+                this.closeCreateModuleModal();
+            }
+        });
+
+        // Link Modules (Manifest) Modal Listeners
+        const toggleLinkBtn = document.getElementById('toggle-link-mode-btn');
+        toggleLinkBtn.addEventListener('click', () => {
+            const isUrlMode = toggleLinkBtn.dataset.mode === 'url';
+            document.getElementById('link-url-section').classList.toggle('hidden', isUrlMode);
+            document.getElementById('link-dir-section').classList.toggle('hidden', !isUrlMode);
+            if (isUrlMode) {
+                toggleLinkBtn.dataset.mode = 'dir';
+                toggleLinkBtn.textContent = 'Switch to URL';
+                document.getElementById('link-confirm-btn').textContent = 'Select Folder...';
+            } else { // Directory mode
+                toggleLinkBtn.dataset.mode = 'url';
+                toggleLinkBtn.textContent = 'Switch to Local Folder';
+                document.getElementById('link-confirm-btn').textContent = 'Select Folder & Link...';
+            }
+        });
+
+        document.getElementById('link-cancel-btn').addEventListener('click', () => this.closeLinkModulesModal());
+        document.getElementById('link-confirm-btn').addEventListener('click', () => {
+            const mode = document.getElementById('toggle-link-mode-btn').dataset.mode;
+            if (mode === 'url') {
+                const manifestUrl = document.getElementById('manifest-url-input').value;
+                if (manifestUrl) {
+                    this.callbacks.onLinkFromUrl(manifestUrl);
+                    this.closeLinkModulesModal();
+                } else {
+                    alert('Please enter a valid URL.');
+                }
+            } else { // Directory mode
+                this.callbacks.onLinkFromDirectory();
+                this.closeLinkModulesModal();
+            }
+        });
+        this.linkModulesModal.addEventListener('click', (event) => {
+            if (event.target === this.linkModulesModal) this.closeLinkModulesModal();
         });
     }
 
@@ -230,6 +306,38 @@ export class UIManager {
         this.mainContent.classList.remove('main-content-shifted');
     }
 
+    openCreateModuleModal() {
+        this.createModuleModal.classList.remove('hidden');
+        this.createModuleModal.style.display = 'flex';
+        document.getElementById('new-module-name-input').value = '';
+        document.getElementById('new-module-filename-input').value = '';
+        this.closeMenu();
+    }
+
+    closeCreateModuleModal() {
+        this.createModuleModal.classList.add('hidden');
+        this.createModuleModal.style.display = 'none';
+    }
+
+    openLinkModulesModal() {
+        this.linkModulesModal.classList.remove('hidden');
+        this.linkModulesModal.style.display = 'flex';
+        // Reset to default URL mode
+        const toggleBtn = document.getElementById('toggle-link-mode-btn');
+        toggleBtn.dataset.mode = 'url';
+        toggleBtn.textContent = 'Switch to Local Folder';
+        document.getElementById('link-url-section').classList.remove('hidden');
+        document.getElementById('link-dir-section').classList.add('hidden');
+        document.getElementById('link-confirm-btn').textContent = 'Select Folder & Link...';
+        document.getElementById('manifest-url-input').value = '';
+        this.closeMenu();
+    }
+
+    closeLinkModulesModal() {
+        this.linkModulesModal.classList.add('hidden');
+        this.linkModulesModal.style.display = 'none';
+    }
+
     startOrganizeIndicator() {
         this.autoOrganizeBtn.classList.add('organizing');
     }
@@ -248,21 +356,13 @@ export class UIManager {
     async populateModuleLoader(availableModules) {
         this.moduleLoaderEl.innerHTML = '';
 
-        // 1. Fetch the content of all available modules to check the 'isTopLevel' flag.
-        const moduleContents = await Promise.all(
-            availableModules.map(m => fetch(m.path).then(res => res.json()).catch(() => null))
-        );
+        // 1. Filter for top-level modules or user-created local modules.
+        const topLevelModules = availableModules.filter(module => module.isTopLevel || module.isLocal || module.isRemote);
 
-        // 2. Filter modules where isTopLevel is explicitly true.
-        const topLevelModules = availableModules.filter((module, index) => {
-            const content = moduleContents[index];
-            return content && content.isTopLevel === true;
-        });
-
-        // 3. Sort the list alphabetically by name.
+        // 2. Sort the filtered list alphabetically by name.
         topLevelModules.sort((a, b) => a.name.localeCompare(b.name));
 
-        // 4. Render the filtered and sorted list.
+        // 3. Render the filtered and sorted list.
         topLevelModules.forEach(module => {
             const link = document.createElement('a');
             link.href = '#';

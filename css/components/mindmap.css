@@ -49,6 +49,21 @@
     border-radius: 4px; /* Add a slight rounding to the SVG area */
 }
 
+.welcome-message {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    text-align: center;
+    color: #cdd9e5;
+    padding: 2rem;
+}
+
+.welcome-message p {
+    max-width: 400px;
+}
+
 .mindmap-bg-star {
     fill: #a9cbe3; /* A soft blue-white for the stars */
     pointer-events: none; /* Ensure stars don't interfere with pan/zoom */

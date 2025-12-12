@@ -34,7 +34,8 @@
             <!-- Module links will be populated here -->
         </div>
         <hr>
-        <button id="load-module-btn" class="menu-btn">Load from File</button>
+        <button id="create-module-btn" class="menu-btn">Create New Module</button>
+        <button id="open-link-modules-modal-btn" class="menu-btn">Link Modules</button>
         <hr>
         <button id="show-readme-btn" class="menu-btn">Help / About</button>
         <hr>
@@ -55,12 +56,16 @@
                 <div class="map-controls">
                     <button id="decrease-map-font-btn" class="icon-button" title="Decrease Map Size">A-</button>
                     <button id="increase-map-font-btn" class="icon-button" title="Increase Map Size">A+</button>
-                    <button id="save-module-btn" class="icon-button hidden" title="Save to File"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg></button>
+                    <button id="save-module-btn" class="icon-button" title="Save to File"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg></button>
                     <button id="auto-organize-btn" class="icon-button" title="Auto Organize"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg></button>
                 </div>
                 <h2>Knowledge Map</h2>
                 <div id="mindmap-svg-container">
                     <!-- SVG Mind Map will be rendered here -->
+                    <div id="welcome-message" class="welcome-message">
+                        <h2>Welcome to the MindMap Knowledge System!</h2>
+                        <p>To get started, open the side menu (☰) and click "Link Modules" to connect to a local or remote set of knowledge maps.</p>
+                    </div>
                 </div>
             </div>
 
@@ -132,10 +137,60 @@
             <p>
                 <strong>Full Reset:</strong> Clears ALL data including saved settings, service workers, and cache.
             </p>
+            <p>
+                <strong>Clear Linked Modules:</strong> Removes all user-linked modules and their cached content, but keeps settings.
+            </p>
             <div class="modal-actions">
                 <button id="reset-preserve-btn" class="button-primary">Preserve Config</button>
                 <button id="reset-full-btn" class="button-danger">Full Reset</button>
+                <button id="reset-clear-linked-btn" class="button-secondary">Clear Linked</button>
                 <button id="reset-cancel-btn" class="button-secondary">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Module Modal -->
+    <div id="create-module-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h2>Create New Module</h2>
+            <p>Create a new top-level mind map module. You will be prompted to select a directory to save the file in.</p>
+            
+            <label for="new-module-name-input">Module Name (e.g., "My New Project")</label>
+            <input type="text" id="new-module-name-input" class="modal-input" placeholder="My New Project">
+            
+            <label for="new-module-filename-input">Filename (e.g., "my-project.json")</label>
+            <input type="text" id="new-module-filename-input" class="modal-input" placeholder="my-project.json">
+
+            <div class="modal-actions">
+                <button id="create-module-save-btn" class="button-primary">Create and Save</button>
+                <button id="create-module-cancel-btn" class="button-secondary">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Link Modules (from Manifest) Modal -->
+    <div id="link-modules-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="modal-header-flex">
+                <h2>Link Modules via Manifest</h2>
+                <button id="toggle-link-mode-btn" class="button-secondary" data-mode="url">Switch to Local Folder</button>
+            </div>
+
+            <!-- URL Input Section (default) -->
+            <div id="link-url-section">
+                <p>Enter the base URL of a remote module repository. The app will download the <code>modules.json</code> manifest and all listed modules to a local folder you select.</p>
+                <label for="manifest-url-input">Repository URL</label>
+                <input type="url" id="manifest-url-input" class="modal-input" placeholder="https://rahbster.github.io/MindMap/modules/">
+            </div>
+
+            <!-- File Input Section (hidden by default) -->
+            <div id="link-dir-section" class="hidden">
+                <p>Select a local folder containing a <code>modules.json</code> manifest file. The app will discover all modules listed within it.</p>
+            </div>
+
+            <div class="modal-actions">
+                <button id="link-confirm-btn" class="button-primary">Link</button>
+                <button id="link-cancel-btn" class="button-secondary">Cancel</button>
             </div>
         </div>
     </div>

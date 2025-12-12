@@ -1,0 +1,5 @@
+[
+    { "name": "Artificial Intelligence", "path": "modules/ai.json", "isTopLevel": true },
+    { "name": "Modern Web Development", "path": "modules/web-development.json", "isTopLevel": true },
+    { "name": "Modern .NET Development", "path": "modules/dotnet.json", "isTopLevel": true }
+]

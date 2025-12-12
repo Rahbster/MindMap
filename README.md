@@ -19,10 +19,10 @@ A dynamic, interactive Progressive Web App (PWA) for creating, navigating, and l
 *   **Interactive Quizzing System**:
     *   Each node can contain a mini-quiz to test user knowledge.
     *   The system shuffles questions to provide variety in learning sessions.
-*   **Data Persistence & File Management**:
-    *   **Local Storage**: All changes, including node content edits and custom node positions, are automatically saved to `localStorage`.
-    *   **Save to File**: Download the current state of any module as a `.json` file.
-    *   **Load from File**: Load a custom mind map module from a local `.json` file.
+*   **Data Persistence & Module Management**:
+    *   **Local Storage**: All changes, including node content edits and custom node positions, are automatically saved to `localStorage` for the currently loaded module hierarchy.
+    *   **Link Modules**: Link to external module collections from a local folder or a remote URL. Remote modules are downloaded locally for full offline access and editing.
+    *   **Save to File**: Save changes to a linked local module directly back to its original file, or download a new copy for other modules.
 *   **User-Friendly Interface**:
     *   **Global Search**: A powerful search that finds nodes across *all* available modules and allows for seamless navigation directly to a result in a different module.
     *   **Dynamic Font Sizing**: Increase or decrease the font size for all content, with UI elements scaling proportionally.
@@ -49,7 +49,8 @@ A dynamic, interactive Progressive Web App (PWA) for creating, navigating, and l
 
 ## 📖 How to Use
 
-*   **Load a Module**: Click the hamburger icon (☰) in the top-left to open the side panel. Select a pre-defined module or click "Load from File" to open a local `.json` file.
+*   **Load a Module**: Click the hamburger icon (☰) in the top-left to open the side panel. Select a pre-defined module to get started.
+*   **Link More Modules**: Click "Link Modules" to connect to an external set of modules. You can either select a local folder on your computer that contains a `modules.json` manifest, or provide a URL to a remote repository. Linking from a URL will download the entire module set to a local folder you choose, enabling full offline editing and saving.
 *   **Navigate the Map**:
     *   Click and drag on the map background to **pan**.
     *   Use the mouse wheel to **zoom** in and out.
@@ -59,13 +60,11 @@ A dynamic, interactive Progressive Web App (PWA) for creating, navigating, and l
     *   Select a node.
     *   Click the pencil icon (✎) next to the node's title in the right-hand panel.
     *   Make your changes in the modal and click "Save".
-*   **Modify the Map**:
+*   **Modify the Map & Save**:
     *   Select a node, then click the plus icon (+) to add a new child node.
     *   Select a node, then click the trash icon (🗑️) to remove it.
     *   Click and drag any node to a new position.
-*   **Organize & Save**:
-    *   Click the "Arrange" button (grid icon) in the map panel to reset all nodes to their default positions.
-    *   Click the "Save" button (download icon) to save the current module, including all your edits and custom positions, to a `.json` file.
+    *   Click the "Save" button (download icon) in the map controls to save your changes. If the module is from a linked local folder, it will overwrite the original file. Otherwise, it will trigger a download.
 
 ## 🧠 Available Knowledge Modules
 
