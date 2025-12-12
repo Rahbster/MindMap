@@ -241,10 +241,10 @@ export class ModuleLoader {
                 if (visited.has(relativePath)) continue;
                 visited.add(relativePath);
 
-                // CRITICAL FIX: The URL constructor was incorrectly resolving the path.
-                // We need to construct the URL manually by combining the origin of the base URL
-                // with the relative path from the manifest, which is relative to the project root.
-                const fullUrl = new URL(baseUrl).origin + '/' + relativePath;
+                // CRITICAL FIX: Resolve the relative path from the parent of the manifest's URL.
+                // This correctly handles cases where the manifest paths are relative to the project root,
+                // not the directory containing the manifest.
+                const fullUrl = new URL(relativePath, new URL('..', manifestUrl)).href;
                 try {
                     const moduleResponse = await fetch(fullUrl);
                     if (!moduleResponse.ok) throw new Error(`HTTP ${moduleResponse.status}`);
