@@ -360,7 +360,7 @@ export class UIManager {
         this.moduleLoaderEl.innerHTML = '';
 
         // 1. Filter for top-level modules or user-created local modules.
-        const topLevelModules = availableModules.filter(module => module.isTopLevel || module.isLocal || module.isRemote);
+        const topLevelModules = availableModules.filter(module => module.isTopLevel);
 
         // 2. Sort the filtered list alphabetically by name.
         topLevelModules.sort((a, b) => a.name.localeCompare(b.name));
