@@ -231,6 +231,23 @@ export class ModuleLoader {
             await localManifestWritable.write(JSON.stringify(remoteManifest, null, 2));
             await localManifestWritable.close();
 
+            // --- INTELLIGENT PATH HANDLING ---
+            // Find the common base path from all module paths in the manifest.
+            // This prevents creating unnecessary folders like 'modules/' if all paths share it.
+            const allPaths = remoteManifest.map(m => m.path);
+            let commonBasePath = '';
+            if (allPaths.length > 0) {
+                const firstPathParts = allPaths[0].split('/');
+                for (let i = 0; i < firstPathParts.length - 1; i++) {
+                    const potentialBase = firstPathParts.slice(0, i + 1).join('/') + '/';
+                    if (allPaths.every(p => p.startsWith(potentialBase))) {
+                        commonBasePath = potentialBase;
+                    } else {
+                        break;
+                    }
+                }
+            }
+
             // 4. Eagerly fetch and save all individual module files, including sub-modules.
             const newModules = [];
             const queue = remoteManifest.map(m => m.path); // Start queue with top-level modules
@@ -250,8 +267,9 @@ export class ModuleLoader {
                     if (!moduleResponse.ok) throw new Error(`HTTP ${moduleResponse.status}`);
                     const moduleData = await moduleResponse.json();
 
-                    // Save the file locally
-                    const pathSegments = relativePath.split('/');
+                    // Create the correct local path by removing the common base.
+                    const localRelativePath = relativePath.startsWith(commonBasePath) ? relativePath.substring(commonBasePath.length) : relativePath;
+                    const pathSegments = localRelativePath.split('/');
                     let currentHandle = dirHandle;
                     for (let i = 0; i < pathSegments.length - 1; i++) {
                         currentHandle = await currentHandle.getDirectoryHandle(pathSegments[i], { create: true });
