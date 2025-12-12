@@ -231,40 +231,58 @@ export class ModuleLoader {
             await localManifestWritable.write(JSON.stringify(remoteManifest, null, 2));
             await localManifestWritable.close();
 
-            // 4. Eagerly fetch and save all individual module files.
+            // 4. Eagerly fetch and save all individual module files, including sub-modules.
             const newModules = [];
-            for (const moduleInfo of remoteManifest) {
-                const fullUrl = new URL(moduleInfo.path, manifestUrl).href;
-                const moduleResponse = await fetch(fullUrl);
-                if (!moduleResponse.ok) {
-                    console.warn(`Failed to fetch module: ${fullUrl}. Skipping.`);
-                    continue;
+            const queue = remoteManifest.map(m => m.path); // Start queue with top-level modules
+            const visited = new Set();
+
+            while (queue.length > 0) {
+                const relativePath = queue.shift();
+                if (visited.has(relativePath)) continue;
+                visited.add(relativePath);
+
+                // CRITICAL FIX: The URL constructor was incorrectly resolving the path.
+                // We need to construct the URL manually by combining the origin of the base URL
+                // with the relative path from the manifest, which is relative to the project root.
+                const fullUrl = new URL(baseUrl).origin + '/' + relativePath;
+                try {
+                    const moduleResponse = await fetch(fullUrl);
+                    if (!moduleResponse.ok) throw new Error(`HTTP ${moduleResponse.status}`);
+                    const moduleData = await moduleResponse.json();
+
+                    // Save the file locally
+                    const pathSegments = relativePath.split('/');
+                    let currentHandle = dirHandle;
+                    for (let i = 0; i < pathSegments.length - 1; i++) {
+                        currentHandle = await currentHandle.getDirectoryHandle(pathSegments[i], { create: true });
+                    }
+                    const fileName = pathSegments[pathSegments.length - 1];
+                    const fileHandle = await currentHandle.getFileHandle(fileName, { create: true });
+                    const writable = await fileHandle.createWritable();
+                    await writable.write(JSON.stringify(moduleData, null, 2));
+                    await writable.close();
+
+                    // Store content in localStorage for immediate use
+                    localStorage.setItem(`mindmap-module-${moduleData.id}`, JSON.stringify(moduleData));
+
+                    // Add to the list of modules to be linked
+                    const moduleInfo = remoteManifest.find(m => m.path === relativePath) || { name: moduleData.name, path: relativePath };
+                    newModules.push({
+                        ...moduleInfo,
+                        id: moduleData.id,
+                        path: relativePath,
+                        isLocal: true
+                    });
+
+                    // Discover and queue sub-modules
+                    Object.values(moduleData.nodes).forEach(node => {
+                        if (node.subModule && !visited.has(node.subModule)) {
+                            queue.push(node.subModule);
+                        }
+                    });
+                } catch (error) {
+                    console.warn(`Failed to fetch or process module: ${fullUrl}. Error: ${error.message}. Skipping.`);
                 }
-                const moduleData = await moduleResponse.json();
-
-                // Determine local path for saving.
-                // If moduleInfo.path is "modules/ai.json", we need to create a "modules" subfolder.
-                const pathSegments = moduleInfo.path.split('/');
-                let currentHandle = dirHandle;
-                for (let i = 0; i < pathSegments.length - 1; i++) {
-                    currentHandle = await currentHandle.getDirectoryHandle(pathSegments[i], { create: true });
-                }
-                const fileName = pathSegments[pathSegments.length - 1];
-                const fileHandle = await currentHandle.getFileHandle(fileName, { create: true });
-                const writable = await fileHandle.createWritable();
-                await writable.write(JSON.stringify(moduleData, null, 2));
-                await writable.close();
-
-                // Store the full content in localStorage for immediate access.
-                localStorage.setItem(`mindmap-module-${moduleData.id}`, JSON.stringify(moduleData));
-
-                // Add to the list of new modules, flagged as local.
-                newModules.push({
-                    ...moduleInfo,
-                    id: moduleData.id, // Ensure ID is from the file content
-                    path: moduleInfo.path, // Path is now relative to the linked local directory
-                    isLocal: true // Flag these as local modules.
-                });
             }
 
             // Use the onModulesLinked callback to replace the existing user-linked modules.
