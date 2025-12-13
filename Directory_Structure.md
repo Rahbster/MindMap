@@ -34,6 +34,7 @@ MindMap/
 │   ├── ToastManager.js
 │   └── UIManager.js
 ├── modules/
+|   ├── modules.json
 │   ├── ai/
 │   │   ├── applications/
 │   │   │   ├── computer-vision.json
